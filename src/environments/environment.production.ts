@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: '/api/v1',
+  apiUrl: 'https://api.sanatte.com/api/v1',
 };
+

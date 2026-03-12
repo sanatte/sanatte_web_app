@@ -70,7 +70,24 @@
                   "maximumError": "8kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.production.ts"
+                }
+              ]
+            },
+            "staging": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.staging.ts"
+                }
+              ]
             },
             "development": {
               "optimization": false,
@@ -85,6 +102,9 @@
           "configurations": {
             "production": {
               "buildTarget": "sanatte_frontend:build:production"
+            },
+            "staging": {
+              "buildTarget": "sanatte_frontend:build:staging"
             },
             "development": {
               "buildTarget": "sanatte_frontend:build:development"
