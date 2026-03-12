@@ -22,11 +22,9 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        working-directory: sanatte_web_app
         run: npm ci
 
       - name: Build Angular app
-        working-directory: sanatte_web_app
         run: npm run build -- --configuration=production
 
       - name: Log in to GitHub Container Registry
@@ -39,8 +37,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
-          context: ./sanatte_web_app
-          file: ./sanatte_web_app/Dockerfile
+          context: .
+          file: ./Dockerfile
           build-args: |
             NG_CONFIG=staging
           push: true
