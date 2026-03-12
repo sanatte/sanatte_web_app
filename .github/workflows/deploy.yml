@@ -1,0 +1,40 @@
+name: Sanatte Frontend Deployment
+
+on:
+  push:
+    branches:
+      - develop  # Se dispara al hacer merge a develop
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Angular Project
+        # Usamos staging o production según prefieras, aquí puse production
+        run: npm run build -- --configuration=production
+
+      - name: Deploy to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: 22
+          # Ruta basada en tu proyecto 'sanatte_frontend'
+          source: "dist/sanatte_frontend/browser/*"
+          target: ${{ secrets.REMOTE_TARGET }}
+          strip_components: 3 # Elimina 'dist/sanatte_frontend/browser'
+          rm: true # Limpia la carpeta destino antes de subir
