@@ -1,5 +1,4 @@
 name: Sanatte Frontend Deployment
-
 on:
   push:
     branches:
@@ -39,26 +38,6 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          build-args: |
-            NG_CONFIG=staging
           push: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/sanatte_frontend:latest
-            ghcr.io/${{ github.repository_owner }}/sanatte_frontend:${{ github.sha }}
-
-  deploy:
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy on VPS via SSH
-        uses: appleboy/ssh-action@v0.1.7
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          port: 22
-          script: |
-            docker pull ghcr.io/${{ github.repository_owner }}/sanatte_frontend:latest
-            docker stop sanatte_frontend || true
-            docker rm sanatte_frontend || true
-            docker run -d --name sanatte_frontend -p 80:80 --restart=always ghcr.io/${{ github.repository_owner }}/sanatte_frontend:latest
