@@ -24,7 +24,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       if (token) {
         headers = headers.set('Authorization', `Bearer ${token}`);
       }
-      
+
       if (appCheck) {
         headers = headers.set('X-Firebase-AppCheck', appCheck);
       }
