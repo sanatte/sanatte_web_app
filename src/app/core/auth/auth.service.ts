@@ -1,5 +1,12 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { Router } from '@angular/router';
+import {
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  User,
+} from 'firebase/auth';
+import { FirebaseService } from '../firebase/firebase.service';
 
 export interface AuthUser {
   uid: string;
@@ -11,60 +18,52 @@ export interface AuthUser {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly _currentUser = signal<AuthUser | null>(null);
-  private readonly _loading = signal(false);
+  private readonly _loading = signal(true);
+  private firebaseUser: User | null = null;
 
   readonly currentUser = this._currentUser.asReadonly();
   readonly isAuthenticated = computed(() => !!this._currentUser());
   readonly loading = this._loading.asReadonly();
 
-  constructor(private readonly router: Router) {
-    // Restore session from localStorage
-    const stored = localStorage.getItem('sanatte_user');
-    if (stored) {
-      try {
-        this._currentUser.set(JSON.parse(stored));
-      } catch {
-        localStorage.removeItem('sanatte_user');
+  constructor(
+    private readonly router: Router,
+    private readonly firebaseService: FirebaseService,
+  ) {
+    // Listen to Firebase auth state changes
+    onAuthStateChanged(this.firebaseService.auth, (user) => {
+      if (user) {
+        this.firebaseUser = user;
+        const authUser: AuthUser = {
+          uid: user.uid,
+          email: user.email || '',
+          displayName: user.displayName || user.email?.split('@')[0] || '',
+          role: 'admin',
+        };
+        this._currentUser.set(authUser);
+      } else {
+        this.firebaseUser = null;
+        this._currentUser.set(null);
       }
-    }
+      this._loading.set(false);
+    });
   }
 
-  /**
-   * Simulated login — replace with Firebase Auth when config is ready.
-   * For now, accepts any email/password and creates a mock admin user.
-   */
-  async login(email: string, _password: string): Promise<void> {
+  async login(email: string, password: string): Promise<void> {
     this._loading.set(true);
     try {
-      // Simulate network delay
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
-      const user: AuthUser = {
-        uid: 'mock-uid-001',
-        email,
-        displayName: email.split('@')[0],
-        role: 'admin',
-      };
-
-      this._currentUser.set(user);
-      localStorage.setItem('sanatte_user', JSON.stringify(user));
+      await signInWithEmailAndPassword(this.firebaseService.auth, email, password);
     } finally {
       this._loading.set(false);
     }
   }
 
   async logout(): Promise<void> {
-    this._currentUser.set(null);
-    localStorage.removeItem('sanatte_user');
+    await signOut(this.firebaseService.auth);
     await this.router.navigate(['/login']);
   }
 
-  /**
-   * Returns a mock token for API calls.
-   * Replace with: await firebase.auth().currentUser?.getIdToken()
-   */
   async getIdToken(): Promise<string | null> {
-    if (!this._currentUser()) return null;
-    return 'mock-firebase-id-token';
+    if (!this.firebaseUser) return null;
+    return this.firebaseUser.getIdToken();
   }
 }
