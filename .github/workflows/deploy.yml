@@ -44,5 +44,6 @@ jobs:
 
       - name: Trigger Coolify Redeploy
         run: |
-          curl -k -X GET "${{ secrets.COOLIFY_WEBHOOK }}"
+          curl -k -X GET "${{ secrets.COOLIFY_WEBHOOK }}" --max-time 10
+
 
