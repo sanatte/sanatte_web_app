@@ -14,8 +14,8 @@ export class FirebaseService {
     this.app = initializeApp(environment.firebase);
     this._auth = getAuth(this.app);
 
-    // Si estamos en entorno de desarrollo/local, decirle a Firebase que genere un token de debug
-    if (!environment.production) {
+    // Solo activar debug token de App Check en desarrollo local
+    if (environment.debugAppCheck) {
       (self as any).FIREBASE_APPCHECK_DEBUG_TOKEN = true;
     }
 

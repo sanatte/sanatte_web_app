@@ -9,7 +9,7 @@ import { Emotion, CreateEmotionRequest, UpdateEmotionRequest, EMOTION_VALENCES }
     @if (open()) {
       <div class="fixed inset-0 z-50 flex items-center justify-center">
         <!-- Backdrop -->
-        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="onCancel()"></div>
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
 
         <!-- Dialog -->
         <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 p-6">
@@ -40,9 +40,6 @@ import { Emotion, CreateEmotionRequest, UpdateEmotionRequest, EMOTION_VALENCES }
               </div>
               <p class="text-[10px] text-gray-400 font-bold tracking-wider uppercase mt-1">Upload Emotion</p>
               <input id="imgUpload" type="file" accept="image/*" class="hidden" (change)="onFileSelected($event)">
-              @if (form.controls.icon.touched && form.controls.icon.errors) {
-                <p class="text-xs text-red-500">An image is required.</p>
-              }
             </div>
 
             <!-- Name and Status Row -->
@@ -124,7 +121,7 @@ export class EmotionFormDialogComponent {
   readonly valences = EMOTION_VALENCES;
 
   readonly form = this.fb.nonNullable.group({
-    icon: ['', Validators.required],
+    icon: [''],
     name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
     description: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(300)]],
     status: [true], // true = active, false = inactive

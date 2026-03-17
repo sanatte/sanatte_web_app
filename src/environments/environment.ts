@@ -1,5 +1,6 @@
 export const environment = {
   production: false,
+  debugAppCheck: true,
   apiUrl: 'http://localhost:3000/api/v1',
   recaptchaSiteKey: '6LcWu4gsAAAAAAMDRcSSn5hWLS-HkZowc3nQHq1h',
   firebase: {
@@ -12,4 +13,3 @@ export const environment = {
     measurementId: 'G-N31WGYDRE8'
   },
 };
-

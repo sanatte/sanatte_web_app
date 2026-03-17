@@ -1,5 +1,6 @@
 export const environment = {
   production: false,
+  debugAppCheck: false,
   apiUrl: 'https://api-dev.sanatte.com/api/v1',
   recaptchaSiteKey: '6LcWu4gsAAAAAAMDRcSSn5hWLS-HkZowc3nQHq1h',
   firebase: {
