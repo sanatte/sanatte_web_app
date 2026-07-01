@@ -1,6 +1,9 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { ResourceService } from '../../services/resource.service';
+import { ProductService } from '../../services/product.service';
+import { EntitlementService } from '../../services/entitlement.service';
 import { ResourceCardComponent } from '../../components/resource-card/resource-card.component';
+import { ResourcePreviewModalComponent } from '../../components/resource-preview-modal/resource-preview-modal.component';
 import { ResourceFormDialogComponent } from '../../components/resource-form-dialog/resource-form-dialog.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { AdminPageHeaderComponent } from '../../../../shared/components/admin-page-header/admin-page-header.component';
@@ -17,20 +20,28 @@ const PAGE_SIZE = 8;
   imports: [
     ResourceCardComponent, ResourceFormDialogComponent,
     ConfirmDialogComponent, AdminPageHeaderComponent,
-    PaginationComponent, SearchInputComponent,
+    PaginationComponent, SearchInputComponent, ResourcePreviewModalComponent,
   ],
   templateUrl: './admin-resources.component.html',
 })
 export class AdminResourcesComponent {
-  private readonly resourceService = inject(ResourceService);
+  private readonly resourceService    = inject(ResourceService);
+  private readonly productService     = inject(ProductService);
+  private readonly entitlementService = inject(EntitlementService);
+
+  readonly linkedCountMap = computed(() =>
+    this.entitlementService.buildLinkedCountMap(this.productService.products())
+  );
 
   readonly searchTerm       = signal('');
   readonly activeTab        = signal<TabFilter>('all');
   readonly currentPage      = signal(1);
   readonly isModalOpen      = signal(false);
   readonly editingResource  = signal<Resource | null>(null);
-  readonly isConfirmOpen    = signal(false);
-  readonly resourceToDelete = signal<Resource | null>(null);
+  readonly isConfirmOpen      = signal(false);
+  readonly resourceToDelete   = signal<Resource | null>(null);
+  readonly isPreviewOpen      = signal(false);
+  readonly previewingResource = signal<Resource | null>(null);
 
   readonly tabs: { key: TabFilter; label: string }[] = [
     { key: 'all',      label: 'Todos'      },
@@ -65,6 +76,21 @@ export class AdminResourcesComponent {
 
   onTabChange(tab: TabFilter): void { this.activeTab.set(tab); this.currentPage.set(1); }
   onSearch(term: string): void { this.searchTerm.set(term); this.currentPage.set(1); }
+
+  openPreview(resource: Resource): void {
+    this.previewingResource.set(resource);
+    this.isPreviewOpen.set(true);
+  }
+
+  closePreview(): void {
+    this.isPreviewOpen.set(false);
+    this.previewingResource.set(null);
+  }
+
+  onPreviewEdit(resource: Resource): void {
+    this.closePreview();
+    this.openEdit(resource);
+  }
 
   openCreate(): void { this.editingResource.set(null); this.isModalOpen.set(true); }
   openEdit(r: Resource): void { this.editingResource.set(r); this.isModalOpen.set(true); }

@@ -19,6 +19,52 @@
 | Roles | USER / ADMIN — guardado en localStorage, switcher dev visible |
 | Imágenes de producto | Array `ProductImage[]` con campo `isPrimary` |
 | Envíos físicos | Modal con transportadora + guía + link de rastreo |
+| **Arquitectura multi-tenant** | **Entitlements layer** — ecommerce core desacoplado del módulo de contenido |
+
+---
+
+## 1b. Visión Multi-Tenant ⭐
+
+Este ecommerce está diseñado para ser **reutilizable en múltiples proyectos**. El principio central:
+
+> **El ecommerce core nunca conoce el tipo de contenido digital del tenant.**
+
+### Capas del sistema
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  ECOMMERCE CORE (domain-agnostic, reutilizable)           │
+│  Product · Order · License · Activation · User            │
+│                                                           │
+│  Product.entitlements: Entitlement[]                      │
+│    { id, type, referenceId, label }  ← 100% abstracto    │
+└──────────────────────────────────────────────────────────┘
+                    ↓ pluggable por tenant (sin tocar el core)
+  ┌─────────────────────┐    ┌─────────────────────┐
+  │  MÓDULO SANATTE      │    │  MÓDULO ACADEMIA     │
+  │  Resource            │    │  Lesson              │
+  │  (audio/video/pdf/   │    │  (partitura/video/   │
+  │   artículo)          │    │   pista de práctica) │
+  │  EntitlementService  │    │  EntitlementService  │
+  │  → resuelve          │    │  → resuelve          │
+  │    content_item=res  │    │    content_item=lesson│
+  └─────────────────────┘    └─────────────────────┘
+```
+
+### Cómo agregar un nuevo tenant
+1. Crear el módulo de contenido propio (`Lesson`, `DownloadLink`, etc.)
+2. Implementar un `EntitlementService` que resuelva `content_item → TuModelo`
+3. **Sin tocar** `Product`, `Order`, `License`, `Activation`
+
+### EntitlementType (extensible sin breaking changes)
+```ts
+type EntitlementType =
+  | 'content_item'       // Sanatte: audio, video, pdf, artículo
+  | 'download'           // Software: archivo descargable
+  | 'license_key'        // Software: clave de activación de software
+  | 'qr_access'          // Físicos: acceso via escaneo QR
+  | 'subscription_tier'; // Suscripciones: nivel de acceso
+```
 
 ---
 

@@ -9,14 +9,15 @@ export class ResourceService {
   readonly resources = this._resources.asReadonly();
   readonly total     = computed(() => this._resources().length);
 
-  create(resource: Omit<Resource, 'id' | 'createdAt' | 'linkedProductIds'>): void {
-    const newResource: Resource = {
-      ...resource,
-      id: `res-${Date.now()}`,
-      linkedProductIds: [],
-      createdAt: new Date().toISOString().split('T')[0],
-    };
-    this._resources.update((list) => [newResource, ...list]);
+  getById(id: string): Resource | undefined {
+    return this._resources().find((r) => r.id === id);
+  }
+
+  create(resource: Omit<Resource, 'id' | 'createdAt'>): void {
+    this._resources.update((list) => [
+      { ...resource, id: `res-${Date.now()}`, createdAt: new Date().toISOString().split('T')[0] },
+      ...list,
+    ]);
   }
 
   update(id: string, changes: Partial<Resource>): void {

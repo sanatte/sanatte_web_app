@@ -1,6 +1,7 @@
 import { Component, input, output, effect, inject, signal, computed } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Product, ProductType, ProductImage } from '../../models/product.model';
+import { Entitlement } from '../../models/entitlement.model';
 
 const GRADIENT_PALETTE = [
   'from-violet-400 to-purple-600', 'from-indigo-400 to-violet-600',
@@ -120,7 +121,7 @@ export class ProductFormDialogComponent {
       accessType: type === 'physical' ? 'qr_activation'
                 : type === 'subscription' ? 'subscription'
                 : 'direct_purchase',
-      resources: this.product()?.resources ?? [],
+      entitlements: this.product()?.entitlements ?? [],
       specs: this.product()?.specs ?? [],
       images: imgs.length ? imgs : [
         { id: `img-${Date.now()}`, gradient: 'from-violet-400 to-purple-600',

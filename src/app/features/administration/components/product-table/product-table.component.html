@@ -85,17 +85,11 @@
 
             <!-- Recursos — lg+ -->
             <td class="hidden lg:table-cell px-6 py-4">
-              @if (product.resources.length > 0) {
-                <div class="flex items-center gap-2">
-                  <div class="flex gap-1">
-                    @for (r of resourceSummary(product); track r.icon) {
-                      <span class="material-symbols-outlined text-[15px] text-on-surface-variant">
-                        {{ r.icon }}
-                      </span>
-                    }
-                  </div>
+              @if (contentCount(product) > 0) {
+                <div class="flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[15px] text-primary">perm_media</span>
                   <span class="text-label-sm font-heading text-on-surface-variant">
-                    {{ product.resources.length }} recurso{{ product.resources.length !== 1 ? 's' : '' }}
+                    {{ contentCount(product) }} recurso{{ contentCount(product) !== 1 ? 's' : '' }}
                   </span>
                 </div>
               } @else {

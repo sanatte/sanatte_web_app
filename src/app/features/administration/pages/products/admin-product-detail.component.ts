@@ -2,9 +2,11 @@ import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { ProductService } from '../../services/product.service';
+import { EntitlementService } from '../../services/entitlement.service';
 import { StatusBadgeComponent } from '../../../../shared/components/status-badge/status-badge.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { Product, ProductImage, getPrimaryImage } from '../../models/product.model';
+import { Resource } from '../../models/resource.model';
 
 const RESOURCE_ICONS: Record<string, string> = {
   audio: 'headphones', video: 'videocam', pdf: 'picture_as_pdf', article: 'description',
@@ -16,12 +18,23 @@ const RESOURCE_ICONS: Record<string, string> = {
   templateUrl: './admin-product-detail.component.html',
 })
 export class AdminProductDetailComponent implements OnInit {
-  private readonly route   = inject(ActivatedRoute);
-  private readonly service = inject(ProductService);
+  private readonly route              = inject(ActivatedRoute);
+  private readonly service            = inject(ProductService);
+  private readonly entitlementService = inject(EntitlementService);
 
   readonly product       = signal<Product | null>(null);
   readonly selectedImage = signal<ProductImage | null>(null);
   readonly isConfirmOpen = signal(false);
+
+  readonly linkedResources = computed<Resource[]>(() => {
+    const p = this.product();
+    return p ? this.entitlementService.getResourcesForProduct(p) : [];
+  });
+
+  readonly entitlementCount = computed(() => {
+    const p = this.product();
+    return p ? this.entitlementService.getContentCount(p) : 0;
+  });
 
   readonly primaryImage = computed(() =>
     this.product() ? getPrimaryImage(this.product()!) ?? null : null

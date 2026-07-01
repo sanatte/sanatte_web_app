@@ -57,6 +57,16 @@ const TYPE_META: Record<ResourceType, { icon: string; label: string }> = {
             {{ metaLabel() }}
           </span>
         }
+
+        <!-- Preview button (aparece al hover) -->
+        <button (click)="preview.emit(resource())"
+                class="absolute inset-0 flex items-center justify-center
+                       bg-black/0 hover:bg-black/30 transition-colors group/prev">
+          <span class="material-symbols-outlined text-white text-[32px] opacity-0
+                       group-hover/prev:opacity-100 transition-opacity drop-shadow-lg">
+            play_circle
+          </span>
+        </button>
       </div>
 
       <!-- Body -->
@@ -76,13 +86,13 @@ const TYPE_META: Record<ResourceType, { icon: string; label: string }> = {
             <!-- Status -->
             <app-status-badge [status]="resource().status" />
 
-            <!-- Productos vinculados -->
-            @if (resource().linkedProductIds.length > 0) {
+            <!-- Productos vinculados (resuelto via EntitlementService en el padre) -->
+            @if (linkedProductCount() > 0) {
               <div class="flex items-center gap-1 text-primary">
                 <span class="material-symbols-outlined text-[13px]">link</span>
                 <span class="text-label-sm font-heading font-semibold">
-                  {{ resource().linkedProductIds.length }}
-                  producto{{ resource().linkedProductIds.length !== 1 ? 's' : '' }}
+                  {{ linkedProductCount() }}
+                  producto{{ linkedProductCount() !== 1 ? 's' : '' }}
                 </span>
               </div>
             }
@@ -109,9 +119,11 @@ const TYPE_META: Record<ResourceType, { icon: string; label: string }> = {
   `,
 })
 export class ResourceCardComponent {
-  readonly resource = input.required<Resource>();
-  readonly edit   = output<Resource>();
-  readonly delete = output<Resource>();
+  readonly resource           = input.required<Resource>();
+  readonly linkedProductCount = input(0);
+  readonly edit    = output<Resource>();
+  readonly delete  = output<Resource>();
+  readonly preview = output<Resource>();
 
   readonly typeMeta = computed(() => TYPE_META[this.resource().type]);
 

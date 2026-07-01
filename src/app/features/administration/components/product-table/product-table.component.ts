@@ -3,7 +3,7 @@ import { DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { StatusBadgeComponent } from '../../../../shared/components/status-badge/status-badge.component';
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
-import { Product, ProductType, AccessType, ResourceType, getPrimaryImage } from '../../models/product.model';
+import { Product, ProductType, AccessType, getPrimaryImage } from '../../models/product.model';
 
 interface TypeConfig  { label: string; classes: string; }
 interface AccessConfig { label: string; icon: string; classes: string; }
@@ -20,9 +20,6 @@ const ACCESS_CONFIG: Record<AccessType, AccessConfig> = {
   subscription:    { label: 'Suscripción',      icon: 'autorenew',       classes: 'text-primary' },
 };
 
-const RESOURCE_ICONS: Record<ResourceType, string> = {
-  audio: 'headphones', video: 'videocam', pdf: 'picture_as_pdf', article: 'article',
-};
 
 @Component({
   selector: 'app-product-table',
@@ -43,14 +40,8 @@ export class ProductTableComponent {
   accessConfig  = (a: AccessType)  => ACCESS_CONFIG[a];
   primaryImage  = (p: Product)     => getPrimaryImage(p);
 
-  resourceSummary(product: Product): { icon: string; count: number }[] {
-    const countByType = product.resources.reduce((acc, r) => {
-      acc[r.type] = (acc[r.type] ?? 0) + 1;
-      return acc;
-    }, {} as Record<ResourceType, number>);
-
-    return (Object.entries(countByType) as [ResourceType, number][])
-      .map(([type, count]) => ({ icon: RESOURCE_ICONS[type], count }));
+  contentCount(product: Product): number {
+    return product.entitlements.filter((e) => e.type === 'content_item').length;
   }
 
   priceLabel(product: Product): string {
