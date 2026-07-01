@@ -1,29 +1,63 @@
+/* ── Fonts ───────────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Be+Vietnam+Pro:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ===== Global Resets ===== */
+/* ── Base ────────────────────────────────────────────────────────────────── */
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: var(--color-gray-50);
-  color: var(--color-gray-800);
+  font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+  background-color: theme('colors.background');
+  color: theme('colors.on-background');
 }
 
-/* ===== Scrollbar ===== */
-::-webkit-scrollbar {
-  width: 6px;
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Manrope', system-ui, sans-serif;
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+/* ── Scrollbar ───────────────────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: theme('colors.primary'); border-radius: 10px; }
+
+/* ── Utilities ───────────────────────────────────────────────────────────── */
+@layer components {
+  .glass-card {
+    background: #ffffff;
+    box-shadow: 0px 10px 30px rgba(76, 29, 149, 0.07);
+    border: 1px solid rgba(203, 195, 215, 0.4);
+  }
+
+  .gradient-primary {
+    background: linear-gradient(135deg, #6b38d4 0%, #8455ef 100%);
+  }
 }
 
-::-webkit-scrollbar-thumb {
-  background: #D1D5DB;
-  border-radius: 3px;
+/* ── Utilities ───────────────────────────────────────────────────────────── */
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+  }
 }
 
-/* ===== Utilities ===== */
-.gradient-primary {
-  background: linear-gradient(135deg, #7C3AED 0%, #4F46E5 50%, #6D28D9 100%);
+/* ── Select: reemplaza flecha nativa por chevron del design system ──────── */
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='20' viewBox='0 96 960 960' width='20'%3E%3Cpath fill='%237b7486' d='M480 696 280 496l56-56 144 144 144-144 56 56-200 200Z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 2.5rem;
+}
+select:focus {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='20' viewBox='0 96 960 960' width='20'%3E%3Cpath fill='%236b38d4' d='M480 696 280 496l56-56 144 144 144-144 56 56-200 200Z'/%3E%3C/svg%3E");
+}
+
+/* ── Material Symbols ────────────────────────────────────────────────────── */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  user-select: none;
 }

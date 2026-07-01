@@ -1,0 +1,123 @@
+<div class="flex min-h-screen bg-background">
+
+  <!-- ── Backdrop móvil ──────────────────────────────────────────────────── -->
+  @if (sidebarOpen()) {
+    <div class="fixed inset-0 z-40 bg-on-background/40 backdrop-blur-sm lg:hidden"
+         (click)="closeSidebar()"></div>
+  }
+
+  <!-- ── Sidebar ─────────────────────────────────────────────────────────── -->
+  <aside class="fixed left-0 top-0 h-screen w-64 flex flex-col py-unit px-4
+                bg-surface-container-low shadow-sm z-50 transition-transform duration-300"
+         [class]="sidebarOpen() ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
+
+    <!-- Logo -->
+    <div class="mb-10 px-2 mt-4 flex items-center justify-between">
+      <div>
+        <h1 class="font-heading text-headline-md font-bold text-primary">Sanatte Admin</h1>
+        <p class="text-on-surface-variant text-label-sm opacity-70 font-heading mt-0.5">
+          Wellness Ecosystem
+        </p>
+      </div>
+      <!-- Cerrar sidebar en móvil -->
+      <button (click)="closeSidebar()"
+              class="lg:hidden p-1.5 rounded-lg hover:bg-surface-variant transition-colors">
+        <span class="material-symbols-outlined text-on-surface-variant text-[20px]">close</span>
+      </button>
+    </div>
+
+    <!-- Main nav -->
+    <nav class="flex-1 space-y-1 overflow-y-auto">
+      @for (item of mainNav; track item.route) {
+        <a [routerLink]="item.route"
+           routerLinkActive="text-primary font-bold border-r-4 border-primary bg-secondary-fixed/20"
+           [routerLinkActiveOptions]="{ exact: false }"
+           class="flex items-center gap-3 px-4 py-3 rounded-lg
+                  text-on-surface-variant hover:text-primary hover:bg-surface-variant/50
+                  transition-all duration-200">
+          <span class="material-symbols-outlined text-[20px]">{{ item.icon }}</span>
+          <span class="text-label-md font-heading">{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+
+    <!-- Bottom -->
+    <div class="mt-auto pt-4 space-y-1 border-t border-outline-variant/30">
+      <button class="w-full flex items-center justify-center gap-2 gradient-primary
+                     text-white py-3 rounded-full hover:shadow-primary transition-all
+                     active:scale-95 mb-3 text-label-md font-heading font-semibold">
+        <span class="material-symbols-outlined text-[20px]">add</span>
+        Crear nuevo
+      </button>
+      @for (item of bottomNav; track item.route) {
+        <a [routerLink]="item.route"
+           routerLinkActive="text-primary font-bold"
+           class="flex items-center gap-3 px-4 py-3 rounded-lg
+                  text-on-surface-variant hover:text-primary hover:bg-surface-variant/50
+                  transition-colors">
+          <span class="material-symbols-outlined text-[20px]">{{ item.icon }}</span>
+          <span class="text-label-md font-heading">{{ item.label }}</span>
+        </a>
+      }
+    </div>
+  </aside>
+
+  <!-- ── Main ────────────────────────────────────────────────────────────── -->
+  <main class="flex-1 flex flex-col min-w-0 lg:ml-64">
+
+    <!-- Topbar -->
+    <header class="sticky top-0 z-40 flex items-center justify-between gap-3
+                   px-4 lg:px-container-padding-desktop py-3
+                   bg-surface-bright/80 backdrop-blur-xl border-b border-outline-variant/20">
+
+      <div class="flex items-center gap-3">
+        <!-- Hamburger (solo móvil) -->
+        <button (click)="toggleSidebar()"
+                class="lg:hidden p-2 rounded-lg hover:bg-surface-container transition-colors">
+          <span class="material-symbols-outlined text-on-surface-variant">menu</span>
+        </button>
+
+        <h2 class="font-heading text-label-md lg:text-headline-md font-semibold text-on-surface truncate">
+          {{ pageTitle() }}
+        </h2>
+
+        <!-- Search (solo desktop) -->
+        <div class="relative hidden xl:block">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2
+                       text-outline text-[18px]">search</span>
+          <input type="text" placeholder="Buscar..."
+                 class="pl-9 pr-4 py-2 bg-surface-container rounded-full border-none
+                        focus:ring-2 focus:ring-primary/50 text-label-md w-56
+                        transition-all outline-none"/>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <!-- Search icon en móvil -->
+        <button class="xl:hidden p-2 hover:bg-surface-container rounded-full transition-colors">
+          <span class="material-symbols-outlined text-on-surface-variant text-[20px]">search</span>
+        </button>
+        <button class="p-2 hover:bg-surface-container rounded-full transition-colors relative">
+          <span class="material-symbols-outlined text-on-surface-variant text-[20px]">notifications</span>
+          <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full"></span>
+        </button>
+        <div class="w-8 h-8 rounded-full gradient-primary flex items-center justify-center
+                    text-white text-sm font-semibold font-heading cursor-pointer
+                    active:scale-95 transition-transform">
+          {{ userInitial() }}
+        </div>
+        <button (click)="logout()"
+                class="hidden sm:block p-2 hover:bg-surface-container rounded-full transition-colors"
+                title="Cerrar sesión">
+          <span class="material-symbols-outlined text-on-surface-variant text-[20px]">logout</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Page content -->
+    <div class="flex-1 min-w-0">
+      <router-outlet />
+    </div>
+
+  </main>
+</div>

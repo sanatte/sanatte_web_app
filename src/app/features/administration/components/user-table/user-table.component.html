@@ -1,0 +1,170 @@
+<div class="bg-white rounded-lg overflow-hidden border border-outline-variant/30"
+     style="box-shadow: 0px 10px 30px rgba(76,29,149,0.05)">
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+      <thead class="bg-surface-container-low border-b border-outline-variant/30">
+        <tr>
+          <th class="px-4 md:px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
+            Usuario
+          </th>
+          <th class="hidden md:table-cell px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
+            Rol
+          </th>
+          <th class="hidden lg:table-cell px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
+            Productos
+          </th>
+          <th class="hidden lg:table-cell px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
+            Suscripción
+          </th>
+          <th class="hidden xl:table-cell px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
+            Último acceso
+          </th>
+          <th class="px-4 md:px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
+            Estado
+          </th>
+          <th class="px-4 md:px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider text-right">
+            Acciones
+          </th>
+        </tr>
+      </thead>
+
+      <tbody class="divide-y divide-outline-variant/20">
+        @for (user of users(); track user.id) {
+          <tr class="hover:bg-surface-container-low/50 transition-colors">
+
+            <!-- Usuario — siempre -->
+            <td class="px-4 md:px-6 py-3 md:py-4">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 md:w-10 md:h-10 rounded-full flex-shrink-0 flex items-center
+                            justify-center text-white text-sm font-heading font-bold
+                            bg-gradient-to-br"
+                     [class]="user.avatarGradient">
+                  {{ user.avatarInitials }}
+                </div>
+                <div class="min-w-0">
+                  <p class="text-label-md font-heading font-bold text-on-surface truncate">
+                    {{ user.displayName }}
+                  </p>
+                  <p class="text-label-sm font-heading text-outline truncate">{{ user.email }}</p>
+                  <!-- Rol inline en móvil -->
+                  <span class="md:hidden inline-block mt-1 px-2 py-0.5 rounded-full
+                               text-[11px] font-heading font-semibold"
+                        [class]="roleClasses(user.role)">
+                    {{ roleLabel(user.role) }}
+                  </span>
+                </div>
+              </div>
+            </td>
+
+            <!-- Rol — md+ -->
+            <td class="hidden md:table-cell px-6 py-4">
+              <span class="px-3 py-1 rounded-full text-label-sm font-heading font-semibold"
+                    [class]="roleClasses(user.role)">
+                {{ roleLabel(user.role) }}
+              </span>
+            </td>
+
+            <!-- Productos — lg+ -->
+            <td class="hidden lg:table-cell px-6 py-4">
+              <div class="flex items-center gap-3">
+                <div>
+                  <p class="text-label-md font-heading font-semibold text-on-surface">
+                    {{ user.productsCount }}
+                    <span class="font-normal text-outline">comprados</span>
+                  </p>
+                  @if (user.activationsCount > 0) {
+                    <p class="text-label-sm font-heading text-primary mt-0.5">
+                      <span class="material-symbols-outlined text-[13px] align-middle">qr_code_scanner</span>
+                      {{ user.activationsCount }} activado{{ user.activationsCount !== 1 ? 's' : '' }}
+                    </p>
+                  }
+                </div>
+              </div>
+            </td>
+
+            <!-- Suscripción — lg+ -->
+            <td class="hidden lg:table-cell px-6 py-4">
+              @if (user.hasActiveSubscription) {
+                <div class="flex items-center gap-1.5 text-primary">
+                  <span class="material-symbols-outlined text-[15px]">autorenew</span>
+                  <span class="text-label-sm font-heading font-semibold">{{ user.subscriptionPlan }}</span>
+                </div>
+              } @else {
+                <span class="text-label-sm text-outline">—</span>
+              }
+            </td>
+
+            <!-- Último acceso — xl+ -->
+            <td class="hidden xl:table-cell px-6 py-4 text-label-sm font-heading text-on-surface-variant">
+              {{ user.lastLoginAt }}
+            </td>
+
+            <!-- Estado — siempre -->
+            <td class="px-4 md:px-6 py-3 md:py-4">
+              <app-status-badge [status]="user.status" />
+            </td>
+
+            <!-- Acciones — siempre -->
+            <td class="px-4 md:px-6 py-3 md:py-4 text-right">
+              <div class="flex justify-end gap-1">
+                <!-- Toggle rol -->
+                <button (click)="toggleRole.emit(user)"
+                        class="p-1.5 md:p-2 rounded-full text-outline hover:text-primary
+                               hover:bg-primary-fixed transition-colors"
+                        [title]="user.role === UserRole.Admin ? 'Cambiar a Usuario' : 'Cambiar a Admin'">
+                  <span class="material-symbols-outlined text-[18px]">
+                    {{ user.role === UserRole.Admin ? 'person' : 'admin_panel_settings' }}
+                  </span>
+                </button>
+                <!-- Toggle estado -->
+                <button (click)="toggleStatus.emit(user)"
+                        class="p-1.5 md:p-2 rounded-full transition-colors"
+                        [class]="user.status === 'active'
+                          ? 'text-outline hover:text-warning hover:bg-amber-50'
+                          : 'text-outline hover:text-emerald-600 hover:bg-green-50'"
+                        [title]="user.status === 'active' ? 'Bloquear' : 'Desbloquear'">
+                  <span class="material-symbols-outlined text-[18px]">
+                    {{ user.status === 'active' ? 'block' : 'check_circle' }}
+                  </span>
+                </button>
+                <!-- Eliminar -->
+                <button (click)="deleteUser.emit(user)"
+                        class="p-1.5 md:p-2 rounded-full text-outline hover:text-error
+                               hover:bg-error-container transition-colors"
+                        title="Eliminar">
+                  <span class="material-symbols-outlined text-[18px]">delete</span>
+                </button>
+              </div>
+            </td>
+
+          </tr>
+        }
+
+        @if (users().length === 0) {
+          <tr>
+            <td colspan="7" class="px-6 py-16 text-center">
+              <span class="material-symbols-outlined text-[48px] text-outline-variant block mb-3">
+                group
+              </span>
+              <p class="text-label-md font-heading text-on-surface-variant">
+                No se encontraron usuarios
+              </p>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="px-4 md:px-6 border-t border-outline-variant/20 bg-surface-container-lowest">
+    <app-pagination
+      [currentPage]="currentPage()"
+      [pageSize]="pageSize()"
+      [total]="totalItems()"
+      label="usuarios"
+      (pageChange)="pageChange.emit($event)" />
+  </div>
+
+</div>

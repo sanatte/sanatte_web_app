@@ -1,0 +1,102 @@
+<section class="px-4 md:px-8 lg:px-container-padding-desktop py-6 max-w-[1400px] mx-auto">
+
+  <app-admin-page-header
+    title="Catálogo de Recursos"
+    description="Gestiona todos los activos digitales de bienestar de la plataforma."
+    actionLabel="Subir recurso"
+    actionIcon="upload"
+    (action)="openCreate()" />
+
+  <!-- Tabs + Filters -->
+  <div class="space-y-4 mb-6">
+    <div class="border-b border-outline-variant/30">
+      <!-- Tabs con scroll horizontal en móvil -->
+      <div class="flex items-end justify-between gap-4 overflow-x-auto scrollbar-hide pb-0">
+        <div class="flex gap-4 md:gap-6 shrink-0">
+          @for (tab of tabs; track tab.key) {
+            <button (click)="onTabChange(tab.key)"
+                    class="pb-3 text-label-md font-heading transition-all whitespace-nowrap"
+                    [class]="activeTab() === tab.key
+                      ? 'text-primary font-bold border-b-2 border-primary'
+                      : 'text-on-surface-variant hover:text-primary'">
+              {{ tab.label }}
+            </button>
+          }
+        </div>
+        <!-- Search desktop -->
+        <div class="hidden sm:block shrink-0 pb-2 w-52">
+          <app-search-input placeholder="Buscar título o tag..." (search)="onSearch($event)" />
+        </div>
+      </div>
+      <!-- Search móvil -->
+      <div class="sm:hidden mt-2 mb-3">
+        <app-search-input placeholder="Buscar..." (search)="onSearch($event)" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Grid -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+
+    @for (resource of paginated(); track resource.id) {
+      <app-resource-card
+        [resource]="resource"
+        (edit)="openEdit($event)"
+        (delete)="requestDelete($event)" />
+    }
+
+    <!-- Empty state -->
+    @if (paginated().length === 0) {
+      <div class="col-span-full flex flex-col items-center justify-center py-20">
+        <span class="material-symbols-outlined text-[56px] text-outline-variant mb-3">
+          perm_media
+        </span>
+        <p class="font-heading text-label-md text-on-surface-variant">
+          No se encontraron recursos
+        </p>
+      </div>
+    }
+
+    <!-- Upload placeholder (último card) -->
+    @if (paginated().length > 0) {
+      <button (click)="openCreate()"
+              class="group aspect-video border-2 border-dashed border-outline-variant
+                     rounded-lg flex flex-col items-center justify-center gap-3
+                     hover:border-primary hover:bg-primary/5 transition-all
+                     text-on-surface-variant hover:text-primary">
+        <span class="material-symbols-outlined text-[40px]">upload_file</span>
+        <div class="text-center">
+          <p class="text-label-md font-heading font-bold">Nuevo recurso</p>
+          <p class="text-[12px] font-heading opacity-70">Arrastra o haz clic</p>
+        </div>
+      </button>
+    }
+  </div>
+
+  <!-- Pagination -->
+  <div class="mt-8">
+    <app-pagination
+      [currentPage]="currentPage()"
+      [pageSize]="8"
+      [total]="filtered().length"
+      label="recursos"
+      (pageChange)="currentPage.set($event)" />
+  </div>
+
+</section>
+
+<!-- Dialogs -->
+<app-resource-form-dialog
+  [isOpen]="isModalOpen()"
+  [resource]="editingResource()"
+  (save)="onSave($event)"
+  (cancel)="closeModal()" />
+
+<app-confirm-dialog
+  [open]="isConfirmOpen()"
+  title="Eliminar recurso"
+  [message]="deleteMessage()"
+  confirmText="Sí, eliminar"
+  variant="danger"
+  (confirm)="confirmDelete()"
+  (cancel)="cancelDelete()" />

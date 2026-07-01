@@ -1,33 +1,70 @@
 import { Routes } from '@angular/router';
-import { authGuard, guestGuard } from './core/auth/auth.guard';
+import { mockAuthGuard } from './core/guards/mock-auth.guard';
+import { adminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
+  // ── Auth (login, registro, recuperar) ──────────────────────────────────
   {
-    path: 'login',
-    canActivate: [guestGuard],
-    loadComponent: () =>
-      import('./features/auth/login/login.component').then((m) => m.LoginComponent),
+    path: 'auth',
+    loadChildren: () =>
+      import('./features/authentication/authentication.routes').then((m) => m.authenticationRoutes),
   },
+
+  // ── Admin ───────────────────────────────────────────────────────────────
   {
-    path: 'dashboard',
-    canActivate: [authGuard],
+    path: 'admin',
+    canActivate: [mockAuthGuard, adminGuard],
     loadComponent: () =>
-      import('./shared/layouts/dashboard-layout/dashboard-layout.component').then(
-        (m) => m.DashboardLayoutComponent
-      ),
+      import('./layouts/admin-layout/admin-layout.component').then((m) => m.AdminLayoutComponent),
+    loadChildren: () =>
+      import('./features/administration/administration.routes').then((m) => m.administrationRoutes),
+  },
+
+  // ── App usuario autenticado ─────────────────────────────────────────────
+  {
+    path: 'app',
+    canActivate: [mockAuthGuard],
+    loadComponent: () =>
+      import('./layouts/app-layout/app-layout.component').then((m) => m.AppLayoutComponent),
     children: [
       {
-        path: 'emotions',
+        path: 'library',
         loadChildren: () =>
-          import('./features/emotions/emotions.routes').then((m) => m.emotionsRoutes),
+          import('./features/library/library.routes').then((m) => m.libraryRoutes),
       },
       {
+        path: 'orders',
+        loadChildren: () =>
+          import('./features/orders/orders.routes').then((m) => m.ordersRoutes),
+      },
+      {
+        path: 'subscriptions',
+        loadChildren: () =>
+          import('./features/subscriptions/subscriptions.routes').then((m) => m.subscriptionsRoutes),
+      },
+      {
+        path: 'profile',
+        loadChildren: () =>
+          import('./features/profile/profile.routes').then((m) => m.profileRoutes),
+      },
+      { path: '', redirectTo: 'library', pathMatch: 'full' },
+    ],
+  },
+
+  // ── Sitio público ───────────────────────────────────────────────────────
+  {
+    path: '',
+    loadComponent: () =>
+      import('./layouts/public-layout/public-layout.component').then((m) => m.PublicLayoutComponent),
+    children: [
+      {
         path: '',
-        redirectTo: 'emotions',
-        pathMatch: 'full',
+        loadComponent: () =>
+          import('./features/public/pages/home/home.component').then((m) => m.HomeComponent),
       },
     ],
   },
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
-  { path: '**', redirectTo: 'login' },
+
+  // ── Fallback ─────────────────────────────────────────────────────────────
+  { path: '**', redirectTo: 'auth/login' },
 ];

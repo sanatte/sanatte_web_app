@@ -1,0 +1,172 @@
+<div class="bg-white rounded-lg overflow-hidden border border-outline-variant/20"
+     style="box-shadow: 0px 10px 30px rgba(76,29,149,0.05)">
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+      <thead class="bg-surface-container-low border-b border-outline-variant/30">
+        <tr>
+          <!-- Siempre -->
+          <th class="px-4 md:px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
+            Código
+          </th>
+          <!-- sm+ -->
+          <th class="hidden sm:table-cell px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
+            Usuario
+          </th>
+          <!-- md+ -->
+          <th class="hidden md:table-cell px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
+            Producto
+          </th>
+          <!-- lg+ -->
+          <th class="hidden lg:table-cell px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
+            Fecha
+          </th>
+          <!-- Siempre -->
+          <th class="px-4 md:px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
+            Estado
+          </th>
+          <!-- lg+ -->
+          <th class="hidden lg:table-cell px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
+            Dispositivo
+          </th>
+          <!-- Siempre -->
+          <th class="px-4 md:px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider text-right">
+            Acciones
+          </th>
+        </tr>
+      </thead>
+
+      <tbody class="divide-y divide-outline-variant/20">
+        @for (act of activations(); track act.id) {
+          <tr class="hover:bg-surface-bright transition-colors">
+
+            <!-- Código — siempre -->
+            <td class="px-4 md:px-6 py-4 md:py-5">
+              <span class="font-heading font-bold text-primary bg-primary/5 px-2 py-1
+                           rounded-md border border-primary/10 text-label-sm whitespace-nowrap">
+                {{ act.licenseCode }}
+              </span>
+              @if (act.orderId) {
+                <p class="text-label-sm font-heading text-on-surface-variant mt-1">
+                  {{ act.orderId }}
+                </p>
+              }
+              @if (act.status === 'success' && act.resourcesUnlocked > 0) {
+                <p class="text-label-sm font-heading text-primary mt-0.5">
+                  <span class="material-symbols-outlined text-[12px] align-middle">lock_open</span>
+                  {{ act.resourcesUnlocked }} recurso{{ act.resourcesUnlocked !== 1 ? 's' : '' }}
+                </p>
+              }
+            </td>
+
+            <!-- Usuario — sm+ -->
+            <td class="hidden sm:table-cell px-6 py-5">
+              @if (act.userName) {
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center
+                              text-white text-xs font-heading font-bold bg-gradient-to-br"
+                       [class]="act.userAvatarGradient">
+                    {{ act.userInitials }}
+                  </div>
+                  <div class="min-w-0">
+                    <p class="text-label-md font-heading font-bold text-on-surface truncate">
+                      {{ act.userName }}
+                    </p>
+                    <p class="text-label-sm font-heading text-outline truncate">
+                      {{ act.userEmail }}
+                    </p>
+                  </div>
+                </div>
+              } @else {
+                <span class="text-outline italic text-label-md font-heading">Anónimo</span>
+              }
+            </td>
+
+            <!-- Producto — md+ -->
+            <td class="hidden md:table-cell px-6 py-5">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center
+                            flex-shrink-0">
+                  <span class="material-symbols-outlined text-secondary text-[18px]">
+                    inventory_2
+                  </span>
+                </div>
+                <span class="text-label-md font-heading text-on-surface">
+                  {{ act.productName }}
+                </span>
+              </div>
+            </td>
+
+            <!-- Fecha — lg+ -->
+            <td class="hidden lg:table-cell px-6 py-5">
+              <p class="text-label-md font-heading text-on-surface">{{ act.date }}</p>
+              <p class="text-label-sm font-heading text-outline mt-0.5">{{ act.time }}h</p>
+            </td>
+
+            <!-- Estado — siempre -->
+            <td class="px-4 md:px-6 py-4 md:py-5">
+              <app-status-badge
+                [status]="statusBadge(act.status)"
+                [label]="statusLabel(act.status)" />
+            </td>
+
+            <!-- Dispositivo — lg+ -->
+            <td class="hidden lg:table-cell px-6 py-5">
+              <p class="text-label-sm font-heading text-on-surface font-medium">
+                {{ act.ipAddress }}
+              </p>
+              <p class="text-[10px] font-heading text-on-surface-variant uppercase tracking-wide mt-0.5">
+                {{ act.device }}
+              </p>
+            </td>
+
+            <!-- Acciones — siempre -->
+            <td class="px-4 md:px-6 py-4 md:py-5 text-right">
+              <div class="flex items-center justify-end gap-1">
+                <button (click)="viewDetail.emit(act)"
+                        class="p-2 text-outline hover:text-primary hover:bg-primary/5
+                               rounded-full transition-colors"
+                        title="Ver detalle">
+                  <span class="material-symbols-outlined text-[18px]">visibility</span>
+                </button>
+                @if (canRevoke(act)) {
+                  <button (click)="revoke.emit(act)"
+                          class="p-2 text-outline hover:text-error hover:bg-error-container
+                                 rounded-full transition-colors"
+                          title="Revocar activación">
+                    <span class="material-symbols-outlined text-[18px]">cancel</span>
+                  </button>
+                }
+              </div>
+            </td>
+
+          </tr>
+        }
+
+        @if (activations().length === 0) {
+          <tr>
+            <td colspan="7" class="px-6 py-16 text-center">
+              <span class="material-symbols-outlined text-[48px] text-outline-variant block mb-3">
+                qr_code_scanner
+              </span>
+              <p class="text-label-md font-heading text-on-surface-variant">
+                No se encontraron activaciones
+              </p>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="px-4 md:px-6 border-t border-outline-variant/20 bg-surface-container-lowest">
+    <app-pagination
+      [currentPage]="currentPage()"
+      [pageSize]="pageSize()"
+      [total]="totalItems()"
+      label="activaciones"
+      (pageChange)="pageChange.emit($event)" />
+  </div>
+
+</div>

@@ -1,24 +1,110 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "./src/**/*.{html,ts}",
-  ],
+  content: ['./src/**/*.{html,ts}'],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        primary: '#7C3AED',
-        'primary-dark': '#6D28D9',
-        'primary-light': '#A78BFA',
-        accent: '#10B981',
-        'accent-dark': '#059669',
-        danger: '#EF4444',
-        'danger-dark': '#DC2626',
-        warning: '#F59E0B',
-        'sidebar-bg': '#F8F7FC',
-        'sidebar-active': '#EDE9FE',
-      }
+        // ── Design System "Serene Pulse" ──────────────────────────────────
+        'primary':                    '#6b38d4',
+        'primary-container':          '#8455ef',
+        'primary-fixed':              '#e9ddff',
+        'primary-fixed-dim':          '#d0bcff',
+        'on-primary':                 '#ffffff',
+        'on-primary-container':       '#fffbff',
+        'on-primary-fixed':           '#23005c',
+        'on-primary-fixed-variant':   '#5516be',
+        'inverse-primary':            '#d0bcff',
+        'surface-tint':               '#6d3bd7',
+
+        'secondary':                  '#6f46b9',
+        'secondary-container':        '#b188ff',
+        'secondary-fixed':            '#ebdcff',
+        'secondary-fixed-dim':        '#d3bbff',
+        'on-secondary':               '#ffffff',
+        'on-secondary-container':     '#44118d',
+        'on-secondary-fixed':         '#260059',
+        'on-secondary-fixed-variant': '#572ba0',
+
+        'tertiary':                   '#5b5b65',
+        'tertiary-container':         '#74747e',
+        'tertiary-fixed':             '#e3e1ed',
+        'tertiary-fixed-dim':         '#c7c5d1',
+        'on-tertiary':                '#ffffff',
+        'on-tertiary-container':      '#fffbff',
+        'on-tertiary-fixed':          '#1a1b23',
+        'on-tertiary-fixed-variant':  '#46464f',
+
+        'surface':                    '#f8f9ff',
+        'surface-dim':                '#d0dbed',
+        'surface-bright':             '#f8f9ff',
+        'surface-container-lowest':   '#ffffff',
+        'surface-container-low':      '#eff4ff',
+        'surface-container':          '#e6eeff',
+        'surface-container-high':     '#dee9fc',
+        'surface-container-highest':  '#d9e3f6',
+        'surface-variant':            '#d9e3f6',
+        'on-surface':                 '#121c2a',
+        'on-surface-variant':         '#494454',
+        'inverse-surface':            '#27313f',
+        'inverse-on-surface':         '#eaf1ff',
+
+        'outline':                    '#7b7486',
+        'outline-variant':            '#cbc3d7',
+
+        'background':                 '#f8f9ff',
+        'on-background':              '#121c2a',
+
+        'error':                      '#ba1a1a',
+        'error-container':            '#ffdad6',
+        'on-error':                   '#ffffff',
+        'on-error-container':         '#93000a',
+
+        // ── Alias semánticos (para no migrar todo de golpe) ───────────────
+        'primary-dark':               '#5516be',
+        'primary-light':              '#d0bcff',
+        'accent':                     '#10B981',
+        'accent-dark':                '#059669',
+        'danger':                     '#ba1a1a',
+        'danger-dark':                '#93000a',
+        'warning':                    '#F59E0B',
+        'sidebar-bg':                 '#eff4ff',
+        'sidebar-active':             '#ebdcff',
+      },
+      fontFamily: {
+        sans:    ['Be Vietnam Pro', 'system-ui', 'sans-serif'],
+        heading: ['Manrope', 'system-ui', 'sans-serif'],
+      },
+      fontSize: {
+        'display-lg':          ['48px', { lineHeight: '56px', letterSpacing: '-0.02em', fontWeight: '700' }],
+        'headline-lg':         ['32px', { lineHeight: '40px', letterSpacing: '-0.01em', fontWeight: '600' }],
+        'headline-lg-mobile':  ['28px', { lineHeight: '36px', fontWeight: '600' }],
+        'headline-md':         ['24px', { lineHeight: '32px', fontWeight: '600' }],
+        'body-lg':             ['18px', { lineHeight: '28px', fontWeight: '400' }],
+        'body-md':             ['16px', { lineHeight: '24px', fontWeight: '400' }],
+        'label-md':            ['14px', { lineHeight: '20px', letterSpacing: '0.01em', fontWeight: '500' }],
+        'label-sm':            ['12px', { lineHeight: '16px', letterSpacing: '0.05em', fontWeight: '600' }],
+      },
+      borderRadius: {
+        DEFAULT: '1rem',
+        sm:      '0.5rem',
+        md:      '1.5rem',
+        lg:      '2rem',
+        xl:      '3rem',
+        full:    '9999px',
+      },
+      spacing: {
+        'unit':                       '8px',
+        'gutter':                     '24px',
+        'section-gap':                '48px',
+        'container-padding-mobile':   '24px',
+        'container-padding-desktop':  '64px',
+      },
+      boxShadow: {
+        'card':    '0px 10px 30px rgba(76, 29, 149, 0.05)',
+        'primary': '0px 4px 20px rgba(107, 56, 212, 0.3)',
+      },
     },
   },
   plugins: [],
-}
-
+};

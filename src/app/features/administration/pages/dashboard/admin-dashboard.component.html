@@ -1,0 +1,32 @@
+<section class="px-4 md:px-8 lg:px-container-padding-desktop py-6 max-w-[1400px] mx-auto">
+
+  <!-- KPI Row -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-gutter mb-6 md:mb-section-gap">
+    @for (metric of kpiMetrics(); track metric.id) {
+      <app-kpi-card [metric]="metric" />
+    }
+  </div>
+
+  <!-- Main grid: chart + top resources -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 md:gap-gutter items-start">
+
+    <!-- Growth Chart (8 cols) -->
+    <div class="lg:col-span-8">
+      <app-growth-chart />
+    </div>
+
+    <!-- Top Resources (4 cols) -->
+    <div class="lg:col-span-4">
+      <app-top-resources [resources]="topResources()" />
+    </div>
+
+    <!-- Recent Orders (full width) -->
+    <div class="lg:col-span-12 mt-2">
+      <app-recent-orders-table
+        [orders]="recentOrders()"
+        (filterClick)="onFilter()"
+        (exportClick)="onExport()" />
+    </div>
+
+  </div>
+</section>

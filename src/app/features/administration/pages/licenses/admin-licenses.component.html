@@ -1,0 +1,179 @@
+<section class="px-4 md:px-8 lg:px-container-padding-desktop py-6 max-w-[1400px] mx-auto space-y-8">
+
+  <!-- Header -->
+  <app-admin-page-header
+    title="Licencias y QR"
+    description="Monitorea y gestiona el ciclo de vida de las licencias del ecosistema."
+    actionLabel="Generar lote"
+    actionIcon="add_box"
+    (action)="openBatchDialog()" />
+
+  <!-- KPI Stats -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
+
+    <div class="glass-card p-6 rounded-lg flex items-center gap-5">
+      <div class="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center
+                  text-primary flex-shrink-0">
+        <span class="material-symbols-outlined text-[32px]">qr_code_scanner</span>
+      </div>
+      <div>
+        <p class="text-label-sm font-heading text-on-surface-variant uppercase tracking-wider">
+          Total generadas
+        </p>
+        <p class="font-heading font-bold text-on-surface mt-1"
+           style="font-size: 2rem; line-height: 1.1">
+          {{ stats().total | number }}
+        </p>
+      </div>
+    </div>
+
+    <div class="glass-card p-6 rounded-lg flex items-center gap-5">
+      <div class="w-14 h-14 bg-secondary/10 rounded-xl flex items-center justify-center
+                  text-secondary flex-shrink-0">
+        <span class="material-symbols-outlined text-[32px]">pending_actions</span>
+      </div>
+      <div>
+        <p class="text-label-sm font-heading text-on-surface-variant uppercase tracking-wider">
+          Pendientes activación
+        </p>
+        <p class="font-heading font-bold text-on-surface mt-1"
+           style="font-size: 2rem; line-height: 1.1">
+          {{ stats().pending | number }}
+        </p>
+      </div>
+    </div>
+
+    <div class="glass-card p-6 rounded-lg flex items-center gap-5">
+      <div class="w-14 h-14 bg-emerald-500/10 rounded-xl flex items-center justify-center
+                  text-emerald-600 flex-shrink-0">
+        <span class="material-symbols-outlined text-[32px]">task_alt</span>
+      </div>
+      <div>
+        <p class="text-label-sm font-heading text-on-surface-variant uppercase tracking-wider">
+          Activadas
+        </p>
+        <p class="font-heading font-bold text-on-surface mt-1"
+           style="font-size: 2rem; line-height: 1.1">
+          {{ stats().activated | number }}
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Search -->
+  <div class="w-full sm:w-80">
+    <app-search-input
+      placeholder="Buscar por código, producto, usuario..."
+      (search)="onSearch($event)" />
+  </div>
+
+  <!-- Table -->
+  <app-license-table
+    [licenses]="paginated()"
+    [totalItems]="filtered().length"
+    [currentPage]="currentPage()"
+    [pageSize]="10"
+    (revoke)="onRevoke($event)"
+    (copyCode)="onCopyCode($event)"
+    (viewOrder)="onViewOrder($event)"
+    (pageChange)="onPageChange($event)" />
+
+  <!-- Bottom: Activity Feed + Trends -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+
+    <!-- Recent Activations -->
+    <div class="glass-card p-6 md:p-8 rounded-lg space-y-5">
+      <div class="flex justify-between items-center">
+        <h5 class="font-heading text-headline-md text-on-surface">Activaciones recientes</h5>
+        <button class="text-primary text-label-md font-heading hover:underline">
+          Ver todo
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        @for (item of activity(); track item.id) {
+          <div class="flex gap-4 p-4 rounded-xl bg-surface-container-low
+                      border border-outline-variant/30">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                 [class]="activityIconClasses(item.type)">
+              <span class="material-symbols-outlined text-[20px]">
+                {{ activityIcon(item.type) }}
+              </span>
+            </div>
+            <div class="min-w-0">
+              <p class="text-label-md font-heading text-on-surface leading-snug">
+                {{ item.message }}
+              </p>
+              <p class="text-label-sm font-heading text-on-surface-variant mt-1">
+                {{ item.detail }}
+              </p>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Activation Trends -->
+    <div class="glass-card p-6 md:p-8 rounded-lg flex flex-col overflow-hidden relative">
+      <div class="relative z-10 mb-6">
+        <h5 class="font-heading text-headline-md text-on-surface">Tendencia de activaciones</h5>
+        <p class="text-label-md font-heading text-on-surface-variant mt-1">
+          Crecimiento diario en los últimos 7 días.
+        </p>
+      </div>
+
+      <!-- Bar chart (CSS) -->
+      <div class="flex items-end justify-between gap-2 h-48 relative z-10">
+        @for (point of trends(); track point.day) {
+          <div class="flex-1 flex flex-col items-center gap-2 group">
+            <div class="w-full rounded-t-lg transition-all duration-300 relative cursor-pointer"
+                 [style.height.%]="point.heightPercent"
+                 [class]="point.heightPercent >= 90 ? 'bg-primary' :
+                          point.heightPercent >= 60 ? 'bg-primary/70' :
+                          point.heightPercent >= 40 ? 'bg-primary/40' : 'bg-surface-container-highest'">
+              <!-- Tooltip -->
+              <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-on-surface text-white
+                          text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100
+                          transition-opacity whitespace-nowrap font-heading">
+                {{ point.value }}
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Day labels -->
+      <div class="flex justify-between mt-3 relative z-10">
+        @for (point of trends(); track point.day) {
+          <span class="flex-1 text-center text-label-sm font-heading text-on-surface-variant
+                       uppercase tracking-wider">
+            {{ point.day }}
+          </span>
+        }
+      </div>
+
+      <!-- Decorative blur -->
+      <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-primary/5
+                  rounded-full blur-[60px]"></div>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- Generate Batch Dialog -->
+<app-generate-batch-dialog
+  [isOpen]="isBatchDialogOpen()"
+  (save)="onGenerateBatch($event)"
+  (cancel)="closeBatchDialog()" />
+
+<!-- Confirm Revoke -->
+<app-confirm-dialog
+  [open]="isConfirmOpen()"
+  title="Revocar licencia"
+  [message]="'¿Revocar la licencia ' + (licenseToRevoke()?.code ?? '') + '? El usuario perderá acceso a los recursos vinculados.'"
+  confirmText="Sí, revocar"
+  variant="danger"
+  (confirm)="confirmRevoke()"
+  (cancel)="cancelRevoke()" />

@@ -1,0 +1,273 @@
+@if (product(); as p) {
+<section class="px-4 md:px-8 lg:px-container-padding-desktop py-6 max-w-[1400px] mx-auto">
+
+  <!-- Breadcrumb + acciones -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+    <nav class="flex items-center gap-1.5 text-label-sm font-heading text-outline font-bold uppercase tracking-wider">
+      <a routerLink="/admin/products" class="hover:text-primary transition-colors">Productos</a>
+      <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+      <span class="text-primary">{{ p.name }}</span>
+    </nav>
+    <div class="flex items-center gap-2">
+      <button (click)="toggleStatus()"
+              class="flex items-center gap-1.5 px-4 py-2 rounded-full border text-label-sm
+                     font-heading font-semibold transition-colors"
+              [class]="p.status === 'active'
+                ? 'border-amber-300 text-amber-700 hover:bg-amber-50'
+                : 'border-green-300 text-green-700 hover:bg-green-50'">
+        <span class="material-symbols-outlined text-[16px]">
+          {{ p.status === 'active' ? 'pause_circle' : 'play_circle' }}
+        </span>
+        {{ p.status === 'active' ? 'Desactivar' : 'Activar' }}
+      </button>
+      <a [routerLink]="['/admin/products']"
+         class="flex items-center gap-1.5 px-4 py-2 rounded-full gradient-primary text-white
+                text-label-sm font-heading font-semibold hover:opacity-90 transition-opacity"
+         style="box-shadow: 0 4px 14px rgba(107,56,212,0.3)">
+        <span class="material-symbols-outlined text-[16px]">edit</span>
+        Editar
+      </a>
+      <button (click)="isConfirmOpen.set(true)"
+              class="p-2 rounded-full text-outline hover:text-error hover:bg-error-container
+                     transition-colors" title="Eliminar producto">
+        <span class="material-symbols-outlined text-[20px]">delete</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Fila principal: Galería + Info -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+
+    <!-- Galería -->
+    <div class="space-y-3">
+      <!-- Imagen principal -->
+      <div class="w-full aspect-square rounded-lg bg-gradient-to-br flex items-center
+                  justify-center overflow-hidden"
+           [class]="displayImage()?.gradient ?? 'from-violet-400 to-purple-600'">
+        <span class="material-symbols-outlined text-white/30 text-[80px]">image</span>
+      </div>
+
+      <!-- Miniaturas -->
+      <div class="flex gap-3 overflow-x-auto scrollbar-hide pb-1">
+        @for (img of p.images; track img.id) {
+          <div class="relative flex-shrink-0 cursor-pointer group"
+               (click)="selectImage(img)">
+            <div class="w-20 h-20 rounded-lg bg-gradient-to-br flex items-center justify-center
+                        transition-all"
+                 [class]="img.gradient + (img.id === (displayImage()?.id) ? ' ring-2 ring-primary ring-offset-1' : ' opacity-60 hover:opacity-90')">
+              <span class="material-symbols-outlined text-white/60 text-[20px]">image</span>
+            </div>
+            @if (img.isPrimary) {
+              <span class="absolute -top-1 -right-1 bg-primary text-white text-[9px]
+                           font-heading font-bold px-1.5 py-0.5 rounded-full leading-none">
+                Principal
+              </span>
+            }
+            <!-- Acciones hover -->
+            <div class="absolute inset-0 bg-black/40 rounded-lg flex items-center justify-center
+                        gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              @if (!img.isPrimary) {
+                <button (click)="setPrimary(img); $event.stopPropagation()"
+                        class="p-1 bg-white/90 rounded-full text-primary"
+                        title="Marcar como principal">
+                  <span class="material-symbols-outlined text-[14px]">star</span>
+                </button>
+              }
+              @if (p.images.length > 1) {
+                <button (click)="removeImage(img); $event.stopPropagation()"
+                        class="p-1 bg-white/90 rounded-full text-error"
+                        title="Eliminar imagen">
+                  <span class="material-symbols-outlined text-[14px]">close</span>
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Info del producto -->
+    <div class="space-y-5">
+      <!-- Badges -->
+      <div class="flex flex-wrap gap-2">
+        <span class="px-3 py-1 rounded-full text-label-sm font-heading font-semibold"
+              [class]="typeClasses()">
+          {{ typeLabel() }}
+        </span>
+        <app-status-badge [status]="p.status" />
+        @if (p.requiresActivation) {
+          <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-100
+                       text-amber-700 text-label-sm font-heading font-semibold">
+            <span class="material-symbols-outlined text-[14px]">qr_code_scanner</span>
+            QR + Activación
+          </span>
+        }
+      </div>
+
+      <div>
+        <h1 class="font-heading text-headline-lg text-on-surface font-bold">{{ p.name }}</h1>
+        <p class="text-label-md font-heading text-outline mt-1">SKU: {{ p.sku }}</p>
+      </div>
+
+      <div class="flex items-baseline gap-2">
+        <span class="font-heading font-bold text-on-surface" style="font-size: 2rem">
+          {{ p.price | currency:'USD':'symbol':'1.2-2' }}
+        </span>
+        @if (p.type === 'subscription') {
+          <span class="text-label-md font-heading text-on-surface-variant">
+            / {{ p.billingPeriod === 'monthly' ? 'mes' : 'año' }}
+          </span>
+        }
+      </div>
+
+      <p class="text-label-md font-heading text-on-surface-variant leading-relaxed">
+        {{ p.description }}
+      </p>
+
+      <!-- Tags / Feature pills -->
+      @if (p.tags?.length) {
+        <div class="flex flex-wrap gap-2">
+          @for (tag of p.tags; track tag) {
+            <span class="px-3 py-1.5 bg-surface-container rounded-full text-label-sm
+                         font-heading text-on-surface-variant">
+              {{ tag }}
+            </span>
+          }
+        </div>
+      }
+
+      <!-- Stats rápidas -->
+      <div class="grid grid-cols-3 gap-3 pt-2">
+        <div class="bg-surface-container-low rounded-lg p-4 text-center">
+          <p class="font-heading font-bold text-on-surface text-headline-md">
+            {{ p.salesCount | number }}
+          </p>
+          <p class="text-label-sm font-heading text-on-surface-variant mt-0.5">
+            {{ p.type === 'physical' ? 'Activadas' : p.type === 'subscription' ? 'Activos' : 'Vendidos' }}
+          </p>
+        </div>
+        <div class="bg-surface-container-low rounded-lg p-4 text-center">
+          <p class="font-heading font-bold text-on-surface text-headline-md">
+            {{ p.resources.length }}
+          </p>
+          <p class="text-label-sm font-heading text-on-surface-variant mt-0.5">Recursos</p>
+        </div>
+        <div class="bg-surface-container-low rounded-lg p-4 text-center">
+          @if (p.stock !== undefined) {
+            <p class="font-heading font-bold text-on-surface text-headline-md">{{ p.stock | number }}</p>
+            <p class="text-label-sm font-heading text-on-surface-variant mt-0.5">
+              {{ p.type === 'physical' ? 'Stock' : 'Límite' }}
+            </p>
+          } @else {
+            <p class="font-heading font-bold text-primary text-headline-md">∞</p>
+            <p class="text-label-sm font-heading text-on-surface-variant mt-0.5">Sin límite</p>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fila: Recursos vinculados + Specs -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+
+    <!-- Recursos vinculados -->
+    <div class="glass-card p-6 rounded-lg">
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="font-heading text-headline-md text-on-surface">Recursos vinculados</h3>
+        <span class="text-label-sm font-heading text-on-surface-variant">
+          {{ p.resources.length }} recurso{{ p.resources.length !== 1 ? 's' : '' }}
+        </span>
+      </div>
+      @if (p.resources.length > 0) {
+        <div class="space-y-3">
+          @for (res of p.resources; track res.id) {
+            <div class="flex items-center gap-3 p-3 bg-surface-container-low rounded-lg
+                        hover:bg-surface-container transition-colors">
+              <div class="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center
+                          flex-shrink-0">
+                <span class="material-symbols-outlined text-primary text-[18px]">
+                  {{ resourceIcon(res.type) }}
+                </span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-label-md font-heading font-semibold text-on-surface truncate">
+                  {{ res.name }}
+                </p>
+                <p class="text-label-sm font-heading text-outline capitalize mt-0.5">
+                  {{ res.type }}
+                </p>
+              </div>
+              <a routerLink="/admin/resources"
+                 class="p-1.5 rounded-full text-outline hover:text-primary hover:bg-primary/5
+                        transition-colors">
+                <span class="material-symbols-outlined text-[16px]">open_in_new</span>
+              </a>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="text-center py-8">
+          <span class="material-symbols-outlined text-[40px] text-outline-variant block mb-2">
+            perm_media
+          </span>
+          <p class="text-label-md font-heading text-on-surface-variant">
+            Sin recursos vinculados
+          </p>
+          <a routerLink="/admin/resources"
+             class="text-primary text-label-sm font-heading hover:underline mt-1 block">
+            Ir a Recursos →
+          </a>
+        </div>
+      }
+    </div>
+
+    <!-- Especificaciones técnicas -->
+    @if (p.specs?.length) {
+      <div class="glass-card rounded-lg overflow-hidden">
+        <div class="px-6 py-5 border-b border-outline-variant/20">
+          <h3 class="font-heading text-headline-md text-on-surface">Especificaciones técnicas</h3>
+        </div>
+        <table class="w-full">
+          <tbody class="divide-y divide-outline-variant/20">
+            @for (spec of p.specs; track spec.label) {
+              <tr>
+                <td class="px-6 py-4 text-label-md font-heading text-on-surface-variant
+                           bg-surface-container-low w-2/5">
+                  {{ spec.label }}
+                </td>
+                <td class="px-6 py-4 text-label-md font-heading text-on-surface">
+                  {{ spec.value }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+
+</section>
+} @else {
+  <div class="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+    <span class="material-symbols-outlined text-[64px] text-outline-variant">
+      inventory_2
+    </span>
+    <p class="font-heading text-headline-md text-on-surface-variant">
+      Producto no encontrado
+    </p>
+    <a routerLink="/admin/products"
+       class="text-primary font-heading text-label-md hover:underline">
+      ← Volver al catálogo
+    </a>
+  </div>
+}
+
+<app-confirm-dialog
+  [open]="isConfirmOpen()"
+  title="Eliminar producto"
+  [message]="'¿Eliminar este producto? Esta acción no se puede deshacer.'"
+  confirmText="Sí, eliminar"
+  variant="danger"
+  (confirm)="confirmDelete()"
+  (cancel)="isConfirmOpen.set(false)">
+</app-confirm-dialog>

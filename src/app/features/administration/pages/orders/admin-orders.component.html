@@ -1,0 +1,118 @@
+<section class="px-4 md:px-8 lg:px-container-padding-desktop py-6 max-w-[1440px] mx-auto">
+
+  <!-- Header con breadcrumb -->
+  <div class="mb-6">
+    <nav class="flex items-center gap-1.5 text-outline text-label-sm font-heading font-bold
+                uppercase tracking-wider mb-2">
+      <span>Commerce</span>
+      <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+      <span class="text-primary">Pedidos</span>
+    </nav>
+    <app-admin-page-header
+      title="Gestión de Pedidos"
+      description="Supervisa, filtra y actualiza el estado de todas las órdenes." />
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+
+    <div class="bg-white p-5 rounded-lg border border-outline-variant/20"
+         style="box-shadow: 0px 10px 30px rgba(76,29,149,0.05)">
+      <p class="text-label-sm font-heading text-outline mb-1">Total Pedidos (MTD)</p>
+      <div class="flex items-baseline gap-2">
+        <span class="font-heading text-headline-md font-bold text-on-surface">
+          {{ stats().total | number }}
+        </span>
+        <span class="text-[12px] font-heading font-bold text-green-600 flex items-center gap-0.5">
+          +12%
+          <span class="material-symbols-outlined text-[14px]">trending_up</span>
+        </span>
+      </div>
+    </div>
+
+    <div class="bg-white p-5 rounded-lg border border-outline-variant/20"
+         style="box-shadow: 0px 10px 30px rgba(76,29,149,0.05)">
+      <p class="text-label-sm font-heading text-outline mb-1">Pendientes de acción</p>
+      <div class="flex items-baseline gap-2">
+        <span class="font-heading text-headline-md font-bold text-on-surface">
+          {{ stats().pendingShipment }}
+        </span>
+        @if (stats().pendingShipment > 0) {
+          <span class="bg-primary/10 text-primary text-[10px] px-2 py-0.5 rounded-full
+                       font-heading font-bold uppercase tracking-wide">
+            Acción requerida
+          </span>
+        }
+      </div>
+    </div>
+
+    <div class="bg-white p-5 rounded-lg border border-outline-variant/20"
+         style="box-shadow: 0px 10px 30px rgba(76,29,149,0.05)">
+      <p class="text-label-sm font-heading text-outline mb-1">Ingresos Totales</p>
+      <span class="font-heading text-headline-md font-bold text-primary">
+        {{ stats().totalRevenue | currency:'USD':'symbol':'1.2-2' }}
+      </span>
+    </div>
+
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="bg-white rounded-lg p-3 md:p-4 border border-outline-variant/10 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4"
+       style="box-shadow: 0px 4px 12px rgba(76,29,149,0.04)">
+
+    <!-- Tabs pill -->
+    <div class="flex items-center gap-1 bg-surface-container-low p-1 rounded-full border border-outline-variant/20 overflow-x-auto scrollbar-hide">
+      @for (tab of tabs; track tab.key) {
+        <button (click)="onTabChange(tab.key)"
+                class="px-4 md:px-6 py-2 rounded-full text-label-md font-heading whitespace-nowrap transition-all"
+                [class]="activeTab() === tab.key
+                  ? 'bg-white shadow-sm text-primary font-bold'
+                  : 'text-on-surface-variant hover:text-primary'">
+          {{ tab.label }}
+        </button>
+      }
+    </div>
+
+    <!-- Search + export -->
+    <div class="flex items-center gap-3">
+      <div class="w-full sm:w-56">
+        <app-search-input placeholder="Buscar pedido, cliente..." (search)="onSearch($event)" />
+      </div>
+      <button class="flex items-center gap-2 px-4 py-2 bg-secondary text-white rounded-full
+                     hover:bg-primary transition-colors text-label-md font-heading font-semibold
+                     whitespace-nowrap shrink-0">
+        <span class="material-symbols-outlined text-[18px]">download</span>
+        <span class="hidden sm:inline">Exportar</span>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Table -->
+  <app-order-table
+    [orders]="paginated()"
+    [totalItems]="filtered().length"
+    [currentPage]="currentPage()"
+    [pageSize]="10"
+    (viewOrder)="onViewOrder($event)"
+    (changeDelivery)="onChangeDelivery($event)"
+    (pageChange)="onPageChange($event)" />
+
+</section>
+
+<!-- Ship dialog (captura transportadora + guía) -->
+<app-ship-order-dialog
+  [isOpen]="isShipDialogOpen()"
+  [order]="orderToShip()"
+  (confirm)="onShipConfirm($event)"
+  (cancel)="onCancelShip()" />
+
+<!-- Confirm dialog (Entregado / Activación) -->
+<app-confirm-dialog
+  [open]="isConfirmOpen()"
+  [title]="confirmTitle()"
+  [message]="confirmMessage()"
+  [confirmText]="confirmText()"
+  variant="primary"
+  (confirm)="onConfirm()"
+  (cancel)="onCancelConfirm()" />

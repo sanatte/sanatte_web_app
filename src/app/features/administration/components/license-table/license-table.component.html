@@ -1,0 +1,206 @@
+<div class="bg-white rounded-lg overflow-hidden border border-outline-variant/20"
+     style="box-shadow: 0px 10px 30px rgba(76,29,149,0.05)">
+
+  <!-- Table header -->
+  <div class="px-6 py-5 border-b border-outline-variant/30 flex flex-col sm:flex-row
+              sm:items-center justify-between gap-3 bg-white/50">
+    <h4 class="font-heading text-headline-md text-on-surface">Ciclo de vida de licencias</h4>
+    <div class="flex gap-2">
+      <select class="bg-surface-container-low border-none rounded-full text-label-md font-heading
+                     px-4 py-2 focus:ring-primary/20 outline-none cursor-pointer">
+        <option>Todos los estados</option>
+        <option>Disponibles</option>
+        <option>Activas</option>
+        <option>Revocadas</option>
+      </select>
+      <select class="bg-surface-container-low border-none rounded-full text-label-md font-heading
+                     px-4 py-2 focus:ring-primary/20 outline-none cursor-pointer">
+        <option>Últimos 30 días</option>
+        <option>Últimos 3 meses</option>
+        <option>Todo el tiempo</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+      <thead class="bg-surface-container-low/50">
+        <tr>
+          <!-- Siempre -->
+          <th class="px-4 md:px-6 py-4 text-label-md font-heading text-on-surface-variant">
+            Código QR
+          </th>
+          <!-- md+ -->
+          <th class="hidden md:table-cell px-6 py-4 text-label-md font-heading text-on-surface-variant">
+            Producto
+          </th>
+          <!-- md+ -->
+          <th class="hidden md:table-cell px-6 py-4 text-label-md font-heading text-on-surface-variant">
+            Usuario
+          </th>
+          <!-- lg+ -->
+          <th class="hidden lg:table-cell px-6 py-4 text-label-md font-heading text-on-surface-variant">
+            Generada
+          </th>
+          <!-- lg+ -->
+          <th class="hidden lg:table-cell px-6 py-4 text-label-md font-heading text-on-surface-variant">
+            Activada
+          </th>
+          <!-- Siempre -->
+          <th class="px-4 md:px-6 py-4 text-label-md font-heading text-on-surface-variant">
+            Estado
+          </th>
+          <!-- Siempre -->
+          <th class="px-4 md:px-6 py-4 text-label-md font-heading text-on-surface-variant text-right">
+            Acciones
+          </th>
+        </tr>
+      </thead>
+
+      <tbody class="divide-y divide-outline-variant/30">
+        @for (license of licenses(); track license.id) {
+          <tr class="hover:bg-primary/5 transition-colors group">
+
+            <!-- Código QR — siempre -->
+            <td class="px-4 md:px-6 py-5">
+              <div class="flex items-center gap-3">
+                <div class="p-2 bg-white rounded-lg shadow-sm group-hover:shadow-md transition-all
+                            flex-shrink-0"
+                     [class]="license.status === 'revoked' ? 'opacity-40' : ''">
+                  <span class="material-symbols-outlined text-[28px] md:text-[36px]"
+                        [class]="license.status === 'revoked' ? 'text-error' : 'text-on-surface'">
+                    qr_code_2
+                  </span>
+                </div>
+                <div class="min-w-0">
+                  <p class="font-heading font-bold text-label-md text-on-surface">
+                    {{ license.code }}
+                  </p>
+                  <p class="text-label-sm font-heading text-on-surface-variant mt-0.5">
+                    {{ license.batchId }}
+                  </p>
+                  @if (license.orderId) {
+                    <p class="text-label-sm font-heading text-primary mt-0.5">
+                      {{ license.orderId }}
+                    </p>
+                  }
+                </div>
+              </div>
+            </td>
+
+            <!-- Producto — md+ -->
+            <td class="hidden md:table-cell px-6 py-5">
+              <p class="text-label-md font-heading text-on-surface font-semibold">
+                {{ license.productName }}
+              </p>
+              <p class="text-label-sm font-heading text-on-surface-variant mt-0.5">
+                Producto físico
+              </p>
+            </td>
+
+            <!-- Usuario — md+ -->
+            <td class="hidden md:table-cell px-6 py-5">
+              @if (license.userName) {
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center
+                              text-white text-xs font-heading font-bold bg-gradient-to-br"
+                       [class]="license.userAvatarGradient">
+                    {{ license.userInitials }}
+                  </div>
+                  <span class="text-label-md font-heading text-on-surface">
+                    {{ license.userName }}
+                  </span>
+                </div>
+              } @else {
+                <span class="text-on-surface-variant italic text-label-md font-heading">
+                  Sin asignar
+                </span>
+              }
+            </td>
+
+            <!-- Generada — lg+ -->
+            <td class="hidden lg:table-cell px-6 py-5">
+              <p class="text-label-md font-heading text-on-surface">{{ license.generatedAt }}</p>
+            </td>
+
+            <!-- Activada — lg+ -->
+            <td class="hidden lg:table-cell px-6 py-5">
+              @if (license.activatedAt) {
+                <p class="text-label-md font-heading text-on-surface">{{ license.activatedAt }}</p>
+                @if (license.status === 'revoked') {
+                  <p class="text-label-sm font-heading text-error line-through mt-0.5">
+                    Revocada
+                  </p>
+                }
+              } @else {
+                <span class="text-on-surface-variant text-label-md font-heading">—</span>
+              }
+            </td>
+
+            <!-- Estado — siempre -->
+            <td class="px-4 md:px-6 py-5">
+              <app-status-badge
+                [status]="license.status === 'available' ? 'pending'
+                        : license.status === 'active' ? 'active'
+                        : 'cancelled'"
+                [label]="statusLabel(license.status)" />
+            </td>
+
+            <!-- Acciones — siempre -->
+            <td class="px-4 md:px-6 py-5 text-right">
+              <div class="flex items-center justify-end gap-1">
+                <button (click)="copyCode.emit(license)"
+                        class="p-2 text-outline hover:text-primary hover:bg-primary/5
+                               rounded-full transition-colors"
+                        title="Copiar código">
+                  <span class="material-symbols-outlined text-[18px]">content_copy</span>
+                </button>
+                @if (license.orderId) {
+                  <button (click)="viewOrder.emit(license)"
+                          class="p-2 text-outline hover:text-primary hover:bg-primary/5
+                                 rounded-full transition-colors hidden sm:block"
+                          title="Ver pedido">
+                    <span class="material-symbols-outlined text-[18px]">receipt_long</span>
+                  </button>
+                }
+                @if (canRevoke(license)) {
+                  <button (click)="revoke.emit(license)"
+                          class="p-2 text-outline hover:text-error hover:bg-error-container
+                                 rounded-full transition-colors"
+                          title="Revocar licencia">
+                    <span class="material-symbols-outlined text-[18px]">block</span>
+                  </button>
+                }
+              </div>
+            </td>
+
+          </tr>
+        }
+
+        @if (licenses().length === 0) {
+          <tr>
+            <td colspan="7" class="px-6 py-16 text-center">
+              <span class="material-symbols-outlined text-[48px] text-outline-variant block mb-3">
+                qr_code_2
+              </span>
+              <p class="text-label-md font-heading text-on-surface-variant">
+                No se encontraron licencias
+              </p>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="px-4 md:px-6 border-t border-outline-variant/20">
+    <app-pagination
+      [currentPage]="currentPage()"
+      [pageSize]="pageSize()"
+      [total]="totalItems()"
+      label="licencias"
+      (pageChange)="pageChange.emit($event)" />
+  </div>
+
+</div>

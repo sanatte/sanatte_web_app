@@ -1,0 +1,209 @@
+<div class="bg-white rounded-lg overflow-hidden border border-outline-variant/20"
+     style="box-shadow: 0px 10px 30px rgba(76,29,149,0.05)">
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+      <thead class="bg-surface-container-low/50 border-b border-outline-variant/20">
+        <tr>
+          <!-- Siempre -->
+          <th class="px-4 md:px-6 py-4 text-label-sm font-heading text-outline uppercase tracking-wider">
+            ID Pedido
+          </th>
+          <!-- Siempre -->
+          <th class="px-4 md:px-6 py-4 text-label-sm font-heading text-outline uppercase tracking-wider">
+            Comprador
+          </th>
+          <!-- lg+ -->
+          <th class="hidden lg:table-cell px-6 py-4 text-label-sm font-heading text-outline uppercase tracking-wider">
+            Productos
+          </th>
+          <!-- lg+ -->
+          <th class="hidden lg:table-cell px-6 py-4 text-label-sm font-heading text-outline uppercase tracking-wider">
+            Fecha
+          </th>
+          <!-- Siempre -->
+          <th class="px-4 md:px-6 py-4 text-label-sm font-heading text-outline uppercase tracking-wider">
+            Total
+          </th>
+          <!-- md+ -->
+          <th class="hidden md:table-cell px-6 py-4 text-label-sm font-heading text-outline uppercase tracking-wider">
+            Pago
+          </th>
+          <!-- md+ -->
+          <th class="hidden md:table-cell px-6 py-4 text-label-sm font-heading text-outline uppercase tracking-wider">
+            Entrega / Activación
+          </th>
+          <!-- Siempre -->
+          <th class="px-4 md:px-6 py-4 text-label-sm font-heading text-outline uppercase tracking-wider text-right">
+            Acciones
+          </th>
+        </tr>
+      </thead>
+
+      <tbody class="divide-y divide-outline-variant/10">
+        @for (order of orders(); track order.id) {
+          <tr class="hover:bg-surface-container-low/30 transition-colors">
+
+            <!-- ID Pedido — siempre -->
+            <td class="px-4 md:px-6 py-4 md:py-5">
+              <span class="font-heading font-bold text-primary text-label-md">
+                {{ order.orderNumber }}
+              </span>
+              <!-- Estado de pago inline en móvil -->
+              <div class="md:hidden mt-1">
+                <app-status-badge [status]="order.paymentStatus" />
+              </div>
+            </td>
+
+            <!-- Comprador — siempre -->
+            <td class="px-4 md:px-6 py-4 md:py-5">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 md:w-9 md:h-9 rounded-full flex-shrink-0 flex items-center
+                            justify-center text-white text-xs font-heading font-bold
+                            bg-gradient-to-br"
+                     [class]="order.buyerAvatarGradient">
+                  {{ order.buyerInitials }}
+                </div>
+                <div class="min-w-0">
+                  <p class="text-sm font-bold text-on-surface truncate">{{ order.buyerName }}</p>
+                  <p class="text-[11px] text-outline truncate hidden sm:block">{{ order.buyerEmail }}</p>
+                </div>
+              </div>
+            </td>
+
+            <!-- Productos — lg+ -->
+            <td class="hidden lg:table-cell px-6 py-5">
+              <div class="flex items-center">
+                <!-- Primeros 2 iconos -->
+                <div class="flex -space-x-1.5">
+                  @for (product of order.products.slice(0, 2); track product.id) {
+                    <div class="w-8 h-8 rounded-lg border-2 border-white flex items-center
+                                justify-center"
+                         [class]="productClasses(product.type)"
+                         [title]="product.name">
+                      <span class="material-symbols-outlined text-[15px]">
+                        {{ productIcon(product.type) }}
+                      </span>
+                    </div>
+                  }
+                </div>
+                <!-- Overflow -->
+                @if (order.products.length > 2) {
+                  <div class="w-8 h-8 rounded-lg border-2 border-white bg-surface-container-high
+                              -ml-1.5 flex items-center justify-center
+                              text-[10px] font-bold text-outline">
+                    +{{ order.products.length - 2 }}
+                  </div>
+                }
+              </div>
+            </td>
+
+            <!-- Fecha — lg+ -->
+            <td class="hidden lg:table-cell px-6 py-5">
+              <p class="text-sm text-on-surface">{{ order.date }}</p>
+              <p class="text-[11px] text-outline mt-0.5">{{ order.time }}</p>
+            </td>
+
+            <!-- Total — siempre -->
+            <td class="px-4 md:px-6 py-4 md:py-5">
+              <span class="font-heading font-bold text-on-surface">
+                {{ order.total | currency:'USD':'symbol':'1.2-2' }}
+              </span>
+            </td>
+
+            <!-- Pago — md+ -->
+            <td class="hidden md:table-cell px-6 py-5">
+              <app-status-badge [status]="order.paymentStatus" />
+            </td>
+
+            <!-- Entrega/Activación — md+ -->
+            <td class="hidden md:table-cell px-6 py-5">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full
+                           text-label-sm font-heading font-bold"
+                    [class]="deliveryConfig(order.deliveryStatus).classes">
+                <span class="material-symbols-outlined text-[14px]">
+                  {{ deliveryConfig(order.deliveryStatus).icon }}
+                </span>
+                {{ deliveryConfig(order.deliveryStatus).label }}
+              </span>
+              <!-- Guía de envío -->
+              @if (order.shippingCarrier && order.trackingNumber) {
+                <div class="mt-1.5 flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[13px] text-on-surface-variant">
+                    local_shipping
+                  </span>
+                  <span class="text-label-sm font-heading text-on-surface-variant">
+                    {{ order.shippingCarrier }} ·
+                  </span>
+                  @if (order.trackingUrl) {
+                    <a [href]="order.trackingUrl" target="_blank"
+                       class="text-label-sm font-heading text-primary hover:underline"
+                       (click)="$event.stopPropagation()">
+                      {{ order.trackingNumber }} ↗
+                    </a>
+                  } @else {
+                    <span class="text-label-sm font-heading text-primary">
+                      {{ order.trackingNumber }}
+                    </span>
+                  }
+                </div>
+              }
+            </td>
+
+            <!-- Acciones — siempre -->
+            <td class="px-4 md:px-6 py-4 md:py-5 text-right">
+              <div class="flex items-center justify-end gap-1">
+                <button (click)="viewOrder.emit(order)"
+                        class="p-2 text-outline hover:text-primary hover:bg-primary/5
+                               rounded-full transition-colors"
+                        title="Ver detalle">
+                  <span class="material-symbols-outlined text-[18px] md:text-[20px]">visibility</span>
+                </button>
+                @if (canChangeDelivery(order)) {
+                  <button (click)="changeDelivery.emit(order)"
+                          class="p-2 text-outline hover:text-secondary hover:bg-secondary/5
+                                 rounded-full transition-colors hidden sm:block"
+                          title="Cambiar estado de entrega">
+                    <span class="material-symbols-outlined text-[18px] md:text-[20px]">
+                      local_shipping
+                    </span>
+                  </button>
+                }
+                <button class="p-2 text-outline hover:text-primary hover:bg-primary/5
+                               rounded-full transition-colors hidden sm:block"
+                        title="Imprimir">
+                  <span class="material-symbols-outlined text-[18px] md:text-[20px]">print</span>
+                </button>
+              </div>
+            </td>
+
+          </tr>
+        }
+
+        @if (orders().length === 0) {
+          <tr>
+            <td colspan="8" class="px-6 py-16 text-center">
+              <span class="material-symbols-outlined text-[48px] text-outline-variant block mb-3">
+                receipt_long
+              </span>
+              <p class="text-label-md font-heading text-on-surface-variant">
+                No se encontraron pedidos
+              </p>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="px-4 md:px-6 border-t border-outline-variant/20 bg-surface-container-lowest">
+    <app-pagination
+      [currentPage]="currentPage()"
+      [pageSize]="pageSize()"
+      [total]="totalItems()"
+      label="pedidos"
+      (pageChange)="pageChange.emit($event)" />
+  </div>
+
+</div>

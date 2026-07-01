@@ -1,0 +1,175 @@
+# SANATTE — Plan de Refactorización Frontend (Angular)
+
+> **Estado:** Fase 3 en progreso (Bloque Admin) — rama `feature/admin-flow`
+> **Última actualización:** 2026-07-01
+> **Stack confirmado:** Angular 21 · Standalone · Signals · RxJS · **Tailwind CSS** · SCSS · TypeScript
+> **Datos:** 100% Mock. Sin HTTP real. Preparado para NestJS + Firebase.
+
+---
+
+## 1. Decisiones tomadas
+
+| Tema | Decisión |
+|------|----------|
+| UI Framework | **Solo Tailwind** — fidelidad 1:1 con mockups de Stitch |
+| Auth fase mock | **MockAuthService** + roles USER/ADMIN + dev-switcher flotante |
+| Auth real (futuro) | **Firebase Auth** — instalado, pendiente credenciales |
+| Estado | **Signals** (sin NgRx) |
+| Datos | Mock con servicios intercambiables (preparado para NestJS) |
+| Roles | USER / ADMIN — guardado en localStorage, switcher dev visible |
+| Imágenes de producto | Array `ProductImage[]` con campo `isPrimary` |
+| Envíos físicos | Modal con transportadora + guía + link de rastreo |
+
+---
+
+## 2. Arquitectura implementada
+
+```
+src/app/
+├── core/
+│   ├── guards/         mockAuthGuard · adminGuard · guestGuard
+│   ├── interceptors/   authInterceptor (preparado, inactivo en mock)
+│   ├── models/         User · Role
+│   └── services/       MockAuthService · RoleService
+│
+├── shared/components/
+│   ├── admin-page-header/   título + descripción + CTA (reutilizado en todas las páginas admin)
+│   ├── confirm-dialog/      modal de confirmación danger/primary (reutilizado en todos los CRUDs)
+│   ├── dev-role-switcher/   floater solo en dev
+│   ├── pagination/          paginación con ellipsis inteligente
+│   ├── search-input/        buscador reutilizable
+│   └── status-badge/        badge con dot: active · inactive · blocked · published · draft · paid · shipped · cancelled
+│
+├── layouts/
+│   ├── admin-layout/    sidebar colapsable (mobile hamburger) + topbar
+│   ├── app-layout/      nav usuario autenticado
+│   └── public-layout/   navbar público + footer
+│
+└── features/
+    ├── administration/  (ver detalle en §3)
+    ├── authentication/  login (funcional)
+    ├── library/         placeholder
+    ├── orders/          placeholder (app usuario)
+    ├── profile/         placeholder
+    ├── public/          home placeholder
+    └── subscriptions/   placeholder
+```
+
+---
+
+## 3. Bloque Admin — Estado detallado
+
+### ✅ Pantallas completadas
+
+| Pantalla | Ruta | Mockup | Componentes clave |
+|---|---|---|---|
+| **Dashboard** | `/admin/dashboard` | ✅ | KpiCard · GrowthChart · TopResources · RecentOrdersTable |
+| **Productos** | `/admin/products` | ✅ | ProductTable (col-hiding) · ProductFormDialog (multi-imagen) · GenerateBatchDialog |
+| **Detalle Producto** | `/admin/products/:id` | Adaptado | Galería interactiva · Recursos vinculados · Specs técnicas |
+| **Recursos** | `/admin/resources` | ✅ | ResourceCard · ResourceFormDialog · tabs por tipo/tag |
+| **Usuarios** | `/admin/users` | Sin mockup | UserTable (col-hiding) · toggle rol/estado · stats chips |
+| **Pedidos** | `/admin/orders` | ✅ | OrderTable (col-hiding) · ShipOrderDialog (transportadora+guía) · KPIs |
+| **Licencias** | `/admin/licenses` | ✅ | LicenseTable · GenerateBatchDialog · feed actividad · barras CSS |
+| **Activaciones** | `/admin/activations` | ✅ | ActivationTable · análisis dispositivos · alertas seguridad |
+
+### ❌ Pantallas pendientes (Admin)
+
+| Pantalla | Ruta | Mockup |
+|---|---|---|
+| **Reportes** | `/admin/reports` | Pendiente |
+| **Configuración** | `/admin/settings` | Pendiente |
+
+---
+
+## 4. Modelos de negocio implementados
+
+| Modelo | Campos clave | Notas |
+|---|---|---|
+| `Product` | `images[]` (multi-imagen + isPrimary) · `tags[]` · `specs[]` · `resources[]` | Physical QR → `requiresActivation: true` |
+| `Resource` | `type` (audio/video/pdf/article) · `tags[]` · `linkedProductIds[]` | Tags para filtro "Ejercicios" |
+| `Order` | `paymentStatus` · `deliveryStatus` · `shippingCarrier` · `trackingNumber` · `trackingUrl` | Guía de envío en modal ShipOrder |
+| `License` | `code` · `batchId` · `status` (available/active/revoked) · `orderId` | Trazabilidad hasta el pedido |
+| `Activation` | `status` (success/pending/failed) · `ipAddress` · `device` · `resourcesUnlocked` | Log de eventos QR |
+| `AdminUser` | `role` (USER/ADMIN) · `status` (active/blocked) · `hasActiveSubscription` | Gestión de roles en caliente |
+
+### Regla de negocio clave (Plena)
+```
+Producto físico + QR → usuario debe autenticarse → activar con QR → accede a recursos digitales
+```
+
+---
+
+## 5. Design System
+
+- **Paleta "Serene Pulse"**: primary `#6b38d4` · surface `#f8f9ff` · on-surface `#121c2a`
+- **Tipografía**: Manrope (headings) + Be Vietnam Pro (body)
+- **Fuente iconos**: Material Symbols Outlined
+- **glass-card**: `background: #fff; box-shadow: 0 10px 30px rgba(76,29,149,0.07); border: 1px solid rgba(203,195,215,0.4)`
+- **Select**: flecha SVG custom (reemplaza nativa del navegador) via CSS global
+- **Responsive**: Mobile-first, col-hiding en tablas admin (3 niveles: mobile/tablet/desktop)
+
+---
+
+## 6. Roadmap pendiente
+
+### 🔹 Bloque Admin (en curso)
+- [x] Dashboard
+- [x] Productos + Detalle producto + Galería multi-imagen
+- [x] Recursos
+- [x] Usuarios
+- [x] Pedidos + Guía de envío
+- [x] Licencias + Generar lote
+- [x] Activaciones
+- [ ] **Reportes** ← siguiente
+- [ ] Configuración
+
+### 🔹 Bloque B — Autenticación
+- [x] Login (funcional con MockAuth)
+- [ ] Registro
+- [ ] Recuperar contraseña
+
+### 🔹 Bloque C — App Usuario
+- [ ] Biblioteca
+- [ ] Detalle recurso (visores audio/video/pdf/artículo)
+- [ ] Mis pedidos + detalle
+- [ ] Perfil + configuración
+- [ ] Suscripciones
+
+### 🔹 Bloque D — Sitio Público
+- [ ] Home
+- [ ] Catálogo público + Detalle producto (mockup en `detalle_product/`)
+- [ ] Tienda / Carrito / Checkout
+- [ ] Blog · FAQ · Contacto
+
+### 🔹 Fase 4 — Navegación completa
+- [ ] Flujo público → auth → app usuario
+- [ ] Flujo admin completo
+- [ ] Estados vacío / loading / error en todas las pantallas
+
+### 🔹 Fase 5 — Firebase + NestJS
+- [ ] Integrar Firebase Auth (ya instalado, pendiente credenciales)
+- [ ] Reemplazar Mock services por HTTP services (1 provider por dominio)
+
+---
+
+## 7. Reglas de calidad
+- Componentes pequeños, responsabilidad única
+- Lógica de negocio en servicios, nunca en componentes
+- `ConfirmDialog` reutilizable en todos los CRUDs (no `window.confirm`)
+- `AdminPageHeader` en todas las páginas admin
+- `StatusBadge` para todos los estados
+- `Pagination` con ellipsis inteligente
+- Column hiding en tablas: mobile (esencial) → tablet (+medio) → desktop (completo)
+- Responsive: mobile-first, sidebar colapsable, dialogs full-screen en móvil
+
+---
+
+## 8. Bitácora de avance
+
+| Fecha | Cambio |
+|-------|--------|
+| 2026-06-30 | Plan creado. Decisiones: Tailwind + eliminar `emotions`. |
+| 2026-06-30 | Fase 1: Estructura limpia, 3 layouts, guards, MockAuthService, rutas, dev-switcher. |
+| 2026-07-01 | Fase 2: Design system "Serene Pulse" — tokens Tailwind, fuentes, glass-card, select custom. |
+| 2026-07-01 | Fase 3 Admin: Dashboard · Productos · Recursos · Usuarios · Pedidos · Licencias · Activaciones. |
+| 2026-07-01 | Extras: Detalle producto con galería multi-imagen · ShipOrderDialog con transportadora/guía · Select arrows CSS global · Responsive mobile-first (sidebar hamburger, col-hiding tables, dialogs full-screen). |

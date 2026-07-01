@@ -1,0 +1,285 @@
+@if (isOpen()) {
+  <!-- Backdrop -->
+  <div class="fixed inset-0 z-50 bg-on-background/40 backdrop-blur-sm
+              flex items-center justify-center p-4"
+       (click)="cancel.emit()">
+
+    <!-- Dialog -->
+    <div class="bg-white w-full max-w-2xl max-h-[100dvh] sm:max-h-[90vh]
+                rounded-none sm:rounded-lg shadow-2xl flex flex-col overflow-hidden"
+         (click)="$event.stopPropagation()">
+
+      <!-- Header -->
+      <div class="px-8 py-6 border-b border-outline-variant/20 flex justify-between items-start">
+        <div>
+          <h2 class="font-heading text-headline-md font-bold text-on-surface">
+            {{ isEditMode() ? 'Editar producto' : 'Crear nuevo producto' }}
+          </h2>
+          <p class="text-label-md font-heading text-on-surface-variant mt-0.5">
+            {{ isEditMode() ? 'Modifica los datos del producto.' : 'Completa los datos del nuevo producto.' }}
+          </p>
+        </div>
+        <button (click)="cancel.emit()"
+                class="p-2 rounded-full hover:bg-surface-container-low transition-colors">
+          <span class="material-symbols-outlined text-outline">close</span>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <form [formGroup]="form" (ngSubmit)="onSubmit()"
+            class="flex-1 overflow-y-auto p-8 space-y-6">
+
+        <!-- Nombre y SKU -->
+        <div class="grid grid-cols-2 gap-6">
+          <div class="space-y-2">
+            <label class="text-label-md font-heading font-semibold text-on-surface">
+              Nombre del producto <span class="text-error">*</span>
+            </label>
+            <input formControlName="name" type="text"
+                   placeholder="ej. Plena Agenda 2025"
+                   class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3
+                          focus:ring-2 focus:ring-primary/50 outline-none text-label-md
+                          font-heading transition-all"/>
+            @if (form.controls.name.touched && form.controls.name.errors) {
+              <p class="text-label-sm text-error">Campo requerido</p>
+            }
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-label-md font-heading font-semibold text-on-surface">
+              SKU <span class="text-error">*</span>
+            </label>
+            <div class="flex gap-2">
+              <input formControlName="sku" type="text" placeholder="WLN-001"
+                     class="flex-1 bg-surface-container-low border-none rounded-lg px-4 py-3
+                            focus:ring-2 focus:ring-primary/50 outline-none text-label-md
+                            font-heading transition-all"/>
+              <button type="button" (click)="generateSku()"
+                      class="px-3 py-2 rounded-lg bg-primary-fixed text-primary text-label-sm
+                             font-heading font-semibold hover:bg-primary-fixed-dim transition-colors"
+                      title="Generar SKU automático">
+                <span class="material-symbols-outlined text-[18px]">auto_awesome</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tipo y Precio -->
+        <div class="grid grid-cols-2 gap-6">
+          <div class="space-y-2">
+            <label class="text-label-md font-heading font-semibold text-on-surface">
+              Tipo <span class="text-error">*</span>
+            </label>
+            <select formControlName="type" (change)="onTypeChange($event)"
+                    class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3
+                           focus:ring-2 focus:ring-primary/50 outline-none text-label-md
+                           font-heading transition-all cursor-pointer">
+              <option value="physical">Físico</option>
+              <option value="digital">Digital</option>
+              <option value="subscription">Suscripción</option>
+            </select>
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-label-md font-heading font-semibold text-on-surface">
+              Precio ($) <span class="text-error">*</span>
+            </label>
+            <div class="flex gap-2">
+              <input formControlName="price" type="number" step="0.01" min="0" placeholder="0.00"
+                     class="flex-1 bg-surface-container-low border-none rounded-lg px-4 py-3
+                            focus:ring-2 focus:ring-primary/50 outline-none text-label-md
+                            font-heading transition-all"/>
+              @if (selectedType() === 'subscription') {
+                <select formControlName="billingPeriod"
+                        class="bg-surface-container-low border-none rounded-lg px-3 py-3
+                               focus:ring-2 focus:ring-primary/50 outline-none text-label-md
+                               font-heading cursor-pointer">
+                  <option value="monthly">/ mes</option>
+                  <option value="annual">/ año</option>
+                </select>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Stock / Límite licencias -->
+        @if (selectedType() !== 'subscription') {
+          <div class="space-y-2">
+            <label class="text-label-md font-heading font-semibold text-on-surface">
+              {{ selectedType() === 'physical' ? 'Stock disponible' : 'Límite de licencias' }}
+            </label>
+            <input formControlName="stock" type="number" min="0"
+                   placeholder="Dejar vacío para ilimitado"
+                   class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3
+                          focus:ring-2 focus:ring-primary/50 outline-none text-label-md
+                          font-heading transition-all"/>
+          </div>
+        }
+
+        <!-- Activación y Estado -->
+        <div class="space-y-3">
+          @if (selectedType() === 'physical') {
+            <div class="flex items-center justify-between p-4 bg-surface-container rounded-lg">
+              <div>
+                <p class="text-label-md font-heading font-bold text-on-surface">Requiere activación por QR</p>
+                <p class="text-label-sm font-heading text-on-surface-variant">
+                  El usuario debe registrarse y activar el producto para acceder a los recursos
+                </p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" formControlName="requiresActivation" class="sr-only peer"/>
+                <div class="w-11 h-6 bg-outline-variant rounded-full peer
+                            peer-checked:after:translate-x-full peer-checked:after:border-white
+                            after:content-[''] after:absolute after:top-[2px] after:left-[2px]
+                            after:bg-white after:rounded-full after:h-5 after:w-5
+                            after:transition-all peer-checked:bg-primary"></div>
+              </label>
+            </div>
+          }
+
+          <div class="flex items-center justify-between p-4 bg-surface-container rounded-lg">
+            <div>
+              <p class="text-label-md font-heading font-bold text-on-surface">Producto activo</p>
+              <p class="text-label-sm font-heading text-on-surface-variant">
+                Visible en la tienda inmediatamente
+              </p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox"
+                     [checked]="form.controls.status.value === 'active'"
+                     (change)="form.controls.status.setValue($any($event.target).checked ? 'active' : 'inactive')"
+                     class="sr-only peer"/>
+              <div class="w-11 h-6 bg-outline-variant rounded-full peer
+                          peer-checked:after:translate-x-full peer-checked:after:border-white
+                          after:content-[''] after:absolute after:top-[2px] after:left-[2px]
+                          after:bg-white after:rounded-full after:h-5 after:w-5
+                          after:transition-all peer-checked:bg-primary"></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Descripción -->
+        <div class="space-y-2">
+          <label class="text-label-md font-heading font-semibold text-on-surface">Descripción</label>
+          <textarea formControlName="description" rows="3"
+                    placeholder="Describe los beneficios y características del producto..."
+                    class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3
+                           focus:ring-2 focus:ring-primary/50 outline-none text-label-md
+                           font-heading resize-none transition-all"></textarea>
+        </div>
+
+        <!-- Tags -->
+        <div class="space-y-2">
+          <label class="text-label-md font-heading font-semibold text-on-surface">
+            Tags <span class="text-outline font-normal ml-1">(separados por coma)</span>
+          </label>
+          <input formControlName="tags" type="text"
+                 placeholder="ej. QR Sync, Cuero vegano, 120gsm"
+                 class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3
+                        focus:ring-2 focus:ring-primary/50 outline-none text-label-md
+                        font-heading transition-all"/>
+        </div>
+
+        <!-- Imágenes del producto -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <label class="text-label-md font-heading font-semibold text-on-surface">
+              Imágenes del producto
+            </label>
+            <button type="button" (click)="addImage()"
+                    class="flex items-center gap-1.5 px-3 py-1.5 gradient-primary text-white
+                           rounded-full text-label-sm font-heading font-semibold
+                           hover:opacity-90 transition-all active:scale-95">
+              <span class="material-symbols-outlined text-[16px]">add_photo_alternate</span>
+              Agregar imagen
+            </button>
+          </div>
+
+          @if (images().length > 0) {
+            <!-- Preview imagen principal -->
+            @if (primaryImage()) {
+              <div class="w-full aspect-video rounded-lg bg-gradient-to-br flex items-center
+                          justify-center overflow-hidden"
+                   [class]="primaryImage()!.gradient">
+                <span class="material-symbols-outlined text-white/50 text-[48px]">image</span>
+              </div>
+            }
+
+            <!-- Galería de miniaturas -->
+            <div class="grid grid-cols-5 gap-2">
+              @for (img of images(); track img.id) {
+                <div class="relative group cursor-pointer" (click)="setPrimary(img.id)">
+                  <div class="aspect-square rounded-lg bg-gradient-to-br flex items-center
+                              justify-center transition-all"
+                       [class]="img.gradient + (img.isPrimary ? ' ring-2 ring-primary ring-offset-1' : ' opacity-70 hover:opacity-100')">
+                    <span class="material-symbols-outlined text-white/60 text-[20px]">image</span>
+                  </div>
+                  <!-- Badge principal -->
+                  @if (img.isPrimary) {
+                    <span class="absolute -top-1.5 -right-1.5 bg-primary text-white
+                                 text-[9px] font-heading font-bold px-1.5 py-0.5
+                                 rounded-full leading-none">
+                      Principal
+                    </span>
+                  }
+                  <!-- Botón eliminar -->
+                  <button type="button" (click)="removeImage(img.id); $event.stopPropagation()"
+                          class="absolute -top-1.5 -left-1.5 w-5 h-5 bg-error text-white
+                                 rounded-full opacity-0 group-hover:opacity-100 transition-opacity
+                                 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[12px]">close</span>
+                  </button>
+                </div>
+              }
+              <!-- Add more placeholder -->
+              <button type="button" (click)="addImage()"
+                      class="aspect-square rounded-lg border-2 border-dashed border-outline-variant
+                             flex items-center justify-center text-outline
+                             hover:border-primary hover:text-primary transition-colors">
+                <span class="material-symbols-outlined text-[20px]">add</span>
+              </button>
+            </div>
+
+            <p class="text-label-sm font-heading text-on-surface-variant">
+              Haz clic en una miniatura para marcarla como imagen principal.
+            </p>
+          } @else {
+            <!-- Empty state -->
+            <div class="border-2 border-dashed border-outline-variant rounded-lg p-6
+                        flex flex-col items-center justify-center gap-3
+                        hover:bg-surface-variant/20 transition-colors cursor-pointer group"
+                 (click)="addImage()">
+              <div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center
+                          justify-center text-primary group-hover:scale-110 transition-transform">
+                <span class="material-symbols-outlined text-2xl">add_photo_alternate</span>
+              </div>
+              <p class="text-label-md font-heading font-bold text-on-surface text-center">
+                Agregar imágenes del producto
+              </p>
+              <p class="text-label-sm font-heading text-outline text-center">
+                JPG, PNG, WebP — máx. 10MB · La primera imagen será la principal
+              </p>
+            </div>
+          }
+        </div>
+
+      </form>
+
+      <!-- Footer -->
+      <div class="px-8 py-5 border-t border-outline-variant/20 flex justify-end gap-3 bg-white">
+        <button type="button" (click)="cancel.emit()"
+                class="px-6 py-3 rounded-full text-label-md font-heading font-bold
+                       text-on-surface-variant hover:bg-surface-container-low transition-colors">
+          Cancelar
+        </button>
+        <button type="button" (click)="onSubmit()"
+                class="px-8 py-3 gradient-primary text-white rounded-full text-label-md
+                       font-heading font-bold hover:opacity-90 active:scale-95 transition-all"
+                style="box-shadow: 0 4px 14px 0 rgba(107,56,212,0.39)">
+          {{ isEditMode() ? 'Guardar cambios' : 'Crear producto' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

@@ -3,50 +3,50 @@ import { Component, input, output, computed } from '@angular/core';
 @Component({
   selector: 'app-pagination',
   template: `
-    <div class="flex items-center justify-between px-2 py-3">
-      <p class="text-sm text-gray-500">
-        Showing <span class="font-medium text-gray-700">{{ startItem() }}</span>
-        to <span class="font-medium text-gray-700">{{ endItem() }}</span>
-        of <span class="font-medium text-gray-700">{{ total() }}</span> results
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 px-2 py-3">
+
+      <!-- Contador -->
+      <p class="text-label-sm font-heading text-on-surface-variant">
+        Mostrando
+        <span class="font-bold text-on-surface">{{ startItem() }}–{{ endItem() }}</span>
+        de <span class="font-bold text-on-surface">{{ total() }}</span>
+        {{ label() }}
       </p>
 
+      <!-- Páginas -->
       <nav class="flex items-center gap-1">
-        <!-- Previous -->
-        <button
-          (click)="goToPage(currentPage() - 1)"
-          [disabled]="currentPage() === 1"
-          class="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100
-                 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
+        <button (click)="goToPage(currentPage() - 1)"
+                [disabled]="currentPage() === 1"
+                class="w-9 h-9 flex items-center justify-center rounded-lg border
+                       border-outline-variant text-on-surface-variant hover:border-primary
+                       hover:text-primary transition-colors
+                       disabled:opacity-40 disabled:cursor-not-allowed">
+          <span class="material-symbols-outlined text-[18px]">chevron_left</span>
         </button>
 
-        <!-- Page numbers -->
         @for (page of visiblePages(); track page) {
           @if (page === -1) {
-            <span class="px-2 text-gray-400">...</span>
+            <span class="w-9 h-9 flex items-center justify-center text-outline
+                         text-label-sm font-heading">…</span>
           } @else {
-            <button
-              (click)="goToPage(page)"
-              class="min-w-[36px] h-9 rounded-lg text-sm font-medium transition-colors"
-              [class]="page === currentPage()
-                ? 'bg-primary text-white shadow-sm'
-                : 'text-gray-600 hover:bg-gray-100'">
+            <button (click)="goToPage(page)"
+                    class="w-9 h-9 flex items-center justify-center rounded-lg text-label-md
+                           font-heading font-bold transition-colors"
+                    [class]="page === currentPage()
+                      ? 'gradient-primary text-white'
+                      : 'border border-outline-variant text-on-surface-variant hover:border-primary'">
               {{ page }}
             </button>
           }
         }
 
-        <!-- Next -->
-        <button
-          (click)="goToPage(currentPage() + 1)"
-          [disabled]="currentPage() === totalPages()"
-          class="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100
-                 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-          </svg>
+        <button (click)="goToPage(currentPage() + 1)"
+                [disabled]="currentPage() === totalPages()"
+                class="w-9 h-9 flex items-center justify-center rounded-lg border
+                       border-outline-variant text-on-surface-variant hover:border-primary
+                       hover:text-primary transition-colors
+                       disabled:opacity-40 disabled:cursor-not-allowed">
+          <span class="material-symbols-outlined text-[18px]">chevron_right</span>
         </button>
       </nav>
     </div>
@@ -54,9 +54,10 @@ import { Component, input, output, computed } from '@angular/core';
 })
 export class PaginationComponent {
   readonly currentPage = input.required<number>();
-  readonly pageSize = input.required<number>();
-  readonly total = input.required<number>();
-  readonly pageChange = output<number>();
+  readonly pageSize    = input.required<number>();
+  readonly total       = input.required<number>();
+  readonly label       = input('resultados');
+  readonly pageChange  = output<number>();
 
   readonly totalPages = computed(() =>
     Math.max(1, Math.ceil(this.total() / this.pageSize()))

@@ -1,0 +1,46 @@
+<section class="px-4 md:px-8 lg:px-container-padding-desktop py-6 max-w-[1400px] mx-auto">
+
+  <app-admin-page-header
+    title="Catálogo de Productos"
+    description="Gestiona los productos físicos, digitales y suscripciones de Sanatte."
+    actionLabel="Crear producto"
+    (action)="openCreate()" />
+
+  <!-- Search + stats bar -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+    <div class="w-full sm:w-80">
+      <app-search-input placeholder="Buscar por nombre o SKU..." (search)="onSearch($event)" />
+    </div>
+    <p class="text-label-sm font-heading text-on-surface-variant">
+      {{ filtered().length }} producto{{ filtered().length !== 1 ? 's' : '' }} encontrado{{ filtered().length !== 1 ? 's' : '' }}
+    </p>
+  </div>
+
+  <!-- Table -->
+  <app-product-table
+    [products]="paginated()"
+    [totalItems]="filtered().length"
+    [currentPage]="currentPage()"
+    [pageSize]="8"
+    (editProduct)="openEdit($event)"
+    (deleteProduct)="requestDelete($event)"
+    (pageChange)="onPageChange($event)" />
+
+</section>
+
+<!-- Form Dialog -->
+<app-product-form-dialog
+  [isOpen]="isModalOpen()"
+  [product]="editingProduct()"
+  (save)="onSave($event)"
+  (cancel)="closeModal()" />
+
+<!-- Confirm Delete Dialog -->
+<app-confirm-dialog
+  [open]="isConfirmOpen()"
+  title="Eliminar producto"
+  [message]="deleteMessage()"
+  confirmText="Sí, eliminar"
+  variant="danger"
+  (confirm)="confirmDelete()"
+  (cancel)="cancelDelete()" />
