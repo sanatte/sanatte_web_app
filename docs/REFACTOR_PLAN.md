@@ -20,52 +20,24 @@
 | Roles | USER / ADMIN — guardado en localStorage, switcher dev visible |
 | Imágenes de producto | Array `ProductImage[]` con campo `isPrimary` |
 | Envíos físicos | Modal con transportadora + guía + link de rastreo |
-| **Arquitectura multi-tenant** | **Entitlements layer** — ecommerce core desacoplado del módulo de contenido |
+| Recursos incluidos por producto | `Entitlement[]` — vincula un producto con los recursos digitales que entrega |
+
+> **Nota:** el proyecto **NO es multi-tenant** (decisión 2026-07-02). Es exclusivamente para Sanatte. La capa `Entitlement` se mantiene únicamente como el vínculo **producto → recursos digitales incluidos** (no como punto de extensión para otros tenants).
 
 ---
 
-## 1b. Visión Multi-Tenant ⭐
+## 1b. Modelo de contenido (Sanatte)
 
-Este ecommerce está diseñado para ser **reutilizable en múltiples proyectos**. El principio central:
-
-> **El ecommerce core nunca conoce el tipo de contenido digital del tenant.**
-
-### Capas del sistema
+Un producto entrega recursos digitales a través de sus **entitlements**:
 
 ```
-┌──────────────────────────────────────────────────────────┐
-│  ECOMMERCE CORE (domain-agnostic, reutilizable)           │
-│  Product · Order · License · Activation · User            │
-│                                                           │
-│  Product.entitlements: Entitlement[]                      │
-│    { id, type, referenceId, label }  ← 100% abstracto    │
-└──────────────────────────────────────────────────────────┘
-                    ↓ pluggable por tenant (sin tocar el core)
-  ┌─────────────────────┐    ┌─────────────────────┐
-  │  MÓDULO SANATTE      │    │  MÓDULO ACADEMIA     │
-  │  Resource            │    │  Lesson              │
-  │  (audio/video/pdf/   │    │  (partitura/video/   │
-  │   artículo)          │    │   pista de práctica) │
-  │  EntitlementService  │    │  EntitlementService  │
-  │  → resuelve          │    │  → resuelve          │
-  │    content_item=res  │    │    content_item=lesson│
-  └─────────────────────┘    └─────────────────────┘
+Product ──< Entitlement (referenceId) >── Resource
+   (Plena)      content_item              (Me Recojo, Me Reconozco, …)
 ```
 
-### Cómo agregar un nuevo tenant
-1. Crear el módulo de contenido propio (`Lesson`, `DownloadLink`, etc.)
-2. Implementar un `EntitlementService` que resuelva `content_item → TuModelo`
-3. **Sin tocar** `Product`, `Order`, `License`, `Activation`
-
-### EntitlementType (extensible sin breaking changes)
-```ts
-type EntitlementType =
-  | 'content_item'       // Sanatte: audio, video, pdf, artículo
-  | 'download'           // Software: archivo descargable
-  | 'license_key'        // Software: clave de activación de software
-  | 'qr_access'          // Físicos: acceso via escaneo QR
-  | 'subscription_tier'; // Suscripciones: nivel de acceso
-```
+- `Entitlement.referenceId` apunta a un `Resource`.
+- `EntitlementService` resuelve producto → recursos incluidos.
+- Es un modelo específico de Sanatte (audio/video/pdf/artículo); no busca reutilizarse en otros negocios.
 
 ---
 
@@ -243,3 +215,5 @@ Producto físico + QR → usuario debe autenticarse → activar con QR → acced
 | 2026-07-02 | **Moneda unificada COP** (Mercado Pago Colombia liquida en pesos). `CurrencyService` (fuente única: código ISO + locale es-CO) + `MoneyPipe` reemplazan 23 usos de `\| currency:'USD'` en 10 archivos. Display siempre con código ISO ("COP $89.900") para evitar ambigüedad del "$". Precios/pedidos/facturas repreciados a COP. Nota: para audiencia global, sumar Stripe/PayPal (MP es LATAM). |
 | 2026-07-02 | **Bloque B Autenticación completo**: Login (Google + email/pass), Registro, Verifica-correo (verificación estricta), Correo-verificado, Recuperar + Restablecer contraseña. `AuthShell` compartido. `MockAuthService` extendido (register/signInWithGoogle/sendPasswordReset/resetPassword/confirmEmailVerification) mapeado 1:1 a Firebase; `/auth/verified` y `/auth/reset` simulan el action handler (oobCode). Menús de cuenta desplegables en admin y usuario (logout deliberado, no instantáneo). `User.emailVerified`. Acabados premium: inputs pill+icono+ring, botones con glow+flecha, logo con glow, card hover-lift. |
 | 2026-07-02 | Bloque D: **Home** (`/`) — spotlight de **Plena** (primer producto): hero con tagline breve, sección de las 4 fases (recursos digitales), "cómo funciona" (QR), "descubre más" y CTA. **Definición de Plena corregida** en datos: planeador emocional en papel, ciclo de 4 fases (Me Recojo/Reconozco/Expreso/Cuido), 4 recursos digitales por fase (`res-plena-1..4`) desbloqueados por QR. |
+| 2026-07-02 | **Backend .NET** (slices Admin sobre API real): Productos, Usuarios, Pedidos, Recursos, Entitlements conectados (mock → HTTP). SQLite dev. Migración por clave estable SKU para evitar regresión de IDs. |
+| 2026-07-02 | **Decisión: el proyecto YA NO es multi-tenant.** Es exclusivo de Sanatte. La capa `Entitlement` se conserva solo como vínculo producto→recursos incluidos (no como punto de extensión a otros negocios). Se retira la "Visión Multi-Tenant" del plan. |
