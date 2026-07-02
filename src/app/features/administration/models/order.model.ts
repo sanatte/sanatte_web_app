@@ -17,6 +17,23 @@ export interface OrderProduct {
   type: ProductType;
 }
 
+/** Tono semántico de un estado de entrega (cada vista lo mapea a sus clases). */
+export type DeliveryTone = 'success' | 'info' | 'accent' | 'warning' | 'neutral' | 'error';
+
+/**
+ * Metadata de presentación por estado de entrega (etiqueta + icono + tono).
+ * Fuente ÚNICA usada por la tabla admin y las tarjetas de usuario.
+ */
+export const DELIVERY_STATUS_META: Record<DeliveryStatus, { label: string; icon: string; tone: DeliveryTone }> = {
+  preparing:           { label: 'Preparando',         icon: 'pending',         tone: 'neutral' },
+  shipped:             { label: 'Enviado',            icon: 'local_shipping',  tone: 'info'    },
+  delivered:           { label: 'Entregado',          icon: 'check_circle',    tone: 'success' },
+  pending_activation:  { label: 'Pend. activación',   icon: 'qr_code_scanner', tone: 'warning' },
+  digital_active:      { label: 'Acceso activo',      icon: 'bolt',            tone: 'accent'  },
+  subscription_active: { label: 'Suscripción activa', icon: 'autorenew',       tone: 'info'    },
+  cancelled:           { label: 'Cancelado',          icon: 'cancel',          tone: 'error'   },
+};
+
 export interface Order {
   id: string;
   orderNumber: string;

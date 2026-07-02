@@ -2,19 +2,17 @@ import { Component, input, output } from '@angular/core';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { StatusBadgeComponent } from '../../../../shared/components/status-badge/status-badge.component';
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
-import { Order, DeliveryStatus } from '../../models/order.model';
+import { Order, DeliveryStatus, DeliveryTone, DELIVERY_STATUS_META } from '../../models/order.model';
 import { ProductType } from '../../models/product.model';
 
-interface DeliveryConfig { label: string; icon: string; classes: string; }
-
-const DELIVERY_CONFIG: Record<DeliveryStatus, DeliveryConfig> = {
-  preparing:           { label: 'Preparando',           icon: 'pending',          classes: 'bg-surface-variant text-on-surface-variant' },
-  shipped:             { label: 'Enviado',               icon: 'local_shipping',   classes: 'bg-primary/10 text-primary' },
-  delivered:           { label: 'Entregado',             icon: 'check_circle',     classes: 'bg-green-100 text-green-700' },
-  pending_activation:  { label: 'Pend. activación',     icon: 'qr_code_scanner',  classes: 'bg-amber-100 text-amber-700' },
-  digital_active:      { label: 'Digital activo',        icon: 'bolt',             classes: 'bg-secondary/10 text-secondary' },
-  subscription_active: { label: 'Suscripción activa',   icon: 'autorenew',        classes: 'bg-primary/10 text-primary' },
-  cancelled:           { label: 'Cancelado',             icon: 'cancel',           classes: 'bg-error-container text-error' },
+// Tono semántico → clases de chip (estilo admin). El label/icon vienen de la fuente única.
+const TONE_CHIP: Record<DeliveryTone, string> = {
+  success: 'bg-green-100 text-green-700',
+  info:    'bg-primary/10 text-primary',
+  accent:  'bg-secondary/10 text-secondary',
+  warning: 'bg-amber-100 text-amber-700',
+  neutral: 'bg-surface-variant text-on-surface-variant',
+  error:   'bg-error-container text-error',
 };
 
 const PRODUCT_ICON: Record<ProductType, string> = {
@@ -44,7 +42,10 @@ export class OrderTableComponent {
   readonly changeDelivery      = output<Order>();
   readonly pageChange          = output<number>();
 
-  deliveryConfig = (s: DeliveryStatus) => DELIVERY_CONFIG[s];
+  deliveryConfig = (s: DeliveryStatus) => {
+    const m = DELIVERY_STATUS_META[s];
+    return { label: m.label, icon: m.icon, classes: TONE_CHIP[m.tone] };
+  };
   productIcon    = (t: ProductType)    => PRODUCT_ICON[t];
   productClasses = (t: ProductType)    => PRODUCT_CLASSES[t];
 

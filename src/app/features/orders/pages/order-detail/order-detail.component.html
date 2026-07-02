@@ -1,0 +1,205 @@
+@if (order(); as o) {
+  <div class="max-w-6xl mx-auto">
+    <!-- Breadcrumb / back -->
+    <nav class="flex items-center gap-2 text-on-surface-variant mb-6 text-label-md font-heading">
+      <button (click)="back()" class="hover:text-primary transition-colors">Mis Pedidos</button>
+      <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+      <span class="text-primary font-bold">Pedido {{ o.orderNumber }}</span>
+    </nav>
+
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+      <div>
+        <h1 class="font-heading text-headline-lg text-on-surface mb-2">Detalle del Pedido {{ o.orderNumber }}</h1>
+        <div class="flex items-center gap-2 text-on-surface-variant">
+          <span class="material-symbols-outlined text-[18px]">calendar_today</span>
+          <span class="font-sans text-body-md">Realizado el {{ o.date }} · {{ o.time }}</span>
+        </div>
+      </div>
+      @if (delivery(); as d) {
+        <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full self-start
+                     bg-surface-container-low font-heading font-bold text-label-md {{ d.textClass }}">
+          <span class="w-2 h-2 rounded-full bg-current"></span>
+          {{ d.label }}
+        </span>
+      }
+    </div>
+
+    <!-- Bento grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+      <!-- Main -->
+      <div class="lg:col-span-2 space-y-gutter">
+
+        <!-- Progress tracker -->
+        @if (tracker().length > 0) {
+          <section class="glass-card rounded-lg p-6 md:p-8">
+            <h3 class="font-heading text-headline-md text-on-surface mb-8">
+              {{ isPhysical() ? 'Estado del envío' : 'Estado del pedido' }}
+            </h3>
+            <div class="relative flex flex-col gap-8 md:flex-row md:gap-0 justify-between">
+              <!-- Línea base (desktop) -->
+              <div class="hidden md:block absolute top-6 left-0 right-0 h-1 bg-secondary-fixed mx-10"></div>
+              @for (step of tracker(); track step.label) {
+                <div class="flex flex-row md:flex-col items-center gap-4 flex-1 relative z-10">
+                  <div class="w-12 h-12 rounded-full flex items-center justify-center shadow-lg flex-shrink-0
+                              transition-colors"
+                       [class]="step.done || step.active
+                         ? 'bg-primary text-white'
+                         : 'bg-secondary-fixed text-on-surface-variant'">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">
+                      {{ step.icon }}
+                    </span>
+                  </div>
+                  <div class="text-center md:pt-4">
+                    <p class="font-heading text-label-md font-bold"
+                       [class]="step.done || step.active ? 'text-primary' : 'text-on-surface-variant'">
+                      {{ step.label }}
+                    </p>
+                  </div>
+                </div>
+              }
+            </div>
+          </section>
+        } @else if (isCancelled()) {
+          <section class="glass-card rounded-lg p-6 flex items-center gap-3 text-error">
+            <span class="material-symbols-outlined">cancel</span>
+            <p class="font-heading font-semibold">Este pedido fue cancelado.</p>
+          </section>
+        }
+
+        <!-- Artículos -->
+        <section class="glass-card rounded-lg p-6 md:p-8">
+          <h3 class="font-heading text-headline-md text-on-surface mb-6">Artículos en tu pedido</h3>
+          <div class="divide-y divide-outline-variant/20">
+            <!-- Productos comprados -->
+            @for (p of o.products; track p.id) {
+              <div class="py-5 first:pt-0 flex items-center gap-5">
+                <div class="w-20 h-20 rounded-lg bg-gradient-to-br {{ gradientFor(p.id) }} flex-shrink-0"></div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex justify-between items-start gap-3 mb-1">
+                    <h4 class="font-heading font-bold text-on-surface truncate">{{ p.name }}</h4>
+                  </div>
+                  <p class="font-sans text-label-md text-on-surface-variant capitalize">
+                    {{ p.type === 'physical' ? 'Producto físico' : p.type === 'subscription' ? 'Suscripción' : 'Producto digital' }}
+                    · Cantidad: 1
+                  </p>
+                </div>
+              </div>
+            }
+            <!-- Recursos digitales incluidos (entitlements) -->
+            @for (res of includedResources(); track res.id) {
+              <div class="py-5 flex items-center gap-5">
+                <div class="w-20 h-20 rounded-lg bg-primary-fixed flex items-center justify-center flex-shrink-0">
+                  <span class="material-symbols-outlined text-primary text-[32px]">{{ res.icon }}</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex justify-between items-start gap-3 mb-1">
+                    <h4 class="font-heading font-bold text-on-surface truncate">{{ res.title }}</h4>
+                    <span class="font-heading font-bold text-secondary flex-shrink-0">Incluido</span>
+                  </div>
+                  <p class="font-sans text-label-md text-on-surface-variant mb-3">
+                    {{ res.type }} · Incluido con {{ res.includedIn }}
+                  </p>
+                  <a [routerLink]="['/app/library', res.productId, res.id]"
+                     class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary rounded-full text-white
+                            text-label-sm font-heading font-bold shadow-md hover:bg-primary/90
+                            transition-all active:scale-95">
+                    <span class="material-symbols-outlined text-[16px]">play_arrow</span>
+                    Acceder ahora
+                  </a>
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="space-y-gutter">
+        <!-- Envío (solo físicos) -->
+        @if (isPhysical()) {
+          <section class="glass-card rounded-lg p-6 border-l-4 border-secondary">
+            <h3 class="font-heading text-label-md font-bold text-secondary uppercase tracking-widest mb-4">Envío</h3>
+            @if (o.trackingNumber) {
+              <div class="space-y-3">
+                <div>
+                  <p class="text-label-sm font-heading text-on-surface-variant uppercase mb-0.5">Transportadora</p>
+                  <p class="font-heading font-semibold text-on-surface">{{ o.shippingCarrier ?? '—' }}</p>
+                </div>
+                <div>
+                  <p class="text-label-sm font-heading text-on-surface-variant uppercase mb-0.5">Guía</p>
+                  <p class="font-heading font-semibold text-on-surface">{{ o.trackingNumber }}</p>
+                </div>
+                @if (o.trackingUrl) {
+                  <a [href]="o.trackingUrl" target="_blank" rel="noopener"
+                     class="w-full py-3 bg-surface-container-high rounded-xl font-heading font-bold text-on-surface
+                            hover:bg-surface-container-highest transition-colors flex items-center justify-center gap-2 mt-2">
+                    <span class="material-symbols-outlined">track_changes</span>
+                    Rastrear envío
+                  </a>
+                }
+              </div>
+            } @else {
+              <div class="flex items-start gap-2 text-on-surface-variant">
+                <span class="material-symbols-outlined text-[18px]">pending</span>
+                <span class="text-label-md font-heading">Tu pedido se está preparando. Te compartiremos la guía de rastreo al despacharlo.</span>
+              </div>
+            }
+          </section>
+        }
+
+        <!-- Resumen de pago -->
+        <section class="glass-card rounded-lg p-6">
+          <h3 class="font-heading text-label-md font-bold text-primary uppercase tracking-widest mb-4">Resumen de pago</h3>
+          <div class="space-y-3 mb-5 font-sans text-body-md">
+            <div class="flex justify-between text-on-surface-variant">
+              <span>Subtotal</span>
+              <span>{{ o.total | currency:'USD':'symbol':'1.2-2' }}</span>
+            </div>
+            <div class="flex justify-between text-on-surface-variant">
+              <span>Envío</span>
+              <span class="text-green-600 font-medium">{{ isPhysical() ? 'Gratis' : '—' }}</span>
+            </div>
+            <div class="flex justify-between text-on-surface-variant">
+              <span>Impuestos</span>
+              <span>{{ 0 | currency:'USD':'symbol':'1.2-2' }}</span>
+            </div>
+            <div class="h-px bg-outline-variant/30 my-1"></div>
+            <div class="flex justify-between font-heading text-headline-md text-on-surface">
+              <span>Total</span>
+              <span class="text-primary">{{ o.total | currency:'USD':'symbol':'1.2-2' }}</span>
+            </div>
+          </div>
+          <button class="w-full py-3 bg-primary rounded-xl font-heading font-bold text-white shadow-primary
+                         hover:opacity-90 transition-all flex items-center justify-center gap-2 active:scale-95">
+            <span class="material-symbols-outlined">receipt</span>
+            Descargar factura
+          </button>
+        </section>
+
+        <!-- Soporte -->
+        <section class="glass-card rounded-lg p-6 border border-primary/10 flex items-start gap-4">
+          <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary flex-shrink-0">
+            <span class="material-symbols-outlined">help_center</span>
+          </div>
+          <div>
+            <p class="font-heading font-bold text-on-surface mb-1">¿Necesitas ayuda?</p>
+            <p class="font-sans text-label-md text-on-surface-variant mb-2">
+              Si tienes dudas sobre este pedido, nuestro equipo está aquí.
+            </p>
+            <a href="#" class="text-primary font-heading font-bold text-label-md hover:underline inline-flex items-center gap-1">
+              Contactar soporte <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+            </a>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="text-center py-20">
+    <p class="font-heading text-headline-md text-on-surface-variant">Pedido no encontrado</p>
+    <button (click)="back()" class="mt-4 text-primary font-heading font-bold hover:underline">
+      Volver a mis pedidos
+    </button>
+  </div>
+}
