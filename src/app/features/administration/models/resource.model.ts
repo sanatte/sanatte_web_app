@@ -1,12 +1,8 @@
 /**
- * Resource — módulo de contenido digital de Sanatte (tenant-specific).
+ * Resource — recurso de contenido digital de Sanatte (audio/video/pdf/artículo).
  *
- * Intencionalmente NO tiene referencia a productos.
- * El vínculo producto ↔ recurso vive en Product.entitlements[] (ecommerce core)
- * y se resuelve a través de EntitlementService.
- *
- * Otro tenant usaría su propio modelo de contenido (Lección, DownloadLink, etc.)
- * sin modificar el ecommerce core.
+ * No tiene referencia a productos: el vínculo producto ↔ recurso vive en
+ * Product.entitlements[] y se resuelve a través de EntitlementService.
  */
 export type ResourceType   = 'audio' | 'video' | 'pdf' | 'article';
 export type ResourceStatus = 'published' | 'draft';

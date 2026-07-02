@@ -5,15 +5,8 @@ import { Resource } from '../models/resource.model';
 import { ResourceService } from './resource.service';
 
 /**
- * EntitlementService — capa de resolución entre el ecommerce core y los módulos
- * de contenido del tenant.
- *
- * El ecommerce core (Product, Order, License) habla solo con Entitlements.
- * Este servicio resuelve qué objetos reales (Resources en Sanatte) corresponden
- * a cada entitlement.
- *
- * Para un nuevo tenant: crear un servicio análogo que resuelva hacia sus propios
- * modelos de contenido sin modificar Product ni Order.
+ * EntitlementService — resuelve los entitlements de un producto a los Resource
+ * que incluye (audio/video/pdf/artículo) y calcula los vínculos producto↔recurso.
  */
 @Injectable({ providedIn: 'root' })
 export class EntitlementService {

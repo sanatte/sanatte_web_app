@@ -26,9 +26,8 @@ export interface Product {
   requiresActivation: boolean;
   images: ProductImage[];
   /**
-   * Entitlements — qué entrega este producto al comprarse/activarse.
-   * El ecommerce core NO sabe qué hay detrás de cada entitlement.
-   * El EntitlementService resuelve el tipo correcto según el tenant.
+   * Entitlements — recursos digitales que incluye este producto.
+   * `EntitlementService` los resuelve a los Resource correspondientes.
    */
   entitlements: Entitlement[];
   salesCount: number;

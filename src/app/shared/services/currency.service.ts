@@ -7,8 +7,8 @@ import { Injectable } from '@angular/core';
  * Se muestra SIEMPRE con código ISO para evitar la ambigüedad del signo "$"
  * (USD, COP, MXN… todos usan "$"). Ej: "COP $96.000".
  *
- * Migración multi-moneda: exponer `code`/`locale` desde config del tenant y, si
- * se muestran precios localizados, convertir con tasas reales — el cargo real
+ * Migración multi-moneda (futuro): exponer `code`/`locale` desde configuración y,
+ * si se muestran precios localizados, convertir con tasas reales — el cargo real
  * seguirá siendo en la moneda de recaudo (MP).
  */
 @Injectable({ providedIn: 'root' })
