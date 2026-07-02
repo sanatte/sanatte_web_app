@@ -5,12 +5,12 @@ import { Order } from '../../administration/models/order.model';
 /**
  * UserOrdersService — pedidos del usuario autenticado (vista cliente).
  *
- * Fase Mock: devuelve un subconjunto curado de los pedidos que representa el
- * historial del usuario (cubre físico/digital/suscripción y varios estados).
- * Migración: filtrar `OrderService.orders()` por `buyerEmail`/uid del usuario
- * autenticado. La API pública (signals) no cambia.
+ * Fase actual: filtra los pedidos por número de pedido (clave estable) como
+ * subconjunto del usuario. Migración final: endpoint `/api/me/orders` que
+ * devuelve los pedidos del usuario autenticado (por FirebaseUid). La API
+ * pública (signals) no cambia.
  */
-const MY_ORDER_IDS = ['o1', 'o7', 'o6', 'o2', 'o5', 'o3'];
+const MY_ORDER_NUMBERS = ['#SAN-9021', '#SAN-9020', '#SAN-9019'];
 
 @Injectable({ providedIn: 'root' })
 export class UserOrdersService {
@@ -19,7 +19,7 @@ export class UserOrdersService {
   readonly orders = computed<Order[]>(() =>
     this.orderService
       .orders()
-      .filter((o) => MY_ORDER_IDS.includes(o.id))
+      .filter((o) => MY_ORDER_NUMBERS.includes(o.orderNumber))
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
   );
 
