@@ -190,11 +190,10 @@ Producto físico + QR → usuario debe autenticarse → activar con QR → acced
 **Regla activación:** solo productos físicos (`qr_activation`) requieren activación por código; digitales/suscripción dan acceso al comprar. Físico aparece en biblioteca SOLO tras activar.
 
 ### 🔹 Bloque D — Sitio Público
-- [ ] Home
+- [x] **Home** (hero + ecosistema + productos destacados + cómo funciona QR + CTA suscripción)
 - [x] **Catálogo público** (grid + búsqueda + filtros por tipo) + **Detalle producto** (galería, compra, highlights, specs, reseñas)
 - [x] **Carrito + Checkout** (checkout exige cuenta; envío condicional físicos; confirmación)
-- [ ] Home (landing) ← siguiente
-- [ ] Blog · FAQ · Contacto
+- [ ] Blog · FAQ · Contacto (opcionales)
 
 **Decisión negocio:** navegar/carrito = público; la cuenta se exige en el **checkout**.
 **Shell unificado:** un usuario logueado navega la tienda dentro de su shell (`/app/products`, `/app/cart`, `/app/checkout`) con el sidebar — sin salto a la pública. El visitante la ve en `/products`, `/cart`, `/checkout`. `StoreContextService` resuelve el prefijo (`/app` vs `''`). Carrito se conserva al cerrar sesión (device-local, estándar).
@@ -241,4 +240,5 @@ Producto físico + QR → usuario debe autenticarse → activar con QR → acced
 | 2026-07-02 | Bloque D: **Carrito + Checkout** (checkout con `mockAuthGuard` + returnUrl). Confirmación de pedido. **Shell unificado (Opción B):** tienda montada también bajo `/app` con sidebar; `StoreContextService` resuelve el prefijo de rutas según login → sin salto de shell. Menú de cuenta en navbar público. Accesos a tienda/carrito desde el shell de usuario. |
 | 2026-07-02 | **Activación de producto** (`/app/activate` + entrada QR pública `/activate?code=` con gate returnUrl). `UserActivationService` valida contra Licencias, marca licencia activa, crea Activation (visible en admin) y desbloquea recursos en biblioteca. Solo físicos (`qr_activation`). Entradas: sidebar, biblioteca, banner en pedido pendiente. Seed de biblioteca ajustado: físicos aparecen solo tras activar. |
 | 2026-07-02 | **Moneda unificada COP** (Mercado Pago Colombia liquida en pesos). `CurrencyService` (fuente única: código ISO + locale es-CO) + `MoneyPipe` reemplazan 23 usos de `\| currency:'USD'` en 10 archivos. Display siempre con código ISO ("COP $89.900") para evitar ambigüedad del "$". Precios/pedidos/facturas repreciados a COP. Nota: para audiencia global, sumar Stripe/PayPal (MP es LATAM). |
-| 2026-07-02 | **Bloque B Autenticación completo**: Login (Google + email/pass), Registro, Verifica-correo (verificación estricta), Correo-verificado, Recuperar + Restablecer contraseña. `AuthShell` compartido. `MockAuthService` extendido (register/signInWithGoogle/sendPasswordReset/resetPassword/confirmEmailVerification) mapeado 1:1 a Firebase; `/auth/verified` y `/auth/reset` simulan el action handler (oobCode). Menús de cuenta desplegables en admin y usuario (logout deliberado, no instantáneo). `User.emailVerified`. |
+| 2026-07-02 | **Bloque B Autenticación completo**: Login (Google + email/pass), Registro, Verifica-correo (verificación estricta), Correo-verificado, Recuperar + Restablecer contraseña. `AuthShell` compartido. `MockAuthService` extendido (register/signInWithGoogle/sendPasswordReset/resetPassword/confirmEmailVerification) mapeado 1:1 a Firebase; `/auth/verified` y `/auth/reset` simulan el action handler (oobCode). Menús de cuenta desplegables en admin y usuario (logout deliberado, no instantáneo). `User.emailVerified`. Acabados premium: inputs pill+icono+ring, botones con glow+flecha, logo con glow, card hover-lift. |
+| 2026-07-02 | Bloque D: **Home** (`/`) — spotlight de **Plena** (primer producto): hero con tagline breve, sección de las 4 fases (recursos digitales), "cómo funciona" (QR), "descubre más" y CTA. **Definición de Plena corregida** en datos: planeador emocional en papel, ciclo de 4 fases (Me Recojo/Reconozco/Expreso/Cuido), 4 recursos digitales por fase (`res-plena-1..4`) desbloqueados por QR. |

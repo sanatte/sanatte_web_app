@@ -1,6 +1,35 @@
 import { Resource } from '../models/resource.model';
 
 export const MOCK_RESOURCES: Resource[] = [
+  // ── Recursos digitales de Plena (uno por fase — se desbloquean vía QR) ──────
+  {
+    id: 'res-plena-1', title: 'Me Recojo · Meditación para soltar',
+    description: 'Un refugio para respirar y descansar. Suelta lo que ya no te sostiene y regresa a ti con una meditación guiada de la Fase 1.',
+    type: 'audio', status: 'published',
+    tags: ['plena', 'fase-1', 'meditación', 'soltar'], duration: '10:00',
+    thumbnailGradient: 'from-indigo-500 to-violet-800', createdAt: '2024-11-01',
+  },
+  {
+    id: 'res-plena-2', title: 'Me Reconozco · Reencuentro en el espejo',
+    description: 'Audio guiado para mirarte con honestidad y ternura, reconectar con tu niña interior y honrar tus fortalezas.',
+    type: 'audio', status: 'published',
+    tags: ['plena', 'fase-2', 'autoconocimiento'], duration: '12:30',
+    thumbnailGradient: 'from-purple-400 to-indigo-600', createdAt: '2024-11-01',
+  },
+  {
+    id: 'res-plena-3', title: 'Me Expreso · El eco de mi verdad',
+    description: 'Activa tu voz creadora: afirmaciones y práctica sonora para transformar lo interno en expresión viva.',
+    type: 'video', status: 'published',
+    tags: ['plena', 'fase-3', 'expresión', 'manifiesto'], duration: '09:15',
+    thumbnailGradient: 'from-violet-500 to-fuchsia-700', createdAt: '2024-11-01',
+  },
+  {
+    id: 'res-plena-4', title: 'Me Cuido · El templo de mi esencia',
+    description: 'Ritual de cierre para habitar tu cuerpo con gratitud y sostener tu bienestar con límites amorosos.',
+    type: 'audio', status: 'published',
+    tags: ['plena', 'fase-4', 'autocuidado', 'ritual'], duration: '11:45',
+    thumbnailGradient: 'from-blue-500 to-indigo-700', createdAt: '2024-11-01',
+  },
   {
     id: 'res-1', title: 'Morning Mindfulness Flow',
     description: 'Secuencia guiada para claridad matutina y despertar físico.',
