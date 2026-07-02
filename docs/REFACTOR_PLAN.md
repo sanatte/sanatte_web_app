@@ -176,7 +176,7 @@ Producto físico + QR → usuario debe autenticarse → activar con QR → acced
 
 ### 🔹 Bloque C — App Usuario
 - [x] **Biblioteca** (home cliente: hero enfoque del día + progreso semanal + Mis Productos + estado vacío)
-- [ ] Detalle recurso (visores audio/video/pdf/artículo) ← siguiente
+- [x] **Detalle recurso** (visor con playlist del producto + 4 visores compartidos por tipo + estado "sin recursos")
 - [ ] Mis pedidos + detalle
 - [ ] Perfil + configuración
 - [ ] Suscripciones
@@ -221,3 +221,4 @@ Producto físico + QR → usuario debe autenticarse → activar con QR → acced
 | 2026-07-01 | Extras: Detalle producto con galería multi-imagen · ShipOrderDialog con transportadora/guía · Select arrows CSS global · Responsive mobile-first (sidebar hamburger, col-hiding tables, dialogs full-screen). |
 | 2026-07-01 | Arquitectura multi-tenant: capa Entitlements (ecommerce core desacoplado del módulo de contenido). Gestión de recursos↔producto editable en form y detalle. |
 | 2026-07-02 | Bloque C: **Biblioteca del cliente** (Library 1). Shared `CircularProgress`. Componentes `DailyFocusCard`/`WeeklyProgressCard`/`OwnedProductCard`. `UserLibraryService` (progreso mock). AppLayout alineado con AdminLayout (sidebar + hamburger + título dinámico). |
+| 2026-07-02 | Bloque C: **Visor de recurso** (`/app/library/:productId/:resourceId`) con playlist del producto y estado "sin recursos". **Consolidación anti-duplicación:** 4 visores por tipo → `shared/components/resource-viewers/` (usados por visor usuario Y modal admin); `RESOURCE_TYPE_META` única en `resource.model` (eliminó 5 mapeos duplicados de icono/label). |

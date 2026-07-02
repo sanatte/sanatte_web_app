@@ -33,6 +33,11 @@ h1, h2, h3, h4, h5, h6 {
   .gradient-primary {
     background: linear-gradient(135deg, #6b38d4 0%, #8455ef 100%);
   }
+
+  /* Fondo inmersivo para players de audio/video (visores) */
+  .player-gradient {
+    background: linear-gradient(135deg, #4c1d95 0%, #1e1b4b 100%);
+  }
 }
 
 /* ── Utilities ───────────────────────────────────────────────────────────── */

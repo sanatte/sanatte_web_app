@@ -1,13 +1,6 @@
 import { Component, input, output, computed } from '@angular/core';
 import { StatusBadgeComponent } from '../../../../shared/components/status-badge/status-badge.component';
-import { Resource, ResourceType } from '../../models/resource.model';
-
-const TYPE_META: Record<ResourceType, { icon: string; label: string }> = {
-  audio:   { icon: 'headphones',     label: 'Audio'    },
-  video:   { icon: 'videocam',       label: 'Video'    },
-  pdf:     { icon: 'picture_as_pdf', label: 'PDF'      },
-  article: { icon: 'description',    label: 'Artículo' },
-};
+import { Resource, RESOURCE_TYPE_META } from '../../models/resource.model';
 
 @Component({
   selector: 'app-resource-card',
@@ -125,7 +118,7 @@ export class ResourceCardComponent {
   readonly delete  = output<Resource>();
   readonly preview = output<Resource>();
 
-  readonly typeMeta = computed(() => TYPE_META[this.resource().type]);
+  readonly typeMeta = computed(() => RESOURCE_TYPE_META[this.resource().type]);
 
   readonly metaLabel = computed(() => {
     const r = this.resource();

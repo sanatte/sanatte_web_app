@@ -1,6 +1,7 @@
 import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DashboardResource, ResourceType } from '../../models/dashboard-resource.model';
+import { RESOURCE_TYPE_META } from '../../models/resource.model';
 
 @Component({
   selector: 'app-top-resources',
@@ -58,10 +59,7 @@ export class TopResourcesComponent {
   readonly resources = input.required<DashboardResource[]>();
 
   iconForType(type: ResourceType): string {
-    const map: Record<ResourceType, string> = {
-      audio: 'headphones', video: 'videocam', pdf: 'picture_as_pdf', article: 'article',
-    };
-    return map[type];
+    return RESOURCE_TYPE_META[type].icon;
   }
 
   playIconForType(type: ResourceType): string {
@@ -69,9 +67,6 @@ export class TopResourcesComponent {
   }
 
   labelForType(type: ResourceType): string {
-    const map: Record<ResourceType, string> = {
-      audio: 'Audio', video: 'Video', pdf: 'PDF', article: 'Artículo',
-    };
-    return map[type];
+    return RESOURCE_TYPE_META[type].label;
   }
 }

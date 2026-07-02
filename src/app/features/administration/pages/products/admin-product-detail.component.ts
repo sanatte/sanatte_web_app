@@ -7,11 +7,7 @@ import { ResourceService } from '../../services/resource.service';
 import { StatusBadgeComponent } from '../../../../shared/components/status-badge/status-badge.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { Product, ProductImage, getPrimaryImage } from '../../models/product.model';
-import { Resource } from '../../models/resource.model';
-
-const RESOURCE_ICONS: Record<string, string> = {
-  audio: 'headphones', video: 'videocam', pdf: 'picture_as_pdf', article: 'description',
-};
+import { Resource, ResourceType, RESOURCE_TYPE_META } from '../../models/resource.model';
 
 @Component({
   selector: 'app-admin-product-detail',
@@ -68,7 +64,7 @@ export class AdminProductDetailComponent implements OnInit {
       : 'bg-surface-variant text-on-surface-variant';
   });
 
-  resourceIcon = (type: string) => RESOURCE_ICONS[type] ?? 'article';
+  resourceIcon = (type: string) => RESOURCE_TYPE_META[type as ResourceType]?.icon ?? 'description';
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');

@@ -2,7 +2,7 @@ import { Component, input, output, effect, inject, signal, computed } from '@ang
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Product, ProductType, ProductImage } from '../../models/product.model';
 import { Entitlement } from '../../models/entitlement.model';
-import { Resource, ResourceType } from '../../models/resource.model';
+import { Resource, ResourceType, RESOURCE_TYPE_META } from '../../models/resource.model';
 import { ResourceService } from '../../services/resource.service';
 
 const GRADIENT_PALETTE = [
@@ -11,10 +11,6 @@ const GRADIENT_PALETTE = [
   'from-sky-400 to-blue-600',      'from-amber-400 to-orange-500',
   'from-purple-300 to-indigo-500', 'from-teal-400 to-cyan-600',
 ];
-
-const RESOURCE_ICONS: Record<ResourceType, string> = {
-  audio: 'headphones', video: 'videocam', pdf: 'picture_as_pdf', article: 'description',
-};
 
 @Component({
   selector: 'app-product-form-dialog',
@@ -51,7 +47,7 @@ export class ProductFormDialogComponent {
   readonly primaryImage        = computed(() => this.images().find((img) => img.isPrimary) ?? this.images()[0]);
   readonly selectedResourceIds = signal<Set<string>>(new Set());
   readonly allResources        = this.resourceService.resources;
-  readonly resourceIcon        = (type: ResourceType) => RESOURCE_ICONS[type];
+  readonly resourceIcon        = (type: ResourceType) => RESOURCE_TYPE_META[type].icon;
 
   readonly selectedResources = computed(() =>
     this.allResources().filter((r) => this.selectedResourceIds().has(r.id))

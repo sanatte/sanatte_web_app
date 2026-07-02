@@ -1,5 +1,5 @@
 import { Component, inject, computed } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { MockAuthService } from '../../../../core/services/mock-auth.service';
 import { UserLibraryService } from '../../services/user-library.service';
 import { DailyFocusCardComponent } from '../../components/daily-focus-card/daily-focus-card.component';
@@ -82,6 +82,7 @@ import { OwnedProduct } from '../../models/user-library.model';
 export class LibraryHomeComponent {
   private readonly auth    = inject(MockAuthService);
   private readonly library = inject(UserLibraryService);
+  private readonly router  = inject(Router);
 
   readonly ownedProducts = this.library.ownedProducts;
   readonly hasProducts   = this.library.hasProducts;
@@ -94,14 +95,24 @@ export class LibraryHomeComponent {
   });
 
   onStartFocus(): void {
-    // TODO(fase visores): navegar al visor del recurso dailyFocus.resourceId
+    // Abre el recurso destacado dentro de su primer producto contenedor (si existe).
+    const resId = this.dailyFocus.resourceId;
+    const owner = resId
+      ? this.ownedProducts().find((o) =>
+          o.product.entitlements.some((e) => e.referenceId === resId)
+        )
+      : undefined;
+    if (owner && resId) {
+      this.router.navigate(['/app/library', owner.product.id, resId]);
+    }
   }
 
-  onOpenProduct(_owned: OwnedProduct): void {
-    // TODO(fase detalle usuario): navegar a /app/library/:productId
+  onOpenProduct(owned: OwnedProduct): void {
+    this.router.navigate(['/app/library', owned.product.id]);
   }
 
-  onContinue(_owned: OwnedProduct): void {
-    // TODO(fase visores): reanudar el último recurso del producto
+  onContinue(owned: OwnedProduct): void {
+    // Abre el visor del producto (elige el primer recurso automáticamente).
+    this.router.navigate(['/app/library', owned.product.id]);
   }
 }

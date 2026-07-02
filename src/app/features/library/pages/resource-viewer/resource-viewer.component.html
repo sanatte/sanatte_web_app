@@ -1,0 +1,157 @@
+@if (product(); as p) {
+  <!-- Back -->
+  <button (click)="back()"
+          class="flex items-center gap-2 text-label-md font-heading text-on-surface-variant
+                 hover:text-primary transition-colors mb-4 -mt-2">
+    <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+    Volver a la biblioteca
+  </button>
+
+  @if (hasResources() && active(); as r) {
+    <div class="flex flex-col lg:flex-row gap-gutter">
+
+      <!-- ══ Contenido principal ══════════════════════════════════════════ -->
+      <section class="flex-1 min-w-0 space-y-6">
+        <!-- Player según tipo -->
+        @switch (r.type) {
+          @case ('video')   { <app-video-player  [resource]="r" [collection]="p.name" /> }
+          @case ('audio')   { <app-audio-player  [resource]="r" [collection]="p.name" /> }
+          @case ('pdf')     { <app-pdf-viewer    [resource]="r" /> }
+          @case ('article') { <app-article-reader [resource]="r" /> }
+        }
+
+        <!-- Header del recurso -->
+        <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+          <div class="min-w-0">
+            <h2 class="font-heading text-headline-lg text-on-background mb-2">{{ r.title }}</h2>
+            <p class="text-on-surface-variant font-sans flex flex-wrap items-center gap-x-4 gap-y-1">
+              @if (r.duration || r.readTime || r.fileSize) {
+                <span class="flex items-center gap-1">
+                  <span class="material-symbols-outlined text-primary text-[18px]">schedule</span>
+                  {{ r.duration ?? r.readTime ?? r.fileSize }}
+                </span>
+              }
+              <span class="flex items-center gap-1">
+                <span class="material-symbols-outlined text-primary text-[18px]">{{ typeMeta()?.icon }}</span>
+                {{ typeMeta()?.label }}
+              </span>
+              @if (r.tags[0]) {
+                <span class="flex items-center gap-1">
+                  <span class="material-symbols-outlined text-primary text-[18px]">sell</span>
+                  {{ r.tags[0] }}
+                </span>
+              }
+            </p>
+          </div>
+          <div class="flex gap-3 flex-shrink-0">
+            <button class="flex items-center gap-2 px-6 py-3 bg-primary text-on-primary rounded-full
+                           font-heading font-bold text-label-md shadow-primary hover:opacity-90
+                           active:scale-95 transition-all">
+              <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">bookmark</span>
+              Guardar
+            </button>
+            <button class="p-3 bg-surface-container text-on-surface rounded-full
+                           hover:bg-surface-container-high transition-colors">
+              <span class="material-symbols-outlined">share</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Descripción -->
+        <p class="text-on-surface-variant font-sans text-body-lg leading-relaxed">
+          {{ r.description }}
+        </p>
+      </section>
+
+      <!-- ══ Sidebar: playlist del producto + acerca de ═══════════════════ -->
+      <aside class="w-full lg:w-[380px] flex-shrink-0 space-y-6">
+        <!-- Playlist -->
+        <div class="glass-card rounded-lg p-5">
+          <h3 class="font-heading text-headline-md text-on-surface mb-4">Contenido del producto</h3>
+          <div class="space-y-2">
+            @for (res of resources(); track res.id) {
+              <button (click)="select(res)"
+                      class="w-full group flex gap-3 p-2.5 rounded-lg text-left transition-all active:scale-[0.98]"
+                      [class]="res.id === r.id
+                        ? 'bg-primary-container/10 border border-primary/20'
+                        : 'hover:bg-surface-container-low border border-transparent'">
+                <!-- Thumbnail -->
+                <div class="relative w-20 h-14 rounded-md overflow-hidden flex-shrink-0
+                            bg-gradient-to-br" [class]="res.thumbnailGradient">
+                  <div class="absolute inset-0 flex items-center justify-center"
+                       [class]="res.id === r.id ? 'bg-primary/20' : 'bg-black/20 group-hover:bg-black/30'">
+                    <span class="material-symbols-outlined text-white text-[22px]"
+                          style="font-variation-settings: 'FILL' 1;">
+                      {{ res.id === r.id ? 'play_circle' : typeMetaOf(res.type).icon }}
+                    </span>
+                  </div>
+                </div>
+                <!-- Info -->
+                <div class="flex flex-col justify-center min-w-0">
+                  <p class="font-heading text-label-md truncate"
+                     [class]="res.id === r.id ? 'text-primary font-bold' : 'text-on-surface group-hover:text-primary'">
+                    {{ res.title }}
+                  </p>
+                  <p class="text-label-sm text-on-surface-variant">
+                    {{ res.duration ?? res.readTime ?? res.fileSize ?? '—' }} · {{ typeMetaOf(res.type).label }}
+                  </p>
+                </div>
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Acerca del producto (reemplaza la 'Author card' del mockup) -->
+        <div class="glass-card rounded-lg p-6 space-y-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center
+                        text-white flex-shrink-0">
+              <span class="material-symbols-outlined">inventory_2</span>
+            </div>
+            <div class="min-w-0">
+              <p class="font-heading font-bold text-on-surface truncate">{{ p.name }}</p>
+              <p class="text-label-sm text-on-surface-variant">
+                {{ resources().length }} recurso{{ resources().length !== 1 ? 's' : '' }} incluido{{ resources().length !== 1 ? 's' : '' }}
+              </p>
+            </div>
+          </div>
+          <p class="text-label-md font-sans text-on-surface-variant leading-relaxed line-clamp-3">
+            {{ p.description }}
+          </p>
+          <a [routerLink]="['/app/library']"
+             class="block text-center w-full py-2 border border-primary text-primary rounded-full
+                    text-label-sm font-heading font-bold hover:bg-primary/5 transition-colors">
+            Ver mi biblioteca
+          </a>
+        </div>
+      </aside>
+    </div>
+  } @else {
+    <!-- Estado: producto sin recursos -->
+    <div class="glass-card rounded-lg p-12 text-center max-w-2xl mx-auto mt-8">
+      <div class="w-20 h-20 rounded-full bg-primary-fixed flex items-center justify-center mx-auto mb-6">
+        <span class="material-symbols-outlined text-primary text-[40px]">hourglass_empty</span>
+      </div>
+      <h3 class="font-heading text-headline-md text-on-surface mb-2">
+        El contenido de {{ p.name }} está en camino
+      </h3>
+      <p class="font-sans text-body-md text-on-surface-variant max-w-md mx-auto mb-8">
+        Aún no hay recursos digitales disponibles para este producto. Te avisaremos cuando
+        estén listos para explorar.
+      </p>
+      <button (click)="back()"
+              class="px-8 py-3 rounded-full bg-primary text-white font-heading font-bold
+                     hover:bg-primary/90 transition-colors active:scale-95">
+        Volver a la biblioteca
+      </button>
+    </div>
+  }
+} @else {
+  <!-- Producto no encontrado -->
+  <div class="text-center py-20">
+    <p class="font-heading text-headline-md text-on-surface-variant">Producto no encontrado</p>
+    <button (click)="back()" class="mt-4 text-primary font-heading font-bold hover:underline">
+      Volver a la biblioteca
+    </button>
+  </div>
+}
