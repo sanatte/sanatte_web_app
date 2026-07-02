@@ -2,7 +2,6 @@ import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { Product, ProductImage } from '../models/product.model';
-import { Entitlement } from '../models/entitlement.model';
 import { Resource } from '../models/resource.model';
 import { environment } from '../../../../environments/environment';
 import { mapApiProduct } from './api-mappers';
@@ -105,19 +104,19 @@ export class ProductService {
     );
   }
 
-  addResourceEntitlement(productId: string, resource: Resource): void {
-    const product = this.getById(productId);
-    if (!product) return;
-    if (product.entitlements.some((e) => e.type === 'content_item' && e.referenceId === resource.id)) return;
-    const entitlement: Entitlement = { id: `ent-${Date.now()}`, type: 'content_item', referenceId: resource.id, label: resource.title };
-    this.update(productId, { entitlements: [...product.entitlements, entitlement] });
+  /** Vincula un recurso al producto (capa Entitlement en la API — ruta admin). */
+  async addResourceEntitlement(productId: string, resource: Resource): Promise<void> {
+    const url = `${environment.apiUrl}/admin/products/${productId}/entitlements`;
+    const raw = await firstValueFrom(this.http.post<unknown>(url, { resourceId: resource.id }));
+    const updated = mapApiProduct(raw);
+    this._products.update((list) => list.map((p) => p.id === productId ? updated : p));
   }
 
-  removeResourceEntitlement(productId: string, resourceId: string): void {
-    const product = this.getById(productId);
-    if (!product) return;
-    this.update(productId, {
-      entitlements: product.entitlements.filter((e) => !(e.type === 'content_item' && e.referenceId === resourceId))
-    });
+  /** Desvincula un recurso del producto. */
+  async removeResourceEntitlement(productId: string, resourceId: string): Promise<void> {
+    const url = `${environment.apiUrl}/admin/products/${productId}/entitlements/${resourceId}`;
+    const raw = await firstValueFrom(this.http.delete<unknown>(url));
+    const updated = mapApiProduct(raw);
+    this._products.update((list) => list.map((p) => p.id === productId ? updated : p));
   }
 }
