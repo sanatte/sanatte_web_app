@@ -9,5 +9,6 @@ export interface User {
   email: string;
   displayName: string;
   role: UserRole;
+  emailVerified: boolean;
   avatarUrl?: string;
 }

@@ -4,14 +4,21 @@ import { User } from '../models/user.model';
 import { UserRole } from '../models/role.model';
 
 const STORAGE_KEY = 'sanatte_user';
+const PENDING_KEY = 'sanatte_pending_user';
 const MOCK_DELAY = 600;
 
 /**
  * Autenticación simulada (fase Mock).
  *
- * Acepta cualquier credencial y crea un usuario con el rol indicado.
- * Para migrar: reemplazar el cuerpo de `login`/`getIdToken` por Firebase Auth
- * o por el AuthService HTTP de NestJS — la API pública (signals) no cambia.
+ * Métodos mapeados 1:1 a Firebase Auth (ver tabla en el plan):
+ *   login → signInWithEmailAndPassword · register → createUserWithEmailAndPassword
+ *   signInWithGoogle → signInWithPopup(GoogleAuthProvider)
+ *   sendPasswordReset → sendPasswordResetEmail · resetPassword → confirmPasswordReset
+ *   sendEmailVerification / confirmEmailVerification → sendEmailVerification / applyActionCode
+ *
+ * Regla de negocio: el correo es la llave de los recursos. El registro por
+ * email/contraseña exige verificación ANTES de acceder (usuario "pendiente" que
+ * no tiene sesión activa hasta verificar). Google entra ya verificado.
  */
 @Injectable({ providedIn: 'root' })
 export class MockAuthService {
@@ -25,21 +32,100 @@ export class MockAuthService {
   readonly isAuthenticated = computed(() => this._currentUser() !== null);
   readonly role = computed<UserRole | null>(() => this._currentUser()?.role ?? null);
   readonly isAdmin = computed(() => this.role() === UserRole.Admin);
+  readonly emailVerified = computed(() => this._currentUser()?.emailVerified ?? false);
 
-  async login(email: string, _password: string, role: UserRole = UserRole.Admin): Promise<void> {
+  /** Inicio de sesión con email/contraseña. Heurística mock: admin@… → ADMIN. */
+  async login(email: string, _password: string): Promise<void> {
     this._loading.set(true);
     try {
       await this.delay(MOCK_DELAY);
-      const user: User = {
+      const role = email.trim().toLowerCase().startsWith('admin@') ? UserRole.Admin : UserRole.User;
+      this.persist({
         uid: `mock-uid-${role.toLowerCase()}`,
         email,
         displayName: this.prettyName(email),
         role,
-      };
-      this.persist(user);
+        emailVerified: true, // quien ya tiene cuenta se asume verificado
+      });
     } finally {
       this._loading.set(false);
     }
+  }
+
+  /**
+   * Registro con email/contraseña → crea un usuario PENDIENTE (sin sesión activa)
+   * y "envía" el correo de verificación. No accede hasta verificar.
+   */
+  async register(name: string, email: string, _password: string): Promise<void> {
+    this._loading.set(true);
+    try {
+      await this.delay(MOCK_DELAY);
+      const pending: User = {
+        uid: `mock-uid-${Date.now()}`,
+        email,
+        displayName: name.trim() || this.prettyName(email),
+        role: UserRole.User,
+        emailVerified: false,
+      };
+      localStorage.setItem(PENDING_KEY, JSON.stringify(pending));
+    } finally {
+      this._loading.set(false);
+    }
+  }
+
+  /** Inicio/registro con Google → entra ya verificado (Google verifica el correo). */
+  async signInWithGoogle(): Promise<void> {
+    this._loading.set(true);
+    try {
+      await this.delay(MOCK_DELAY);
+      this.persist({
+        uid: 'mock-uid-google',
+        email: 'usuario@gmail.com',
+        displayName: 'Usuario Google',
+        role: UserRole.User,
+        emailVerified: true,
+      });
+    } finally {
+      this._loading.set(false);
+    }
+  }
+
+  /** Email del registro pendiente de verificación (para la pantalla "verifica tu correo"). */
+  pendingEmail(): string | null {
+    const p = this.restorePending();
+    return p?.email ?? null;
+  }
+
+  /** Simula reenviar el correo de verificación. */
+  async sendEmailVerification(): Promise<void> {
+    await this.delay(MOCK_DELAY);
+  }
+
+  /**
+   * Confirma la verificación (mock: equivale a hacer clic en el enlace del correo).
+   * Promueve el usuario pendiente a sesión activa y verificada.
+   */
+  async confirmEmailVerification(): Promise<boolean> {
+    const pending = this.restorePending();
+    if (!pending) {
+      // Si ya hay sesión, solo marca verificado.
+      const u = this._currentUser();
+      if (u) { this.persist({ ...u, emailVerified: true }); return true; }
+      return false;
+    }
+    this.persist({ ...pending, emailVerified: true });
+    localStorage.removeItem(PENDING_KEY);
+    return true;
+  }
+
+  /** Solicita enlace de recuperación (mock). */
+  async sendPasswordReset(_email: string): Promise<void> {
+    await this.delay(MOCK_DELAY);
+  }
+
+  /** Restablece la contraseña (mock). */
+  async resetPassword(_code: string, _newPassword: string): Promise<void> {
+    await this.delay(MOCK_DELAY);
   }
 
   async logout(): Promise<void> {
@@ -69,12 +155,21 @@ export class MockAuthService {
     if (!stored) return null;
     try {
       const user = JSON.parse(stored) as User;
-      // Normaliza nombres genéricos de sesiones previas (p. ej. "admin").
-      return { ...user, displayName: this.prettyName(user.email, user.displayName) };
+      return {
+        ...user,
+        emailVerified: user.emailVerified ?? true,
+        displayName: this.prettyName(user.email, user.displayName),
+      };
     } catch {
       localStorage.removeItem(STORAGE_KEY);
       return null;
     }
+  }
+
+  private restorePending(): User | null {
+    const stored = localStorage.getItem(PENDING_KEY);
+    if (!stored) return null;
+    try { return JSON.parse(stored) as User; } catch { return null; }
   }
 
   /**
@@ -85,7 +180,7 @@ export class MockAuthService {
     const local = (email?.split('@')[0] ?? '').trim();
     const generic = ['admin', 'user', 'usuario', 'test', 'demo', 'hola', 'root', 'sanatte'];
     if (current && !generic.includes(current.toLowerCase()) && current !== local) {
-      return current; // conserva un nombre ya personalizado
+      return current;
     }
     if (!local || generic.includes(local.toLowerCase())) return 'María';
     return local.charAt(0).toUpperCase() + local.slice(1);

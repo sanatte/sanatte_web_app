@@ -169,10 +169,15 @@ Producto físico + QR → usuario debe autenticarse → activar con QR → acced
 - [ ] **Reportes** ← siguiente
 - [ ] Configuración
 
-### 🔹 Bloque B — Autenticación
-- [x] Login (funcional con MockAuth)
-- [ ] Registro
-- [ ] Recuperar contraseña
+### 🔹 Bloque B — Autenticación ✅
+- [x] Login (Serene Pulse: email/contraseña + Google + returnUrl)
+- [x] Registro (Google o email/contraseña; sin teléfono)
+- [x] Verifica tu correo (verificación estricta antes de entrar)
+- [x] Correo verificado (mockup)
+- [x] Recuperar contraseña (mockup) + Restablecer contraseña
+- [x] Menús de cuenta desplegables (admin + usuario) — logout deliberado
+
+**Reglas:** solo Google o email/contraseña. El correo es la llave de los recursos → verificación obligatoria antes de acceder (Google entra verificado). `MockAuthService` mapeado 1:1 a Firebase.
 
 ### 🔹 Bloque C — App Usuario
 - [x] **Biblioteca** (home cliente: hero enfoque del día + progreso semanal + Mis Productos + estado vacío)
@@ -236,3 +241,4 @@ Producto físico + QR → usuario debe autenticarse → activar con QR → acced
 | 2026-07-02 | Bloque D: **Carrito + Checkout** (checkout con `mockAuthGuard` + returnUrl). Confirmación de pedido. **Shell unificado (Opción B):** tienda montada también bajo `/app` con sidebar; `StoreContextService` resuelve el prefijo de rutas según login → sin salto de shell. Menú de cuenta en navbar público. Accesos a tienda/carrito desde el shell de usuario. |
 | 2026-07-02 | **Activación de producto** (`/app/activate` + entrada QR pública `/activate?code=` con gate returnUrl). `UserActivationService` valida contra Licencias, marca licencia activa, crea Activation (visible en admin) y desbloquea recursos en biblioteca. Solo físicos (`qr_activation`). Entradas: sidebar, biblioteca, banner en pedido pendiente. Seed de biblioteca ajustado: físicos aparecen solo tras activar. |
 | 2026-07-02 | **Moneda unificada COP** (Mercado Pago Colombia liquida en pesos). `CurrencyService` (fuente única: código ISO + locale es-CO) + `MoneyPipe` reemplazan 23 usos de `\| currency:'USD'` en 10 archivos. Display siempre con código ISO ("COP $89.900") para evitar ambigüedad del "$". Precios/pedidos/facturas repreciados a COP. Nota: para audiencia global, sumar Stripe/PayPal (MP es LATAM). |
+| 2026-07-02 | **Bloque B Autenticación completo**: Login (Google + email/pass), Registro, Verifica-correo (verificación estricta), Correo-verificado, Recuperar + Restablecer contraseña. `AuthShell` compartido. `MockAuthService` extendido (register/signInWithGoogle/sendPasswordReset/resetPassword/confirmEmailVerification) mapeado 1:1 a Firebase; `/auth/verified` y `/auth/reset` simulan el action handler (oobCode). Menús de cuenta desplegables en admin y usuario (logout deliberado, no instantáneo). `User.emailVerified`. |

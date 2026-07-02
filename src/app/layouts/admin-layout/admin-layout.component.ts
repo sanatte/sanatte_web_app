@@ -22,14 +22,16 @@ export class AdminLayoutComponent {
 
   readonly pageTitle    = signal('Admin Dashboard');
   readonly sidebarOpen  = signal(false);
+  readonly menuOpen     = signal(false);
 
   toggleSidebar(): void { this.sidebarOpen.update((v) => !v); }
   closeSidebar():  void { this.sidebarOpen.set(false); }
+  toggleMenu():    void { this.menuOpen.update((v) => !v); }
 
   constructor() {
-    // Cierra el sidebar al navegar en móvil
+    // Cierra el sidebar y el menú al navegar
     this.router.events.subscribe((e) => {
-      if (e instanceof NavigationEnd) this.closeSidebar();
+      if (e instanceof NavigationEnd) { this.closeSidebar(); this.menuOpen.set(false); }
     });
     this.router.events.subscribe((e) => {
       if (e instanceof NavigationEnd) {
@@ -66,5 +68,5 @@ export class AdminLayoutComponent {
     { label: 'Soporte',       route: '/admin/support',  icon: 'help' },
   ];
 
-  logout(): void { this.auth.logout(); }
+  logout(): void { this.menuOpen.set(false); this.auth.logout(); }
 }

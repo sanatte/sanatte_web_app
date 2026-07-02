@@ -30,14 +30,20 @@ export class AppLayoutComponent {
 
   readonly pageTitle   = signal('Mi Biblioteca');
   readonly sidebarOpen = signal(false);
+  readonly menuOpen       = signal(false); // dropdown de cuenta (topbar)
+  readonly footerMenuOpen = signal(false); // dropdown de cuenta (sidebar)
 
   toggleSidebar(): void { this.sidebarOpen.update((v) => !v); }
   closeSidebar():  void { this.sidebarOpen.set(false); }
+  toggleMenu():       void { this.menuOpen.update((v) => !v); }
+  toggleFooterMenu(): void { this.footerMenuOpen.update((v) => !v); }
+  closeMenus(): void { this.menuOpen.set(false); this.footerMenuOpen.set(false); }
 
   constructor() {
     this.router.events.subscribe((e) => {
       if (e instanceof NavigationEnd) {
         this.closeSidebar();
+        this.closeMenus();
         const titles: Record<string, string> = {
           '/app/library':       'Mi Biblioteca',
           '/app/products':      'Tienda',
@@ -63,5 +69,5 @@ export class AppLayoutComponent {
     { label: 'Perfil',          route: '/app/profile',       icon: 'person' },
   ];
 
-  logout(): void { this.auth.logout(); }
+  logout(): void { this.closeMenus(); this.auth.logout(); }
 }
