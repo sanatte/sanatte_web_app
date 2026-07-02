@@ -26,4 +26,9 @@ export class ActivationService {
       list.map((a) => a.id === id ? { ...a, status: 'failed' as const } : a)
     );
   }
+
+  /** Registra un nuevo evento de activación (lo verá el admin). */
+  record(activation: Activation): void {
+    this._activations.update((list) => [activation, ...list]);
+  }
 }

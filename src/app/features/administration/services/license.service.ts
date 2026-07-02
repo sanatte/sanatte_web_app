@@ -25,6 +25,26 @@ export class LicenseService {
     );
   }
 
+  /** Busca una licencia por código (case-insensitive). */
+  findByCode(code: string): License | undefined {
+    const norm = code.trim().toUpperCase();
+    return this._licenses().find((l) => l.code.toUpperCase() === norm);
+  }
+
+  /** Marca una licencia como activada y la vincula al usuario. */
+  activate(
+    id: string,
+    user: { userId: string; userName: string; userInitials: string; userAvatarGradient: string },
+  ): void {
+    this._licenses.update((list) =>
+      list.map((l) =>
+        l.id === id
+          ? { ...l, status: 'active' as LicenseStatus, ...user, activatedAt: new Date().toISOString().split('T')[0] }
+          : l
+      )
+    );
+  }
+
   generateBatch(productId: string, productName: string, quantity: number): void {
     const batchId = `Lote #${Math.floor(Math.random() * 90) + 10}-X`;
     const newLicenses: License[] = Array.from({ length: quantity }, (_, i) => ({

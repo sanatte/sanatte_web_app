@@ -43,6 +43,7 @@ export class AppLayoutComponent {
           '/app/products':      'Tienda',
           '/app/cart':          'Carrito',
           '/app/checkout':      'Finalizar compra',
+          '/app/activate':      'Activar producto',
           '/app/orders':        'Mis Pedidos',
           '/app/subscriptions': 'Suscripciones',
           '/app/profile':       'Perfil',
@@ -54,11 +55,12 @@ export class AppLayoutComponent {
   }
 
   readonly mainNav: NavItem[] = [
-    { label: 'Biblioteca',    route: '/app/library',       icon: 'subscriptions' },
-    { label: 'Tienda',        route: '/app/products',      icon: 'storefront' },
-    { label: 'Mis pedidos',   route: '/app/orders',        icon: 'receipt_long' },
-    { label: 'Suscripciones', route: '/app/subscriptions', icon: 'workspace_premium' },
-    { label: 'Perfil',        route: '/app/profile',       icon: 'person' },
+    { label: 'Biblioteca',      route: '/app/library',       icon: 'subscriptions' },
+    { label: 'Activar producto', route: '/app/activate',      icon: 'qr_code_scanner' },
+    { label: 'Tienda',          route: '/app/products',      icon: 'storefront' },
+    { label: 'Mis pedidos',     route: '/app/orders',        icon: 'receipt_long' },
+    { label: 'Suscripciones',   route: '/app/subscriptions', icon: 'workspace_premium' },
+    { label: 'Perfil',          route: '/app/profile',       icon: 'person' },
   ];
 
   logout(): void { this.auth.logout(); }

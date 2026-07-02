@@ -74,6 +74,9 @@ export class OrderDetailComponent {
 
   readonly isPhysical = computed(() => this.order()?.products.some((p) => p.type === 'physical') ?? false);
 
+  /** ¿El pedido está pendiente de activación por QR? */
+  readonly isPendingActivation = computed(() => this.order()?.deliveryStatus === 'pending_activation');
+
   /** Recursos digitales incluidos (entitlements de los productos comprados). */
   readonly includedResources = computed<IncludedResource[]>(() => {
     const o = this.order();

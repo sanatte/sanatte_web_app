@@ -179,7 +179,10 @@ Producto físico + QR → usuario debe autenticarse → activar con QR → acced
 - [x] **Detalle recurso** (visor con playlist del producto + 4 visores compartidos por tipo + estado "sin recursos")
 - [x] **Mis pedidos + detalle** (lista con búsqueda/filtros por tipo + detalle con envío físico/acceso digital)
 - [x] **Perfil** (datos personales + seguridad + preferencias de correo/newsletter + gestión de datos)
-- [x] **Suscripciones** (plan actual + método de pago + facturación + planes disponibles + cancelar/reactivar/cambiar) ✅ Bloque C completo
+- [x] **Suscripciones** (plan actual + método de pago + facturación + planes disponibles + cancelar/reactivar/cambiar)
+- [x] **Activación de producto** (form código + éxito; entrada QR pública con gate; solo físicos) ✅ Bloque C completo
+
+**Regla activación:** solo productos físicos (`qr_activation`) requieren activación por código; digitales/suscripción dan acceso al comprar. Físico aparece en biblioteca SOLO tras activar.
 
 ### 🔹 Bloque D — Sitio Público
 - [ ] Home
@@ -231,3 +234,4 @@ Producto físico + QR → usuario debe autenticarse → activar con QR → acced
 | 2026-07-02 | Bloque C: **Suscripciones** (`/app/subscriptions`) — plan actual, método de pago, facturación y planes disponibles (cambiar/cancelar/reactivar). `UserSubscriptionService` (mock, swappable a Mercado Pago). Cancelación estilo SaaS (fin de periodo). Reusa `ConfirmDialog`/`EntitlementService`. **✅ Bloque C — App Usuario completo.** |
 | 2026-07-02 | Bloque D: **Catálogo + Detalle producto** (público). `CartService` (localStorage). Public layout Serene Pulse. |
 | 2026-07-02 | Bloque D: **Carrito + Checkout** (checkout con `mockAuthGuard` + returnUrl). Confirmación de pedido. **Shell unificado (Opción B):** tienda montada también bajo `/app` con sidebar; `StoreContextService` resuelve el prefijo de rutas según login → sin salto de shell. Menú de cuenta en navbar público. Accesos a tienda/carrito desde el shell de usuario. |
+| 2026-07-02 | **Activación de producto** (`/app/activate` + entrada QR pública `/activate?code=` con gate returnUrl). `UserActivationService` valida contra Licencias, marca licencia activa, crea Activation (visible en admin) y desbloquea recursos en biblioteca. Solo físicos (`qr_activation`). Entradas: sidebar, biblioteca, banner en pedido pendiente. Seed de biblioteca ajustado: físicos aparecen solo tras activar. |

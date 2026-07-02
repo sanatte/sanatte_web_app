@@ -38,7 +38,11 @@ import { OwnedProduct } from '../../models/user-library.model';
         <section class="space-y-gutter">
           <div class="flex items-center justify-between">
             <h3 class="font-heading text-headline-md text-on-surface">Mis Productos</h3>
-            <button class="text-primary font-bold font-label-md hover:underline">Ver todo</button>
+            <a routerLink="/app/activate"
+               class="flex items-center gap-1.5 text-primary font-bold font-label-md hover:underline">
+              <span class="material-symbols-outlined text-[18px]">qr_code_scanner</span>
+              Activar producto
+            </a>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             @for (owned of ownedProducts(); track owned.product.id) {
@@ -63,12 +67,13 @@ import { OwnedProduct } from '../../models/user-library.model';
             descubrir recursos de bienestar.
           </p>
           <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <button class="px-8 py-3 rounded-full bg-primary text-white font-heading font-bold
-                           flex items-center gap-2 hover:bg-primary/90 transition-colors active:scale-95">
+            <a routerLink="/app/activate"
+               class="px-8 py-3 rounded-full bg-primary text-white font-heading font-bold
+                      flex items-center gap-2 hover:bg-primary/90 transition-colors active:scale-95">
               <span class="material-symbols-outlined">qr_code_scanner</span>
               Activar producto
-            </button>
-            <a routerLink="/catalog"
+            </a>
+            <a routerLink="/app/products"
                class="px-8 py-3 rounded-full bg-surface-container-high text-primary font-heading
                       font-bold hover:bg-surface-container-highest transition-colors">
               Ver catálogo

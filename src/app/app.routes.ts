@@ -68,8 +68,20 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/public/pages/checkout/checkout.component').then((m) => m.CheckoutComponent),
       },
+      {
+        path: 'activate',
+        loadComponent: () =>
+          import('./features/activation/pages/activate/activate.component').then((m) => m.ActivateComponent),
+      },
       { path: '', redirectTo: 'library', pathMatch: 'full' },
     ],
+  },
+
+  // ── Activación por QR (entrada pública que reenvía al shell privado) ──────
+  {
+    path: 'activate',
+    loadComponent: () =>
+      import('./features/activation/pages/activate-redirect/activate-redirect.component').then((m) => m.ActivateRedirectComponent),
   },
 
   // ── Sitio público ───────────────────────────────────────────────────────

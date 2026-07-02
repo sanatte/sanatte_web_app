@@ -1,7 +1,9 @@
-import { Injectable, inject, computed } from '@angular/core';
+import { Injectable, inject, computed, signal } from '@angular/core';
 import { ProductService } from '../../administration/services/product.service';
 import { Product } from '../../administration/models/product.model';
 import { OwnedProduct, DailyFocus, WeeklyProgress, ProgressStatus } from '../models/user-library.model';
+
+const ACTIVATED_KEY = 'sanatte_activated_products';
 
 /**
  * UserLibraryService — datos de la Biblioteca del usuario autenticado.
@@ -12,26 +14,46 @@ import { OwnedProduct, DailyFocus, WeeklyProgress, ProgressStatus } from '../mod
  * La API pública (signals/getters) no cambia.
  */
 
-// Progreso simulado por producto (productId → % completado).
+// Progreso simulado — SOLO productos obtenidos sin activación (compra directa / suscripción).
+// Los físicos (p. ej. Plena) NO se listan aquí: aparecen únicamente tras activar su QR.
 const MOCK_PROGRESS: Record<string, number> = {
-  p1: 65,   // Plena (Agenda)
-  p3: 100,  // The Silent Mind (eBook)
-  p2: 30,   // Guided Flow Pro (Suscripción)
+  p3: 100,  // The Silent Mind (eBook — compra directa)
+  p2: 30,   // Guided Flow Pro (suscripción)
 };
 
 @Injectable({ providedIn: 'root' })
 export class UserLibraryService {
   private readonly productService = inject(ProductService);
 
+  // IDs de productos activados por el usuario en esta sesión/dispositivo (además del seed mock).
+  private readonly _activatedIds = signal<string[]>(this.restoreActivated());
+
   /** Productos que el usuario posee/activó, con su progreso. */
-  readonly ownedProducts = computed<OwnedProduct[]>(() =>
-    this.productService
+  readonly ownedProducts = computed<OwnedProduct[]>(() => {
+    const activated = this._activatedIds();
+    return this.productService
       .products()
-      .filter((p) => p.id in MOCK_PROGRESS)
-      .map((p) => this.toOwnedProduct(p, MOCK_PROGRESS[p.id]))
-  );
+      .filter((p) => p.id in MOCK_PROGRESS || activated.includes(p.id))
+      .map((p) => this.toOwnedProduct(p, MOCK_PROGRESS[p.id] ?? 0));
+  });
 
   readonly hasProducts = computed(() => this.ownedProducts().length > 0);
+
+  /** Marca un producto como activado → aparece en la biblioteca. */
+  registerActivated(productId: string): void {
+    this._activatedIds.update((ids) => (ids.includes(productId) ? ids : [...ids, productId]));
+    localStorage.setItem(ACTIVATED_KEY, JSON.stringify(this._activatedIds()));
+  }
+
+  isActivated(productId: string): boolean {
+    return productId in MOCK_PROGRESS || this._activatedIds().includes(productId);
+  }
+
+  private restoreActivated(): string[] {
+    const stored = localStorage.getItem(ACTIVATED_KEY);
+    if (!stored) return [];
+    try { return JSON.parse(stored) as string[]; } catch { return []; }
+  }
 
   readonly dailyFocus: DailyFocus = {
     badge: 'Enfoque del día',
