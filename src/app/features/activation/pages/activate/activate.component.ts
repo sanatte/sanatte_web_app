@@ -39,14 +39,16 @@ export class ActivateComponent {
     if (c) this.code = c;
   }
 
-  verify(): void {
+  async verify(): Promise<void> {
     const code = this.code.trim();
     if (!code) return;
     this.verifying.set(true);
-    // Simula verificación
-    const res = this.activation.activate(code);
-    this.result.set(res);
-    this.verifying.set(false);
+    try {
+      const res = await this.activation.activate(code);
+      this.result.set(res);
+    } finally {
+      this.verifying.set(false);
+    }
   }
 
   reset(): void {
