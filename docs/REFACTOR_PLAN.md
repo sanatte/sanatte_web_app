@@ -179,7 +179,7 @@ Producto físico + QR → usuario debe autenticarse → activar con QR → acced
 - [x] **Detalle recurso** (visor con playlist del producto + 4 visores compartidos por tipo + estado "sin recursos")
 - [x] **Mis pedidos + detalle** (lista con búsqueda/filtros por tipo + detalle con envío físico/acceso digital)
 - [x] **Perfil** (datos personales + seguridad + preferencias de correo/newsletter + gestión de datos)
-- [ ] Suscripciones ← siguiente (cierra Bloque C)
+- [x] **Suscripciones** (plan actual + método de pago + facturación + planes disponibles + cancelar/reactivar/cambiar) ✅ Bloque C completo
 
 ### 🔹 Bloque D — Sitio Público
 - [ ] Home
@@ -224,3 +224,4 @@ Producto físico + QR → usuario debe autenticarse → activar con QR → acced
 | 2026-07-02 | Bloque C: **Visor de recurso** (`/app/library/:productId/:resourceId`) con playlist del producto y estado "sin recursos". **Consolidación anti-duplicación:** 4 visores por tipo → `shared/components/resource-viewers/` (usados por visor usuario Y modal admin); `RESOURCE_TYPE_META` única en `resource.model` (eliminó 5 mapeos duplicados de icono/label). |
 | 2026-07-02 | Bloque C: **Mis Pedidos** (`/app/orders`) lista con búsqueda + filtros (Todos/En proceso/Enviado/Entregado/Activo) y **detalle** (`/app/orders/:id`) con bloque de envío para físicos y botón "Acceder" al visor para digitales/suscripción. `UserOrdersService` (subset del usuario). **Validación negocio:** filtros/estados adaptados para cubrir físico + digital + suscripción (el mockup solo contemplaba físico). `DELIVERY_STATUS_META` única en `order.model` (refactor del admin `order-table`, sin duplicar). |
 | 2026-07-02 | Bloque C: **Perfil** (`/app/profile`) con datos personales, seguridad (password + 2FA) y **preferencias de correo/newsletter** (opt-in/opt-out). `UserProfileService` (persistencia localStorage, swappable a backend). **Validación negocio:** notificaciones push del mockup → newsletter por correo (web sin push hoy); biometría/Touch ID eliminada (solo móvil). |
+| 2026-07-02 | Bloque C: **Suscripciones** (`/app/subscriptions`) — plan actual, método de pago, facturación y planes disponibles (cambiar/cancelar/reactivar). `UserSubscriptionService` (mock, swappable a Mercado Pago). Cancelación estilo SaaS (fin de periodo). Reusa `ConfirmDialog`/`EntitlementService`. **✅ Bloque C — App Usuario completo.** |
