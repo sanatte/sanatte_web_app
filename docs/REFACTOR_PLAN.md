@@ -3,7 +3,8 @@
 > **Estado:** Fase 3 en progreso (Bloque Admin) — rama `feature/admin-flow`
 > **Última actualización:** 2026-07-01
 > **Stack confirmado:** Angular 21 · Standalone · Signals · RxJS · **Tailwind CSS** · SCSS · TypeScript
-> **Datos:** 100% Mock. Sin HTTP real. Preparado para NestJS + Firebase.
+> **Backend:** **.NET 8 (C#) Web API + SQL Server** (Clean Architecture simplificada). Autenticación: **Firebase Auth** (el backend solo valida JWT). Ver `../sanatte-api/BACKEND_PLAN.md`.
+> **Datos:** hoy 100% Mock en el front; se irán reemplazando por la API .NET (empezando por Admin). Los servicios mock tienen API pública estable → swap directo a HTTP services.
 
 ---
 
@@ -15,7 +16,7 @@
 | Auth fase mock | **MockAuthService** + roles USER/ADMIN + dev-switcher flotante |
 | Auth real (futuro) | **Firebase Auth** — instalado, pendiente credenciales |
 | Estado | **Signals** (sin NgRx) |
-| Datos | Mock con servicios intercambiables (preparado para NestJS) |
+| Datos | Mock con servicios intercambiables (preparado para la API .NET) |
 | Roles | USER / ADMIN — guardado en localStorage, switcher dev visible |
 | Imágenes de producto | Array `ProductImage[]` con campo `isPrimary` |
 | Envíos físicos | Modal con transportadora + guía + link de rastreo |
@@ -203,9 +204,9 @@ Producto físico + QR → usuario debe autenticarse → activar con QR → acced
 - [ ] Flujo admin completo
 - [ ] Estados vacío / loading / error en todas las pantallas
 
-### 🔹 Fase 5 — Firebase + NestJS
+### 🔹 Fase 5 — Backend .NET + Firebase
 - [ ] Integrar Firebase Auth (ya instalado, pendiente credenciales)
-- [ ] Reemplazar Mock services por HTTP services (1 provider por dominio)
+- [ ] Reemplazar Mock services por HTTP services que consumen la API .NET (1 provider por dominio)
 
 ---
 
