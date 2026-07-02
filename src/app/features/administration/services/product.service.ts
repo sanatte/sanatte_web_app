@@ -1,5 +1,7 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { Product, ProductImage } from '../models/product.model';
+import { Entitlement } from '../models/entitlement.model';
+import { Resource } from '../models/resource.model';
 import { MOCK_PRODUCTS } from '../mocks/products.mock';
 
 @Injectable({ providedIn: 'root' })
@@ -49,6 +51,32 @@ export class ProductService {
         p.id === productId ? { ...p, images: [...p.images, image] } : p
       )
     );
+  }
+
+  addResourceEntitlement(productId: string, resource: Resource): void {
+    const product = this.getById(productId);
+    if (!product) return;
+    const alreadyLinked = product.entitlements.some(
+      (e) => e.type === 'content_item' && e.referenceId === resource.id
+    );
+    if (alreadyLinked) return;
+    const entitlement: Entitlement = {
+      id: `ent-${Date.now()}`,
+      type: 'content_item',
+      referenceId: resource.id,
+      label: resource.title,
+    };
+    this.update(productId, { entitlements: [...product.entitlements, entitlement] });
+  }
+
+  removeResourceEntitlement(productId: string, resourceId: string): void {
+    const product = this.getById(productId);
+    if (!product) return;
+    this.update(productId, {
+      entitlements: product.entitlements.filter(
+        (e) => !(e.type === 'content_item' && e.referenceId === resourceId)
+      ),
+    });
   }
 
   removeImage(productId: string, imageId: string): void {

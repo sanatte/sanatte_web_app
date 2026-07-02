@@ -175,8 +175,8 @@ Producto físico + QR → usuario debe autenticarse → activar con QR → acced
 - [ ] Recuperar contraseña
 
 ### 🔹 Bloque C — App Usuario
-- [ ] Biblioteca
-- [ ] Detalle recurso (visores audio/video/pdf/artículo)
+- [x] **Biblioteca** (home cliente: hero enfoque del día + progreso semanal + Mis Productos + estado vacío)
+- [ ] Detalle recurso (visores audio/video/pdf/artículo) ← siguiente
 - [ ] Mis pedidos + detalle
 - [ ] Perfil + configuración
 - [ ] Suscripciones
@@ -219,3 +219,5 @@ Producto físico + QR → usuario debe autenticarse → activar con QR → acced
 | 2026-07-01 | Fase 2: Design system "Serene Pulse" — tokens Tailwind, fuentes, glass-card, select custom. |
 | 2026-07-01 | Fase 3 Admin: Dashboard · Productos · Recursos · Usuarios · Pedidos · Licencias · Activaciones. |
 | 2026-07-01 | Extras: Detalle producto con galería multi-imagen · ShipOrderDialog con transportadora/guía · Select arrows CSS global · Responsive mobile-first (sidebar hamburger, col-hiding tables, dialogs full-screen). |
+| 2026-07-01 | Arquitectura multi-tenant: capa Entitlements (ecommerce core desacoplado del módulo de contenido). Gestión de recursos↔producto editable en form y detalle. |
+| 2026-07-02 | Bloque C: **Biblioteca del cliente** (Library 1). Shared `CircularProgress`. Componentes `DailyFocusCard`/`WeeklyProgressCard`/`OwnedProductCard`. `UserLibraryService` (progreso mock). AppLayout alineado con AdminLayout (sidebar + hamburger + título dinámico). |

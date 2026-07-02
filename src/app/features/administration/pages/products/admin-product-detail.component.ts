@@ -3,6 +3,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { ProductService } from '../../services/product.service';
 import { EntitlementService } from '../../services/entitlement.service';
+import { ResourceService } from '../../services/resource.service';
 import { StatusBadgeComponent } from '../../../../shared/components/status-badge/status-badge.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { Product, ProductImage, getPrimaryImage } from '../../models/product.model';
@@ -21,10 +22,12 @@ export class AdminProductDetailComponent implements OnInit {
   private readonly route              = inject(ActivatedRoute);
   private readonly service            = inject(ProductService);
   private readonly entitlementService = inject(EntitlementService);
+  private readonly resourceService    = inject(ResourceService);
 
-  readonly product       = signal<Product | null>(null);
-  readonly selectedImage = signal<ProductImage | null>(null);
-  readonly isConfirmOpen = signal(false);
+  readonly product         = signal<Product | null>(null);
+  readonly selectedImage   = signal<ProductImage | null>(null);
+  readonly isConfirmOpen   = signal(false);
+  readonly isPickerOpen    = signal(false);
 
   readonly linkedResources = computed<Resource[]>(() => {
     const p = this.product();
@@ -35,6 +38,13 @@ export class AdminProductDetailComponent implements OnInit {
     const p = this.product();
     return p ? this.entitlementService.getContentCount(p) : 0;
   });
+
+  // Recursos disponibles para agregar (los que aún no están vinculados)
+  readonly availableResources = computed(() => {
+    const linked = new Set(this.linkedResources().map((r) => r.id));
+    return this.resourceService.resources().filter((r) => !linked.has(r.id));
+  });
+
 
   readonly primaryImage = computed(() =>
     this.product() ? getPrimaryImage(this.product()!) ?? null : null
@@ -92,6 +102,21 @@ export class AdminProductDetailComponent implements OnInit {
     const p = this.product();
     if (!p) return;
     this.service.update(p.id, { status: p.status === 'active' ? 'inactive' : 'active' });
+    this.product.set(this.service.getById(p.id) ?? null);
+  }
+
+  addResource(resource: Resource): void {
+    const p = this.product();
+    if (!p) return;
+    this.service.addResourceEntitlement(p.id, resource);
+    this.product.set(this.service.getById(p.id) ?? null);
+    this.isPickerOpen.set(false);
+  }
+
+  removeResource(resourceId: string): void {
+    const p = this.product();
+    if (!p) return;
+    this.service.removeResourceEntitlement(p.id, resourceId);
     this.product.set(this.service.getById(p.id) ?? null);
   }
 

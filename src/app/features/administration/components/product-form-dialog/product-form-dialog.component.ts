@@ -2,6 +2,8 @@ import { Component, input, output, effect, inject, signal, computed } from '@ang
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Product, ProductType, ProductImage } from '../../models/product.model';
 import { Entitlement } from '../../models/entitlement.model';
+import { Resource, ResourceType } from '../../models/resource.model';
+import { ResourceService } from '../../services/resource.service';
 
 const GRADIENT_PALETTE = [
   'from-violet-400 to-purple-600', 'from-indigo-400 to-violet-600',
@@ -10,13 +12,18 @@ const GRADIENT_PALETTE = [
   'from-purple-300 to-indigo-500', 'from-teal-400 to-cyan-600',
 ];
 
+const RESOURCE_ICONS: Record<ResourceType, string> = {
+  audio: 'headphones', video: 'videocam', pdf: 'picture_as_pdf', article: 'description',
+};
+
 @Component({
   selector: 'app-product-form-dialog',
   imports: [ReactiveFormsModule],
   templateUrl: './product-form-dialog.component.html',
 })
 export class ProductFormDialogComponent {
-  private readonly fb = inject(FormBuilder);
+  private readonly fb              = inject(FormBuilder);
+  private readonly resourceService = inject(ResourceService);
 
   readonly isOpen  = input.required<boolean>();
   readonly product = input<Product | null>(null);
@@ -39,9 +46,16 @@ export class ProductFormDialogComponent {
     tags:               [''],
   });
 
-  readonly isEditMode   = computed(() => this.product() !== null);
-  readonly selectedType = signal<ProductType>('physical');
-  readonly primaryImage = computed(() => this.images().find((img) => img.isPrimary) ?? this.images()[0]);
+  readonly isEditMode          = computed(() => this.product() !== null);
+  readonly selectedType        = signal<ProductType>('physical');
+  readonly primaryImage        = computed(() => this.images().find((img) => img.isPrimary) ?? this.images()[0]);
+  readonly selectedResourceIds = signal<Set<string>>(new Set());
+  readonly allResources        = this.resourceService.resources;
+  readonly resourceIcon        = (type: ResourceType) => RESOURCE_ICONS[type];
+
+  readonly selectedResources = computed(() =>
+    this.allResources().filter((r) => this.selectedResourceIds().has(r.id))
+  );
 
   constructor() {
     effect(() => {
@@ -55,6 +69,12 @@ export class ProductFormDialogComponent {
         });
         this.selectedType.set(p.type);
         this.images.set(p.images ? [...p.images] : []);
+        const ids = new Set(
+          p.entitlements
+            .filter((e) => e.type === 'content_item')
+            .map((e) => e.referenceId)
+        );
+        this.selectedResourceIds.set(ids);
       } else {
         this.form.reset({
           name: '', sku: '', type: 'physical', price: 0,
@@ -63,8 +83,21 @@ export class ProductFormDialogComponent {
         });
         this.selectedType.set('physical');
         this.images.set([]);
+        this.selectedResourceIds.set(new Set());
       }
     });
+  }
+
+  toggleResource(resource: Resource): void {
+    this.selectedResourceIds.update((set) => {
+      const next = new Set(set);
+      next.has(resource.id) ? next.delete(resource.id) : next.add(resource.id);
+      return next;
+    });
+  }
+
+  isResourceSelected(id: string): boolean {
+    return this.selectedResourceIds().has(id);
   }
 
   onTypeChange(event: Event): void {
@@ -121,7 +154,14 @@ export class ProductFormDialogComponent {
       accessType: type === 'physical' ? 'qr_activation'
                 : type === 'subscription' ? 'subscription'
                 : 'direct_purchase',
-      entitlements: this.product()?.entitlements ?? [],
+      entitlements: this.allResources()
+        .filter((r) => this.selectedResourceIds().has(r.id))
+        .map((r) => ({
+          id: `ent-${r.id}`,
+          type: 'content_item' as const,
+          referenceId: r.id,
+          label: r.title,
+        })),
       specs: this.product()?.specs ?? [],
       images: imgs.length ? imgs : [
         { id: `img-${Date.now()}`, gradient: 'from-violet-400 to-purple-600',
