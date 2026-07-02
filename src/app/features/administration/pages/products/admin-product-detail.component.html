@@ -111,7 +111,7 @@
 
       <div class="flex items-baseline gap-2">
         <span class="font-heading font-bold text-on-surface" style="font-size: 2rem">
-          {{ p.price | currency:'USD':'symbol':'1.2-2' }}
+          {{ p.price | money }}
         </span>
         @if (p.type === 'subscription') {
           <span class="text-label-md font-heading text-on-surface-variant">

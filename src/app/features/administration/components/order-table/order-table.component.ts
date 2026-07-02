@@ -1,5 +1,6 @@
 import { Component, input, output } from '@angular/core';
-import { CurrencyPipe, DecimalPipe } from '@angular/common';
+import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
+import { DecimalPipe } from '@angular/common';
 import { StatusBadgeComponent } from '../../../../shared/components/status-badge/status-badge.component';
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
 import { Order, DeliveryStatus, DeliveryTone, DELIVERY_STATUS_META } from '../../models/order.model';
@@ -29,7 +30,7 @@ const PRODUCT_CLASSES: Record<ProductType, string> = {
 
 @Component({
   selector: 'app-order-table',
-  imports: [CurrencyPipe, DecimalPipe, StatusBadgeComponent, PaginationComponent],
+  imports: [MoneyPipe, DecimalPipe, StatusBadgeComponent, PaginationComponent],
   templateUrl: './order-table.component.html',
 })
 export class OrderTableComponent {

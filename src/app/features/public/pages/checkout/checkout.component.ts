@@ -1,5 +1,5 @@
 import { Component, inject, signal, computed } from '@angular/core';
-import { CurrencyPipe } from '@angular/common';
+import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { CartService } from '../../services/cart.service';
@@ -8,7 +8,7 @@ import { MockAuthService } from '../../../../core/services/mock-auth.service';
 
 @Component({
   selector: 'app-checkout',
-  imports: [CurrencyPipe, FormsModule, RouterLink],
+  imports: [MoneyPipe, FormsModule, RouterLink],
   templateUrl: './checkout.component.html',
 })
 export class CheckoutComponent {

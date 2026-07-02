@@ -50,7 +50,7 @@
          style="box-shadow: 0px 10px 30px rgba(76,29,149,0.05)">
       <p class="text-label-sm font-heading text-outline mb-1">Ingresos Totales</p>
       <span class="font-heading text-headline-md font-bold text-primary">
-        {{ stats().totalRevenue | currency:'USD':'symbol':'1.2-2' }}
+        {{ stats().totalRevenue | money }}
       </span>
     </div>
 

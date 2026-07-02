@@ -1,5 +1,5 @@
 import { Component, inject, computed } from '@angular/core';
-import { CurrencyPipe } from '@angular/common';
+import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
 import { Router, RouterLink } from '@angular/router';
 import { CartService } from '../../services/cart.service';
 import { StoreContextService } from '../../services/store-context.service';
@@ -7,7 +7,7 @@ import { MockAuthService } from '../../../../core/services/mock-auth.service';
 
 @Component({
   selector: 'app-cart',
-  imports: [CurrencyPipe, RouterLink],
+  imports: [MoneyPipe, RouterLink],
   templateUrl: './cart.component.html',
 })
 export class CartComponent {

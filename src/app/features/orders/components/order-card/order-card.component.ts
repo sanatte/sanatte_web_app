@@ -1,5 +1,5 @@
 import { Component, input, output, inject, computed } from '@angular/core';
-import { CurrencyPipe } from '@angular/common';
+import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
 import { Order, DeliveryTone, DELIVERY_STATUS_META } from '../../../administration/models/order.model';
 import { ProductService } from '../../../administration/services/product.service';
 import { getPrimaryImage } from '../../../administration/models/product.model';
@@ -20,7 +20,7 @@ const TONE_TEXT: Record<DeliveryTone, string> = {
  */
 @Component({
   selector: 'app-order-card',
-  imports: [CurrencyPipe],
+  imports: [MoneyPipe],
   template: `
     <div class="bg-surface-container-lowest rounded-lg p-5 md:p-6 shadow-card border border-transparent
                 hover:border-primary/20 transition-all">
@@ -50,7 +50,7 @@ const TONE_TEXT: Record<DeliveryTone, string> = {
           </div>
           <div class="flex flex-col">
             <span class="text-[11px] font-heading text-outline-variant uppercase tracking-wider">Total</span>
-            <span class="font-heading font-bold text-on-surface text-lg">{{ order().total | currency:'USD':'symbol':'1.2-2' }}</span>
+            <span class="font-heading font-bold text-on-surface text-lg">{{ order().total | money }}</span>
           </div>
           <div class="col-span-2 md:col-span-1">
             <button (click)="view.emit(order())"

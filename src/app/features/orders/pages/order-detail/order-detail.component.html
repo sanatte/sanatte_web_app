@@ -176,7 +176,7 @@
           <div class="space-y-3 mb-5 font-sans text-body-md">
             <div class="flex justify-between text-on-surface-variant">
               <span>Subtotal</span>
-              <span>{{ o.total | currency:'USD':'symbol':'1.2-2' }}</span>
+              <span>{{ o.total | money }}</span>
             </div>
             <div class="flex justify-between text-on-surface-variant">
               <span>Envío</span>
@@ -184,12 +184,12 @@
             </div>
             <div class="flex justify-between text-on-surface-variant">
               <span>Impuestos</span>
-              <span>{{ 0 | currency:'USD':'symbol':'1.2-2' }}</span>
+              <span>{{ 0 | money }}</span>
             </div>
             <div class="h-px bg-outline-variant/30 my-1"></div>
             <div class="flex justify-between font-heading text-headline-md text-on-surface">
               <span>Total</span>
-              <span class="text-primary">{{ o.total | currency:'USD':'symbol':'1.2-2' }}</span>
+              <span class="text-primary">{{ o.total | money }}</span>
             </div>
           </div>
           <button class="w-full py-3 bg-primary rounded-xl font-heading font-bold text-white shadow-primary

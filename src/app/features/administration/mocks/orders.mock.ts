@@ -10,7 +10,7 @@ export const MOCK_ORDERS: Order[] = [
       { id: 'p2', name: 'Guided Flow Pro', type: 'subscription' },
       { id: 'p6', name: 'Mindfulness 30 días', type: 'digital' },
     ],
-    date: '24 May, 2026', time: '14:32h', total: 142.00,
+    date: '24 May, 2026', time: '14:32h', total: 142000,
     paymentStatus: 'paid', deliveryStatus: 'shipped', createdAt: '2026-05-24',
   },
   {
@@ -18,7 +18,7 @@ export const MOCK_ORDERS: Order[] = [
     buyerName: 'Sara Velasco', buyerEmail: 'sara.v@domain.es', buyerInitials: 'SV',
     buyerAvatarGradient: 'from-indigo-400 to-blue-600',
     products: [{ id: 'p2', name: 'Guided Flow Pro', type: 'subscription' }],
-    date: '23 May, 2026', time: '18:05h', total: 299.90,
+    date: '23 May, 2026', time: '18:05h', total: 299900,
     paymentStatus: 'paid', deliveryStatus: 'subscription_active', createdAt: '2026-05-23',
   },
   {
@@ -26,7 +26,7 @@ export const MOCK_ORDERS: Order[] = [
     buyerName: 'Jordi Ferrán', buyerEmail: 'jordi.f@gmail.com', buyerInitials: 'JF',
     buyerAvatarGradient: 'from-emerald-400 to-teal-600',
     products: [{ id: 'p4', name: 'Serenity Kit', type: 'physical' }],
-    date: '23 May, 2026', time: '10:15h', total: 89.00,
+    date: '23 May, 2026', time: '10:15h', total: 89000,
     paymentStatus: 'pending', deliveryStatus: 'preparing', createdAt: '2026-05-23',
   },
   {
@@ -34,7 +34,7 @@ export const MOCK_ORDERS: Order[] = [
     buyerName: 'María Castro', buyerEmail: 'maria.c@gmail.com', buyerInitials: 'MC',
     buyerAvatarGradient: 'from-rose-400 to-red-500',
     products: [{ id: 'p5', name: 'Guided Flow Basic', type: 'subscription' }],
-    date: '22 May, 2026', time: '09:48h', total: 55.00,
+    date: '22 May, 2026', time: '09:48h', total: 55000,
     paymentStatus: 'cancelled', deliveryStatus: 'cancelled', createdAt: '2026-05-22',
   },
   {
@@ -45,7 +45,7 @@ export const MOCK_ORDERS: Order[] = [
       { id: 'p1', name: 'Plena', type: 'physical' },
       { id: 'p3', name: 'The Silent Mind', type: 'digital' },
     ],
-    date: '21 May, 2026', time: '16:20h', total: 69.00,
+    date: '21 May, 2026', time: '16:20h', total: 69000,
     paymentStatus: 'paid', deliveryStatus: 'pending_activation', createdAt: '2026-05-21',
   },
   {
@@ -53,7 +53,7 @@ export const MOCK_ORDERS: Order[] = [
     buyerName: 'Carlos Mendez', buyerEmail: 'cmendez@outlook.com', buyerInitials: 'CM',
     buyerAvatarGradient: 'from-sky-400 to-cyan-600',
     products: [{ id: 'p3', name: 'The Silent Mind', type: 'digital' }],
-    date: '20 May, 2026', time: '11:30h', total: 45.00,
+    date: '20 May, 2026', time: '11:30h', total: 45000,
     paymentStatus: 'paid', deliveryStatus: 'digital_active', createdAt: '2026-05-20',
   },
   {
@@ -61,7 +61,7 @@ export const MOCK_ORDERS: Order[] = [
     buyerName: 'Sofía Reyes', buyerEmail: 'sofia.reyes@hotmail.com', buyerInitials: 'SR',
     buyerAvatarGradient: 'from-amber-400 to-orange-500',
     products: [{ id: 'p4', name: 'Serenity Kit', type: 'physical' }],
-    date: '19 May, 2026', time: '08:55h', total: 68.00,
+    date: '19 May, 2026', time: '08:55h', total: 68000,
     paymentStatus: 'paid', deliveryStatus: 'delivered', createdAt: '2026-05-19',
   },
   {
@@ -72,7 +72,7 @@ export const MOCK_ORDERS: Order[] = [
       { id: 'p1', name: 'Plena', type: 'physical' },
       { id: 'p2', name: 'Guided Flow Pro', type: 'subscription' },
     ],
-    date: '18 May, 2026', time: '20:10h', total: 190.00,
+    date: '18 May, 2026', time: '20:10h', total: 190000,
     paymentStatus: 'paid', deliveryStatus: 'shipped', createdAt: '2026-05-18',
   },
 ];

@@ -1,6 +1,6 @@
 import { Component, inject, computed } from '@angular/core';
+import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { CurrencyPipe } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { UserOrdersService } from '../../services/user-orders.service';
@@ -43,7 +43,7 @@ interface IncludedResource {
 
 @Component({
   selector: 'app-order-detail',
-  imports: [RouterLink, CurrencyPipe],
+  imports: [RouterLink, MoneyPipe],
   templateUrl: './order-detail.component.html',
 })
 export class OrderDetailComponent {

@@ -1,6 +1,7 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { CurrencyPipe, DecimalPipe } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { ProductService } from '../../services/product.service';
 import { EntitlementService } from '../../services/entitlement.service';
 import { ResourceService } from '../../services/resource.service';
@@ -11,7 +12,7 @@ import { Resource, ResourceType, RESOURCE_TYPE_META } from '../../models/resourc
 
 @Component({
   selector: 'app-admin-product-detail',
-  imports: [RouterLink, CurrencyPipe, DecimalPipe, StatusBadgeComponent, ConfirmDialogComponent],
+  imports: [RouterLink, MoneyPipe, DecimalPipe, StatusBadgeComponent, ConfirmDialogComponent],
   templateUrl: './admin-product-detail.component.html',
 })
 export class AdminProductDetailComponent implements OnInit {

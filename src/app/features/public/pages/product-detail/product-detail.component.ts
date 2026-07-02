@@ -1,6 +1,7 @@
 import { Component, inject, signal, computed } from '@angular/core';
+import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { CurrencyPipe, DecimalPipe } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { ProductService } from '../../../administration/services/product.service';
@@ -21,7 +22,7 @@ const MOCK_REVIEWS: Review[] = [
 
 @Component({
   selector: 'app-product-detail',
-  imports: [RouterLink, CurrencyPipe, DecimalPipe],
+  imports: [RouterLink, MoneyPipe, DecimalPipe],
   templateUrl: './product-detail.component.html',
 })
 export class ProductDetailComponent {

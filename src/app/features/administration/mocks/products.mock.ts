@@ -2,7 +2,7 @@ import { Product } from '../models/product.model';
 
 export const MOCK_PRODUCTS: Product[] = [
   {
-    id: 'p1', sku: 'WLN-001', name: 'Plena', type: 'physical', price: 24.00,
+    id: 'p1', sku: 'WLN-001', name: 'Plena', type: 'physical', price: 89900,
     status: 'active', accessType: 'qr_activation', requiresActivation: true,
     description: 'Agenda de bienestar con 4 QRs que dan acceso a recursos digitales exclusivos. Papel 120gsm, tapa en cuero vegano reciclado.',
     images: [
@@ -28,7 +28,7 @@ export const MOCK_PRODUCTS: Product[] = [
     createdAt: '2024-11-01',
   },
   {
-    id: 'p2', sku: 'DIG-082', name: 'Guided Flow Pro', type: 'subscription', price: 12.99,
+    id: 'p2', sku: 'DIG-082', name: 'Guided Flow Pro', type: 'subscription', price: 39900,
     billingPeriod: 'monthly', status: 'active', accessType: 'subscription', requiresActivation: false,
     description: 'Suscripción premium a la biblioteca completa de recursos de bienestar.',
     images: [
@@ -51,7 +51,7 @@ export const MOCK_PRODUCTS: Product[] = [
     createdAt: '2024-09-15',
   },
   {
-    id: 'p3', sku: 'DIG-115', name: 'The Silent Mind (eBook)', type: 'digital', price: 45.00,
+    id: 'p3', sku: 'DIG-115', name: 'The Silent Mind (eBook)', type: 'digital', price: 34900,
     status: 'inactive', accessType: 'direct_purchase', requiresActivation: false,
     description: 'Guía completa para reducir la ansiedad. 200 páginas en PDF.',
     images: [
@@ -69,7 +69,7 @@ export const MOCK_PRODUCTS: Product[] = [
     createdAt: '2024-10-20',
   },
   {
-    id: 'p4', sku: 'WLN-002', name: 'Serenity Kit', type: 'physical', price: 68.00,
+    id: 'p4', sku: 'WLN-002', name: 'Serenity Kit', type: 'physical', price: 149900,
     status: 'active', accessType: 'qr_activation', requiresActivation: true,
     description: 'Kit físico de bienestar con vela aromática, difusor y tarjeta de activación.',
     images: [
@@ -89,7 +89,7 @@ export const MOCK_PRODUCTS: Product[] = [
     createdAt: '2025-01-10',
   },
   {
-    id: 'p5', sku: 'DIG-200', name: 'Guided Flow Basic', type: 'subscription', price: 6.99,
+    id: 'p5', sku: 'DIG-200', name: 'Guided Flow Basic', type: 'subscription', price: 19900,
     billingPeriod: 'monthly', status: 'active', accessType: 'subscription', requiresActivation: false,
     description: 'Plan de suscripción básico con acceso a 10 recursos curados.',
     images: [
@@ -105,7 +105,7 @@ export const MOCK_PRODUCTS: Product[] = [
     createdAt: '2025-02-01',
   },
   {
-    id: 'p6', sku: 'DIG-310', name: 'Curso: Mindfulness 30 días', type: 'digital', price: 89.00,
+    id: 'p6', sku: 'DIG-310', name: 'Curso: Mindfulness 30 días', type: 'digital', price: 129900,
     status: 'active', accessType: 'direct_purchase', requiresActivation: false,
     description: 'Programa digital de 30 días con videos, audios y guía PDF.',
     images: [

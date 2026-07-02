@@ -1,5 +1,5 @@
 import { Component, input, output, computed, inject } from '@angular/core';
-import { CurrencyPipe } from '@angular/common';
+import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
 import { RouterLink } from '@angular/router';
 import { Product, getPrimaryImage } from '../../../administration/models/product.model';
 import { StoreContextService } from '../../services/store-context.service';
@@ -14,7 +14,7 @@ const TYPE_LABEL: Record<string, string> = {
  */
 @Component({
   selector: 'app-store-product-card',
-  imports: [CurrencyPipe, RouterLink],
+  imports: [MoneyPipe, RouterLink],
   template: `
     <div class="group bg-surface-container-lowest rounded-lg overflow-hidden shadow-card
                 hover:shadow-[0px_20px_40px_rgba(76,29,149,0.1)] transition-all flex flex-col">
@@ -39,7 +39,7 @@ const TYPE_LABEL: Record<string, string> = {
         </p>
         <div class="flex items-center justify-between mt-4">
           <p class="font-heading font-bold text-primary text-lg">
-            {{ product().price | currency:'USD':'symbol':'1.2-2' }}
+            {{ product().price | money }}
             @if (product().type === 'subscription') {
               <span class="text-label-sm text-on-surface-variant font-sans">
                 {{ product().billingPeriod === 'annual' ? '/año' : '/mes' }}

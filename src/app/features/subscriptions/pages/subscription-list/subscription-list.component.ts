@@ -1,12 +1,12 @@
 import { Component, inject, signal, computed } from '@angular/core';
-import { CurrencyPipe } from '@angular/common';
+import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
 import { UserSubscriptionService } from '../../services/user-subscription.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { Product } from '../../../administration/models/product.model';
 
 @Component({
   selector: 'app-subscription-list',
-  imports: [CurrencyPipe, ConfirmDialogComponent],
+  imports: [MoneyPipe, ConfirmDialogComponent],
   templateUrl: './subscription-list.component.html',
 })
 export class SubscriptionListComponent {

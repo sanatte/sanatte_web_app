@@ -1,5 +1,6 @@
 import { Component, inject, signal, computed } from '@angular/core';
-import { CurrencyPipe, DecimalPipe } from '@angular/common';
+import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
+import { DecimalPipe } from '@angular/common';
 import { OrderService } from '../../services/order.service';
 import { OrderTableComponent } from '../../components/order-table/order-table.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
@@ -14,7 +15,7 @@ const PAGE_SIZE = 10;
 @Component({
   selector: 'app-admin-orders',
   imports: [
-    CurrencyPipe, DecimalPipe, OrderTableComponent, ConfirmDialogComponent,
+    MoneyPipe, DecimalPipe, OrderTableComponent, ConfirmDialogComponent,
     AdminPageHeaderComponent, SearchInputComponent, ShipOrderDialogComponent,
   ],
   templateUrl: './admin-orders.component.html',

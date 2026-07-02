@@ -40,7 +40,7 @@
               </div>
             </div>
             <p class="font-heading font-bold text-primary text-lg flex-shrink-0">
-              {{ line.lineTotal | currency:'USD':'symbol':'1.2-2' }}
+              {{ line.lineTotal | money }}
             </p>
           </div>
         }
@@ -61,20 +61,20 @@
           <div class="space-y-3 font-sans text-body-md">
             <div class="flex justify-between text-on-surface-variant">
               <span>Subtotal</span>
-              <span>{{ subtotal() | currency:'USD':'symbol':'1.2-2' }}</span>
+              <span>{{ subtotal() | money }}</span>
             </div>
             <div class="flex justify-between text-on-surface-variant">
               <span>Envío {{ hasPhysical() ? '(estimado)' : '' }}</span>
-              <span>{{ hasPhysical() ? (shipping() | currency:'USD':'symbol':'1.2-2') : 'No aplica' }}</span>
+              <span>{{ hasPhysical() ? (shipping() | money) : 'No aplica' }}</span>
             </div>
             <div class="flex justify-between text-on-surface-variant">
               <span>Impuestos</span>
-              <span>{{ taxes() | currency:'USD':'symbol':'1.2-2' }}</span>
+              <span>{{ taxes() | money }}</span>
             </div>
             <div class="h-px bg-outline-variant/30 my-1"></div>
             <div class="flex justify-between font-heading text-headline-md text-on-surface">
               <span>Total</span>
-              <span class="text-primary">{{ total() | currency:'USD':'symbol':'1.2-2' }}</span>
+              <span class="text-primary">{{ total() | money }}</span>
             </div>
           </div>
 

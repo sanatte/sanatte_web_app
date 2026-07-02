@@ -48,9 +48,9 @@ export class UserSubscriptionService {
   readonly paymentMethod = signal<PaymentMethod>({ brand: 'Visa', last4: '4242', expiry: '08/27' });
 
   readonly invoices = signal<Invoice[]>([
-    { id: 'inv-3', date: '15 de julio, 2026',   planName: 'Guided Flow Pro', amount: 12.99 },
-    { id: 'inv-2', date: '15 de junio, 2026',   planName: 'Guided Flow Pro', amount: 12.99 },
-    { id: 'inv-1', date: '15 de mayo, 2026',    planName: 'Guided Flow Pro', amount: 12.99 },
+    { id: 'inv-3', date: '15 de julio, 2026',   planName: 'Guided Flow Pro', amount: 39900 },
+    { id: 'inv-2', date: '15 de junio, 2026',   planName: 'Guided Flow Pro', amount: 39900 },
+    { id: 'inv-1', date: '15 de mayo, 2026',    planName: 'Guided Flow Pro', amount: 39900 },
   ]);
 
   /** Producto del plan actual. */
