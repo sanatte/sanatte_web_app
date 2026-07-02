@@ -178,8 +178,8 @@ Producto físico + QR → usuario debe autenticarse → activar con QR → acced
 - [x] **Biblioteca** (home cliente: hero enfoque del día + progreso semanal + Mis Productos + estado vacío)
 - [x] **Detalle recurso** (visor con playlist del producto + 4 visores compartidos por tipo + estado "sin recursos")
 - [x] **Mis pedidos + detalle** (lista con búsqueda/filtros por tipo + detalle con envío físico/acceso digital)
-- [ ] Perfil + configuración ← siguiente
-- [ ] Suscripciones
+- [x] **Perfil** (datos personales + seguridad + preferencias de correo/newsletter + gestión de datos)
+- [ ] Suscripciones ← siguiente (cierra Bloque C)
 
 ### 🔹 Bloque D — Sitio Público
 - [ ] Home
@@ -223,3 +223,4 @@ Producto físico + QR → usuario debe autenticarse → activar con QR → acced
 | 2026-07-02 | Bloque C: **Biblioteca del cliente** (Library 1). Shared `CircularProgress`. Componentes `DailyFocusCard`/`WeeklyProgressCard`/`OwnedProductCard`. `UserLibraryService` (progreso mock). AppLayout alineado con AdminLayout (sidebar + hamburger + título dinámico). |
 | 2026-07-02 | Bloque C: **Visor de recurso** (`/app/library/:productId/:resourceId`) con playlist del producto y estado "sin recursos". **Consolidación anti-duplicación:** 4 visores por tipo → `shared/components/resource-viewers/` (usados por visor usuario Y modal admin); `RESOURCE_TYPE_META` única en `resource.model` (eliminó 5 mapeos duplicados de icono/label). |
 | 2026-07-02 | Bloque C: **Mis Pedidos** (`/app/orders`) lista con búsqueda + filtros (Todos/En proceso/Enviado/Entregado/Activo) y **detalle** (`/app/orders/:id`) con bloque de envío para físicos y botón "Acceder" al visor para digitales/suscripción. `UserOrdersService` (subset del usuario). **Validación negocio:** filtros/estados adaptados para cubrir físico + digital + suscripción (el mockup solo contemplaba físico). `DELIVERY_STATUS_META` única en `order.model` (refactor del admin `order-table`, sin duplicar). |
+| 2026-07-02 | Bloque C: **Perfil** (`/app/profile`) con datos personales, seguridad (password + 2FA) y **preferencias de correo/newsletter** (opt-in/opt-out). `UserProfileService` (persistencia localStorage, swappable a backend). **Validación negocio:** notificaciones push del mockup → newsletter por correo (web sin push hoy); biometría/Touch ID eliminada (solo móvil). |

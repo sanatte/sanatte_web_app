@@ -1,0 +1,164 @@
+<div class="max-w-4xl mx-auto space-y-section-gap">
+
+  <!-- Encabezado de perfil -->
+  <header class="flex items-center gap-5">
+    <div class="w-20 h-20 rounded-full gradient-primary flex items-center justify-center
+                text-white font-heading font-bold text-3xl flex-shrink-0">
+      {{ initial() }}
+    </div>
+    <div class="min-w-0">
+      <h1 class="font-heading text-headline-lg text-on-surface truncate">{{ form().fullName }}</h1>
+      <div class="flex flex-wrap items-center gap-2 mt-1.5">
+        <span class="px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed-variant
+                     text-label-sm font-heading font-semibold">Miembro Premium</span>
+        <span class="px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant
+                     text-label-sm font-heading font-semibold">Zen Master</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Datos personales -->
+  <section class="glass-card rounded-lg p-6 md:p-8">
+    <div class="flex items-center gap-2 mb-6">
+      <span class="material-symbols-outlined text-primary">badge</span>
+      <h2 class="font-heading text-headline-md text-on-surface">Datos personales</h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div>
+        <label class="text-label-md font-heading font-semibold text-on-surface block mb-1.5">Nombre completo</label>
+        <input type="text" [value]="form().fullName" (input)="update('fullName', $any($event.target).value)"
+               class="w-full px-4 py-3 bg-surface-container-low border border-transparent focus:border-primary
+                      focus:ring-0 rounded-xl outline-none text-body-md transition-colors" />
+      </div>
+      <div>
+        <label class="text-label-md font-heading font-semibold text-on-surface block mb-1.5">Correo electrónico</label>
+        <input type="email" [value]="form().email" readonly
+               class="w-full px-4 py-3 bg-surface-container border border-transparent rounded-xl outline-none
+                      text-body-md text-on-surface-variant cursor-not-allowed" />
+      </div>
+      <div>
+        <label class="text-label-md font-heading font-semibold text-on-surface block mb-1.5">Fecha de nacimiento</label>
+        <input type="date" [value]="form().dateOfBirth" (input)="update('dateOfBirth', $any($event.target).value)"
+               class="w-full px-4 py-3 bg-surface-container-low border border-transparent focus:border-primary
+                      focus:ring-0 rounded-xl outline-none text-body-md transition-colors" />
+      </div>
+      <div>
+        <label class="text-label-md font-heading font-semibold text-on-surface block mb-1.5">Ubicación</label>
+        <input type="text" [value]="form().location" (input)="update('location', $any($event.target).value)"
+               placeholder="Ciudad, País"
+               class="w-full px-4 py-3 bg-surface-container-low border border-transparent focus:border-primary
+                      focus:ring-0 rounded-xl outline-none text-body-md placeholder:text-outline-variant transition-colors" />
+      </div>
+    </div>
+
+    <div class="flex items-center justify-end gap-3 mt-6">
+      @if (savedFlag()) {
+        <span class="flex items-center gap-1 text-green-600 text-label-md font-heading font-semibold">
+          <span class="material-symbols-outlined text-[18px]">check_circle</span>
+          Cambios guardados
+        </span>
+      }
+      <button (click)="saveChanges()"
+              class="px-6 py-3 rounded-full bg-primary text-white font-heading font-bold text-label-md
+                     shadow-primary hover:opacity-90 active:scale-95 transition-all">
+        Guardar cambios
+      </button>
+    </div>
+  </section>
+
+  <!-- Seguridad -->
+  <section class="glass-card rounded-lg p-6 md:p-8">
+    <div class="flex items-center gap-2 mb-6">
+      <span class="material-symbols-outlined text-primary">lock</span>
+      <h2 class="font-heading text-headline-md text-on-surface">Seguridad</h2>
+    </div>
+
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4
+                p-5 bg-surface-container-low rounded-xl">
+      <div>
+        <h3 class="font-heading font-bold text-on-surface">Contraseña y acceso</h3>
+        <p class="font-sans text-label-md text-on-surface-variant mt-0.5">
+          Actualiza tu contraseña con regularidad para mantener segura tu cuenta.
+        </p>
+      </div>
+      <div class="flex gap-2 flex-shrink-0">
+        <button class="px-5 py-2.5 rounded-full border border-outline-variant text-on-surface font-heading
+                       font-semibold text-label-md hover:bg-surface-container transition-colors">
+          Cambiar contraseña
+        </button>
+        <button class="px-5 py-2.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant font-heading
+                       font-semibold text-label-md hover:bg-primary-fixed-dim transition-colors">
+          Activar 2FA
+        </button>
+      </div>
+    </div>
+    <p class="text-label-sm font-heading text-outline mt-3 flex items-center gap-1">
+      <span class="material-symbols-outlined text-[14px]">info</span>
+      Estas opciones se conectarán al iniciar la autenticación con Firebase.
+    </p>
+  </section>
+
+  <!-- Preferencias de correo (Newsletter) -->
+  <section class="glass-card rounded-lg p-6 md:p-8">
+    <div class="flex items-center gap-2 mb-6">
+      <span class="material-symbols-outlined text-primary">mail</span>
+      <h2 class="font-heading text-headline-md text-on-surface">Preferencias de correo</h2>
+    </div>
+
+    <div class="flex items-center justify-between gap-4 p-5 bg-surface-container-low rounded-xl">
+      <div class="min-w-0">
+        <h3 class="font-heading font-bold text-on-surface">Newsletter Sanatte</h3>
+        <p class="font-sans text-label-md text-on-surface-variant mt-0.5">
+          Tips de bienestar, contenido nuevo y novedades. Puedes darte de baja cuando quieras.
+        </p>
+      </div>
+      <!-- Toggle -->
+      <button (click)="toggleNewsletter()" role="switch" [attr.aria-checked]="newsletter()"
+              class="relative w-12 h-7 rounded-full transition-colors flex-shrink-0"
+              [class]="newsletter() ? 'bg-primary' : 'bg-outline-variant'">
+        <span class="absolute top-1 left-1 w-5 h-5 bg-white rounded-full shadow transition-transform"
+              [class.translate-x-5]="newsletter()"></span>
+      </button>
+    </div>
+
+    <p class="text-label-sm font-heading text-outline mt-3 flex items-center gap-1">
+      <span class="material-symbols-outlined text-[14px]">info</span>
+      Los correos de tu cuenta y pedidos (transaccionales) siempre se envían.
+    </p>
+  </section>
+
+  <!-- Gestionar datos -->
+  <section class="rounded-lg p-6 md:p-8 border border-error/20 bg-error-container/20">
+    <div class="flex items-center gap-2 mb-2">
+      <span class="material-symbols-outlined text-error">shield</span>
+      <h2 class="font-heading text-headline-md text-on-surface">Gestiona tus datos</h2>
+    </div>
+    <p class="font-sans text-label-md text-on-surface-variant mb-5">
+      Descarga tu historial de bienestar o gestiona la visibilidad de tu cuenta.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-3">
+      <button class="px-5 py-2.5 rounded-full border border-outline-variant text-on-surface font-heading
+                     font-semibold text-label-md hover:bg-surface-container transition-colors
+                     flex items-center justify-center gap-2">
+        <span class="material-symbols-outlined text-[18px]">download</span>
+        Exportar mis datos
+      </button>
+      <button class="px-5 py-2.5 rounded-full border border-error text-error font-heading font-semibold
+                     text-label-md hover:bg-error hover:text-white transition-colors
+                     flex items-center justify-center gap-2">
+        <span class="material-symbols-outlined text-[18px]">delete</span>
+        Eliminar cuenta
+      </button>
+    </div>
+  </section>
+
+  <!-- Cerrar sesión -->
+  <div class="pb-4">
+    <button (click)="logout()"
+            class="flex items-center gap-2 text-error font-heading font-semibold hover:underline">
+      <span class="material-symbols-outlined text-[20px]">logout</span>
+      Cerrar sesión
+    </button>
+  </div>
+</div>
