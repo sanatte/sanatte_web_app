@@ -47,6 +47,27 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./features/profile/profile.routes').then((m) => m.profileRoutes),
       },
+      // ── Tienda dentro del shell privado (shell unificado) ────────────────
+      {
+        path: 'products',
+        loadComponent: () =>
+          import('./features/public/pages/catalog/catalog.component').then((m) => m.CatalogComponent),
+      },
+      {
+        path: 'products/:id',
+        loadComponent: () =>
+          import('./features/public/pages/product-detail/product-detail.component').then((m) => m.ProductDetailComponent),
+      },
+      {
+        path: 'cart',
+        loadComponent: () =>
+          import('./features/public/pages/cart/cart.component').then((m) => m.CartComponent),
+      },
+      {
+        path: 'checkout',
+        loadComponent: () =>
+          import('./features/public/pages/checkout/checkout.component').then((m) => m.CheckoutComponent),
+      },
       { path: '', redirectTo: 'library', pathMatch: 'full' },
     ],
   },
@@ -71,6 +92,18 @@ export const routes: Routes = [
         path: 'products/:id',
         loadComponent: () =>
           import('./features/public/pages/product-detail/product-detail.component').then((m) => m.ProductDetailComponent),
+      },
+      {
+        path: 'cart',
+        loadComponent: () =>
+          import('./features/public/pages/cart/cart.component').then((m) => m.CartComponent),
+      },
+      {
+        // Checkout: requiere cuenta (regla de negocio) — guard preserva returnUrl.
+        path: 'checkout',
+        canActivate: [mockAuthGuard],
+        loadComponent: () =>
+          import('./features/public/pages/checkout/checkout.component').then((m) => m.CheckoutComponent),
       },
     ],
   },

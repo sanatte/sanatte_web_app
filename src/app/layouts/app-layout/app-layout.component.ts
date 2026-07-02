@@ -1,6 +1,7 @@
 import { Component, inject, computed, signal } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { MockAuthService } from '../../core/services/mock-auth.service';
+import { CartService } from '../../features/public/services/cart.service';
 
 interface NavItem {
   label: string;
@@ -21,9 +22,11 @@ interface NavItem {
 export class AppLayoutComponent {
   private readonly auth   = inject(MockAuthService);
   private readonly router = inject(Router);
+  private readonly cart   = inject(CartService);
 
   readonly displayName = computed(() => this.auth.currentUser()?.displayName ?? 'Usuario');
   readonly userInitial = computed(() => this.displayName().charAt(0).toUpperCase());
+  readonly cartCount   = this.cart.count;
 
   readonly pageTitle   = signal('Mi Biblioteca');
   readonly sidebarOpen = signal(false);
@@ -37,6 +40,9 @@ export class AppLayoutComponent {
         this.closeSidebar();
         const titles: Record<string, string> = {
           '/app/library':       'Mi Biblioteca',
+          '/app/products':      'Tienda',
+          '/app/cart':          'Carrito',
+          '/app/checkout':      'Finalizar compra',
           '/app/orders':        'Mis Pedidos',
           '/app/subscriptions': 'Suscripciones',
           '/app/profile':       'Perfil',
@@ -49,6 +55,7 @@ export class AppLayoutComponent {
 
   readonly mainNav: NavItem[] = [
     { label: 'Biblioteca',    route: '/app/library',       icon: 'subscriptions' },
+    { label: 'Tienda',        route: '/app/products',      icon: 'storefront' },
     { label: 'Mis pedidos',   route: '/app/orders',        icon: 'receipt_long' },
     { label: 'Suscripciones', route: '/app/subscriptions', icon: 'workspace_premium' },
     { label: 'Perfil',        route: '/app/profile',       icon: 'person' },

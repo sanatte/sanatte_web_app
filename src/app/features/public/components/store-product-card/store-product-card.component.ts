@@ -1,7 +1,8 @@
-import { Component, input, output, computed } from '@angular/core';
+import { Component, input, output, computed, inject } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Product, getPrimaryImage } from '../../../administration/models/product.model';
+import { StoreContextService } from '../../services/store-context.service';
 
 const TYPE_LABEL: Record<string, string> = {
   physical: 'Físico', digital: 'Digital', subscription: 'Suscripción',
@@ -18,7 +19,7 @@ const TYPE_LABEL: Record<string, string> = {
     <div class="group bg-surface-container-lowest rounded-lg overflow-hidden shadow-card
                 hover:shadow-[0px_20px_40px_rgba(76,29,149,0.1)] transition-all flex flex-col">
       <!-- Imagen -->
-      <a [routerLink]="['/products', product().id]" class="block relative aspect-[4/3] overflow-hidden
+      <a [routerLink]="ctx.productLink(product().id)" class="block relative aspect-[4/3] overflow-hidden
              bg-gradient-to-br {{ gradient() }}">
         <div class="absolute inset-0 bg-black/5 group-hover:bg-black/0 transition-colors"></div>
         <span class="absolute top-3 left-3 bg-white/90 backdrop-blur px-2.5 py-1 rounded-full
@@ -28,7 +29,7 @@ const TYPE_LABEL: Record<string, string> = {
       </a>
       <!-- Body -->
       <div class="p-5 flex-1 flex flex-col">
-        <a [routerLink]="['/products', product().id]" class="block">
+        <a [routerLink]="ctx.productLink(product().id)" class="block">
           <h3 class="font-heading font-bold text-on-surface hover:text-primary transition-colors line-clamp-1">
             {{ product().name }}
           </h3>
@@ -57,6 +58,8 @@ const TYPE_LABEL: Record<string, string> = {
   `,
 })
 export class StoreProductCardComponent {
+  readonly ctx = inject(StoreContextService);
+
   readonly product = input.required<Product>();
   readonly add     = output<Product>();
 

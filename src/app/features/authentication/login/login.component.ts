@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { MockAuthService } from '../../../core/services/mock-auth.service';
 import { UserRole } from '../../../core/models/role.model';
 
@@ -13,6 +13,7 @@ export class LoginComponent {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(MockAuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   readonly loginForm = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -37,8 +38,11 @@ export class LoginComponent {
     try {
       const { email, password } = this.loginForm.getRawValue();
       await this.auth.login(email, password);
-      const target = this.auth.role() === UserRole.Admin ? '/admin/dashboard' : '/app/library';
-      await this.router.navigate([target]);
+      // Si venimos de un flujo que requería cuenta (p. ej. checkout), volvemos allí.
+      const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+      const target = returnUrl
+        ?? (this.auth.role() === UserRole.Admin ? '/admin/dashboard' : '/app/library');
+      await this.router.navigateByUrl(target);
     } catch {
       this.errorMessage.set('Credenciales inválidas. Por favor intenta de nuevo.');
     }

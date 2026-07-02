@@ -96,6 +96,16 @@
         <button class="xl:hidden p-2 hover:bg-surface-container rounded-full transition-colors">
           <span class="material-symbols-outlined text-on-surface-variant text-[20px]">search</span>
         </button>
+        <!-- Carrito -->
+        <a routerLink="/app/cart" class="relative p-2 hover:bg-surface-container rounded-full transition-colors">
+          <span class="material-symbols-outlined text-on-surface-variant text-[20px]">shopping_bag</span>
+          @if (cartCount() > 0) {
+            <span class="absolute -top-0.5 -right-0.5 w-5 h-5 rounded-full bg-primary text-white
+                         text-[10px] font-heading font-bold flex items-center justify-center">
+              {{ cartCount() }}
+            </span>
+          }
+        </a>
         <button class="p-2 hover:bg-surface-container rounded-full transition-colors relative">
           <span class="material-symbols-outlined text-on-surface-variant text-[20px]">notifications</span>
           <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full"></span>

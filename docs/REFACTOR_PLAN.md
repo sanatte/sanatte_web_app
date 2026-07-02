@@ -184,10 +184,12 @@ Producto físico + QR → usuario debe autenticarse → activar con QR → acced
 ### 🔹 Bloque D — Sitio Público
 - [ ] Home
 - [x] **Catálogo público** (grid + búsqueda + filtros por tipo) + **Detalle producto** (galería, compra, highlights, specs, reseñas)
-- [ ] Carrito / Checkout (checkout exige cuenta) ← siguiente
+- [x] **Carrito + Checkout** (checkout exige cuenta; envío condicional físicos; confirmación)
+- [ ] Home (landing) ← siguiente
 - [ ] Blog · FAQ · Contacto
 
-**Decisión negocio:** navegar/carrito = público; la cuenta se exige en el **checkout** (todo lo vendido se entrega vía cuenta: activación QR, biblioteca, suscripción).
+**Decisión negocio:** navegar/carrito = público; la cuenta se exige en el **checkout**.
+**Shell unificado:** un usuario logueado navega la tienda dentro de su shell (`/app/products`, `/app/cart`, `/app/checkout`) con el sidebar — sin salto a la pública. El visitante la ve en `/products`, `/cart`, `/checkout`. `StoreContextService` resuelve el prefijo (`/app` vs `''`). Carrito se conserva al cerrar sesión (device-local, estándar).
 
 ### 🔹 Fase 4 — Navegación completa
 - [ ] Flujo público → auth → app usuario
@@ -227,3 +229,5 @@ Producto físico + QR → usuario debe autenticarse → activar con QR → acced
 | 2026-07-02 | Bloque C: **Mis Pedidos** (`/app/orders`) lista con búsqueda + filtros (Todos/En proceso/Enviado/Entregado/Activo) y **detalle** (`/app/orders/:id`) con bloque de envío para físicos y botón "Acceder" al visor para digitales/suscripción. `UserOrdersService` (subset del usuario). **Validación negocio:** filtros/estados adaptados para cubrir físico + digital + suscripción (el mockup solo contemplaba físico). `DELIVERY_STATUS_META` única en `order.model` (refactor del admin `order-table`, sin duplicar). |
 | 2026-07-02 | Bloque C: **Perfil** (`/app/profile`) con datos personales, seguridad (password + 2FA) y **preferencias de correo/newsletter** (opt-in/opt-out). `UserProfileService` (persistencia localStorage, swappable a backend). **Validación negocio:** notificaciones push del mockup → newsletter por correo (web sin push hoy); biometría/Touch ID eliminada (solo móvil). |
 | 2026-07-02 | Bloque C: **Suscripciones** (`/app/subscriptions`) — plan actual, método de pago, facturación y planes disponibles (cambiar/cancelar/reactivar). `UserSubscriptionService` (mock, swappable a Mercado Pago). Cancelación estilo SaaS (fin de periodo). Reusa `ConfirmDialog`/`EntitlementService`. **✅ Bloque C — App Usuario completo.** |
+| 2026-07-02 | Bloque D: **Catálogo + Detalle producto** (público). `CartService` (localStorage). Public layout Serene Pulse. |
+| 2026-07-02 | Bloque D: **Carrito + Checkout** (checkout con `mockAuthGuard` + returnUrl). Confirmación de pedido. **Shell unificado (Opción B):** tienda montada también bajo `/app` con sidebar; `StoreContextService` resuelve el prefijo de rutas según login → sin salto de shell. Menú de cuenta en navbar público. Accesos a tienda/carrito desde el shell de usuario. |

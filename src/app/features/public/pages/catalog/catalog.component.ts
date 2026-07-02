@@ -10,7 +10,7 @@ type FilterKey = 'all' | ProductType;
   selector: 'app-catalog',
   imports: [StoreProductCardComponent],
   template: `
-    <div class="px-container-padding-mobile md:px-container-padding-desktop py-gutter max-w-6xl mx-auto">
+    <div class="max-w-6xl mx-auto">
       <!-- Header -->
       <header class="mb-8 text-center max-w-2xl mx-auto">
         <h1 class="font-heading text-headline-lg text-on-surface mb-3">Catálogo Sanatte</h1>

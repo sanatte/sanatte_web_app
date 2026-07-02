@@ -5,6 +5,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { ProductService } from '../../../administration/services/product.service';
 import { CartService } from '../../services/cart.service';
+import { StoreContextService } from '../../services/store-context.service';
 import { Product, ProductImage } from '../../../administration/models/product.model';
 
 interface Review { author: string; initials: string; rating: number; text: string; }
@@ -28,6 +29,7 @@ export class ProductDetailComponent {
   private readonly router   = inject(Router);
   private readonly products = inject(ProductService);
   private readonly cart     = inject(CartService);
+  readonly ctx              = inject(StoreContextService);
 
   private readonly id = toSignal(this.route.paramMap.pipe(map((p) => p.get('id'))), { initialValue: null });
 
@@ -76,6 +78,6 @@ export class ProductDetailComponent {
     const p = this.product();
     if (!p) return;
     this.cart.add(p.id);
-    this.router.navigate(['/cart']);
+    this.router.navigateByUrl(this.ctx.cartLink());
   }
 }

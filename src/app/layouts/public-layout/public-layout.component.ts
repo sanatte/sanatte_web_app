@@ -1,5 +1,5 @@
-import { Component, inject, computed } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, inject, computed, signal } from '@angular/core';
+import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { CartService } from '../../features/public/services/cart.service';
 import { MockAuthService } from '../../core/services/mock-auth.service';
 
@@ -39,11 +39,43 @@ import { MockAuthService } from '../../core/services/mock-auth.service';
           </a>
 
           @if (isAuthenticated()) {
-            <a routerLink="/app/library"
-               class="px-5 py-2 rounded-full text-label-md font-heading font-semibold text-white
-                      gradient-primary hover:opacity-90 transition-opacity">
-              Mi cuenta
-            </a>
+            <!-- Menú de cuenta -->
+            <div class="relative">
+              <button (click)="menuOpen.set(!menuOpen())"
+                      class="flex items-center gap-2 pl-1 pr-2 py-1 rounded-full hover:bg-surface-container transition-colors">
+                <span class="w-8 h-8 rounded-full gradient-primary flex items-center justify-center
+                             text-white text-sm font-heading font-bold">{{ userInitial() }}</span>
+                <span class="material-symbols-outlined text-on-surface-variant text-[18px]">
+                  {{ menuOpen() ? 'expand_less' : 'expand_more' }}
+                </span>
+              </button>
+
+              @if (menuOpen()) {
+                <!-- backdrop para cerrar al hacer clic fuera -->
+                <button class="fixed inset-0 z-40 cursor-default" (click)="menuOpen.set(false)"></button>
+                <div class="absolute right-0 mt-2 w-60 z-50 bg-surface-container-lowest rounded-lg shadow-card
+                            border border-outline-variant/20 overflow-hidden py-1">
+                  <div class="px-4 py-3 border-b border-outline-variant/20">
+                    <p class="font-heading font-bold text-on-surface truncate">{{ displayName() }}</p>
+                    <p class="text-label-sm font-heading text-primary">Miembro Premium</p>
+                  </div>
+                  @for (item of accountMenu; track item.route) {
+                    <a [routerLink]="item.route"
+                       class="flex items-center gap-3 px-4 py-2.5 text-label-md font-heading text-on-surface
+                              hover:bg-surface-container-low transition-colors">
+                      <span class="material-symbols-outlined text-[20px] text-on-surface-variant">{{ item.icon }}</span>
+                      {{ item.label }}
+                    </a>
+                  }
+                  <button (click)="logout()"
+                          class="w-full flex items-center gap-3 px-4 py-2.5 text-label-md font-heading text-error
+                                 hover:bg-error-container/40 transition-colors border-t border-outline-variant/20">
+                    <span class="material-symbols-outlined text-[20px]">logout</span>
+                    Cerrar sesión
+                  </button>
+                </div>
+              }
+            </div>
           } @else {
             <a routerLink="/auth/login"
                class="hidden sm:inline-block px-4 py-2 rounded-full text-label-md font-heading text-primary
@@ -55,7 +87,7 @@ import { MockAuthService } from '../../core/services/mock-auth.service';
         </div>
       </header>
 
-      <main class="flex-1">
+      <main class="flex-1 px-container-padding-mobile md:px-container-padding-desktop py-gutter">
         <router-outlet />
       </main>
 
@@ -96,9 +128,33 @@ import { MockAuthService } from '../../core/services/mock-auth.service';
   `,
 })
 export class PublicLayoutComponent {
-  private readonly cart = inject(CartService);
-  private readonly auth = inject(MockAuthService);
+  private readonly cart   = inject(CartService);
+  private readonly auth   = inject(MockAuthService);
+  private readonly router = inject(Router);
 
   readonly cartCount       = this.cart.count;
   readonly isAuthenticated = computed(() => this.auth.isAuthenticated());
+  readonly displayName     = computed(() => this.auth.currentUser()?.displayName ?? 'Usuario');
+  readonly userInitial     = computed(() => this.displayName().charAt(0).toUpperCase());
+
+  readonly menuOpen = signal(false);
+
+  readonly accountMenu = [
+    { label: 'Mi biblioteca', route: '/app/library',       icon: 'subscriptions' },
+    { label: 'Mis pedidos',   route: '/app/orders',        icon: 'receipt_long' },
+    { label: 'Suscripciones', route: '/app/subscriptions', icon: 'workspace_premium' },
+    { label: 'Perfil',        route: '/app/profile',       icon: 'person' },
+  ];
+
+  constructor() {
+    // Cierra el menú al navegar.
+    this.router.events.subscribe((e) => {
+      if (e instanceof NavigationEnd) this.menuOpen.set(false);
+    });
+  }
+
+  logout(): void {
+    this.menuOpen.set(false);
+    this.auth.logout();
+  }
 }
