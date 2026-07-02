@@ -33,7 +33,7 @@ export class MockAuthService {
       const user: User = {
         uid: `mock-uid-${role.toLowerCase()}`,
         email,
-        displayName: email.split('@')[0],
+        displayName: this.prettyName(email),
         role,
       };
       this.persist(user);
@@ -68,11 +68,27 @@ export class MockAuthService {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) return null;
     try {
-      return JSON.parse(stored) as User;
+      const user = JSON.parse(stored) as User;
+      // Normaliza nombres genéricos de sesiones previas (p. ej. "admin").
+      return { ...user, displayName: this.prettyName(user.email, user.displayName) };
     } catch {
       localStorage.removeItem(STORAGE_KEY);
       return null;
     }
+  }
+
+  /**
+   * Genera un nombre legible a partir del email. Si la parte local es genérica
+   * (admin, user, test…) usa un nombre real por defecto. Mock only.
+   */
+  private prettyName(email: string, current?: string): string {
+    const local = (email?.split('@')[0] ?? '').trim();
+    const generic = ['admin', 'user', 'usuario', 'test', 'demo', 'hola', 'root', 'sanatte'];
+    if (current && !generic.includes(current.toLowerCase()) && current !== local) {
+      return current; // conserva un nombre ya personalizado
+    }
+    if (!local || generic.includes(local.toLowerCase())) return 'María';
+    return local.charAt(0).toUpperCase() + local.slice(1);
   }
 
   private delay(ms: number): Promise<void> {
