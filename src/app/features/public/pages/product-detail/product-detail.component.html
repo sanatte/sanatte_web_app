@@ -1,0 +1,177 @@
+@if (product(); as p) {
+  <div class="px-container-padding-mobile md:px-container-padding-desktop py-gutter max-w-6xl mx-auto">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center gap-2 text-on-surface-variant mb-6 text-label-md font-heading">
+      <a routerLink="/products" class="hover:text-primary transition-colors">Productos</a>
+      <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+      <span class="text-primary font-bold truncate">{{ p.name }}</span>
+    </nav>
+
+    <!-- Galería + info -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+      <!-- Galería -->
+      <div class="space-y-3">
+        <div class="aspect-square rounded-lg overflow-hidden bg-gradient-to-br
+                    {{ displayImage()?.gradient ?? 'from-violet-400 to-purple-600' }}"></div>
+        @if (p.images.length > 1) {
+          <div class="grid grid-cols-4 gap-3">
+            @for (img of p.images; track img.id) {
+              <button (click)="selectImage(img)"
+                      class="aspect-square rounded-lg overflow-hidden bg-gradient-to-br transition-all
+                             {{ img.gradient }}"
+                      [class]="displayImage()?.id === img.id ? 'ring-2 ring-primary ring-offset-2' : 'opacity-80 hover:opacity-100'">
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Info + compra -->
+      <div>
+        <span class="inline-block px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed-variant
+                     text-label-sm font-heading font-bold uppercase tracking-wider mb-3">
+          {{ p.type === 'physical' ? 'Producto físico' : p.type === 'subscription' ? 'Suscripción' : 'Producto digital' }}
+        </span>
+        <h1 class="font-heading text-headline-lg text-on-surface mb-2">{{ p.name }}</h1>
+        <p class="font-heading text-headline-md text-primary mb-4">
+          {{ p.price | currency:'USD':'symbol':'1.2-2' }}
+          @if (isSubscription()) {
+            <span class="text-label-md text-on-surface-variant font-sans">
+              {{ p.billingPeriod === 'annual' ? '/año' : '/mes' }}
+            </span>
+          }
+        </p>
+        <p class="font-sans text-body-md text-on-surface-variant leading-relaxed mb-6">{{ p.description }}</p>
+
+        <!-- Acciones -->
+        <div class="flex flex-col sm:flex-row gap-3 mb-4">
+          <button (click)="addToCart()"
+                  class="flex-1 py-3.5 rounded-full gradient-primary text-white font-heading font-bold
+                         shadow-primary hover:opacity-90 active:scale-95 transition-all
+                         flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-[20px]">add_shopping_cart</span>
+            Agregar al carrito
+          </button>
+          <button (click)="buyNow()"
+                  class="flex-1 py-3.5 rounded-full border border-primary text-primary font-heading font-bold
+                         hover:bg-primary/5 active:scale-95 transition-all">
+            Comprar ahora
+          </button>
+        </div>
+
+        @if (addedFlag()) {
+          <p class="flex items-center gap-1.5 text-green-600 text-label-md font-heading font-semibold mb-4">
+            <span class="material-symbols-outlined text-[18px]">check_circle</span>
+            Agregado al carrito
+          </p>
+        }
+
+        <!-- Garantías -->
+        <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-on-surface-variant mb-6">
+          @if (isPhysical()) {
+            <span class="flex items-center gap-1.5 text-label-md font-heading">
+              <span class="material-symbols-outlined text-primary text-[18px]">local_shipping</span> Envío incluido
+            </span>
+          }
+          <span class="flex items-center gap-1.5 text-label-md font-heading">
+            <span class="material-symbols-outlined text-primary text-[18px]">verified</span>
+            {{ isSubscription() ? 'Cancela cuando quieras' : 'Acceso de por vida' }}
+          </span>
+          @if (p.accessType === 'qr_activation') {
+            <span class="flex items-center gap-1.5 text-label-md font-heading">
+              <span class="material-symbols-outlined text-primary text-[18px]">qr_code_scanner</span> Activación por QR
+            </span>
+          }
+        </div>
+
+        <!-- Tags -->
+        @if (p.tags.length) {
+          <div class="flex flex-wrap gap-2">
+            @for (tag of p.tags; track tag) {
+              <span class="px-4 py-2 bg-surface-container rounded-full text-on-surface-variant
+                           text-label-sm font-heading">{{ tag }}</span>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Highlights -->
+    @if (highlights().length) {
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
+        @for (h of highlights(); track h.title) {
+          <div class="flex flex-col items-center text-center">
+            <div class="w-14 h-14 rounded-full bg-primary-fixed flex items-center justify-center mb-4">
+              <span class="material-symbols-outlined text-primary text-[26px]">{{ h.icon }}</span>
+            </div>
+            <h3 class="font-heading text-headline-md text-on-surface mb-2">{{ h.title }}</h3>
+            <p class="font-sans text-on-surface-variant text-label-md">{{ h.description }}</p>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Especificaciones técnicas -->
+    @if (p.specs.length) {
+      <section class="mt-16">
+        <h2 class="font-heading text-headline-lg text-on-surface text-center mb-8">Especificaciones técnicas</h2>
+        <div class="glass-card rounded-lg overflow-hidden max-w-3xl mx-auto divide-y divide-outline-variant/20">
+          @for (spec of p.specs; track spec.label) {
+            <div class="flex justify-between gap-4 px-6 py-4">
+              <span class="font-heading text-label-md text-on-surface-variant">{{ spec.label }}</span>
+              <span class="font-heading font-semibold text-on-surface text-right">{{ spec.value }}</span>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- Reseñas -->
+    <section class="mt-16">
+      <div class="flex items-center justify-between mb-8 max-w-4xl mx-auto">
+        <div>
+          <h2 class="font-heading text-headline-lg text-on-surface">Reseñas</h2>
+          <div class="flex items-center gap-2 mt-1">
+            <div class="flex text-amber-400">
+              @for (star of [1,2,3,4,5]; track star) {
+                <span class="material-symbols-outlined text-[18px]"
+                      style="font-variation-settings: 'FILL' 1;"
+                      [class.text-outline-variant]="star > avgRating()">star</span>
+              }
+            </div>
+            <span class="text-label-md font-heading text-on-surface-variant">
+              {{ avgRating() | number:'1.1-1' }} · {{ reviews.length }} reseñas
+            </span>
+          </div>
+        </div>
+        <button class="px-5 py-2.5 rounded-full border border-primary text-primary font-heading font-bold
+                       text-label-md hover:bg-primary/5 transition-colors">Escribir reseña</button>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+        @for (r of reviews; track r.author) {
+          <div class="glass-card rounded-lg p-5">
+            <div class="flex text-amber-400 mb-3">
+              @for (star of [1,2,3,4,5]; track star) {
+                <span class="material-symbols-outlined text-[15px]" style="font-variation-settings: 'FILL' 1;"
+                      [class.text-outline-variant]="star > r.rating">star</span>
+              }
+            </div>
+            <p class="font-sans text-label-md text-on-surface-variant leading-relaxed mb-4">"{{ r.text }}"</p>
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-full gradient-primary flex items-center justify-center
+                          text-white text-label-sm font-heading font-bold">{{ r.initials }}</div>
+              <span class="font-heading font-semibold text-on-surface text-label-md">{{ r.author }}</span>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+  </div>
+} @else {
+  <div class="text-center py-24">
+    <p class="font-heading text-headline-md text-on-surface-variant">Producto no encontrado</p>
+    <a routerLink="/products" class="mt-4 inline-block text-primary font-heading font-bold hover:underline">
+      Ver catálogo
+    </a>
+  </div>
+}

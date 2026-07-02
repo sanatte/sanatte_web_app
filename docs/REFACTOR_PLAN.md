@@ -183,9 +183,11 @@ Producto físico + QR → usuario debe autenticarse → activar con QR → acced
 
 ### 🔹 Bloque D — Sitio Público
 - [ ] Home
-- [ ] Catálogo público + Detalle producto (mockup en `detalle_product/`)
-- [ ] Tienda / Carrito / Checkout
+- [x] **Catálogo público** (grid + búsqueda + filtros por tipo) + **Detalle producto** (galería, compra, highlights, specs, reseñas)
+- [ ] Carrito / Checkout (checkout exige cuenta) ← siguiente
 - [ ] Blog · FAQ · Contacto
+
+**Decisión negocio:** navegar/carrito = público; la cuenta se exige en el **checkout** (todo lo vendido se entrega vía cuenta: activación QR, biblioteca, suscripción).
 
 ### 🔹 Fase 4 — Navegación completa
 - [ ] Flujo público → auth → app usuario
