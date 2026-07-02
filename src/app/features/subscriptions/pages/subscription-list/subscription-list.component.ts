@@ -23,7 +23,7 @@ export class SubscriptionListComponent {
   readonly isCancelling      = computed(() => this.subscription().status === 'cancels_at_period_end');
   readonly confirmCancelOpen = signal(false);
 
-  isCurrent = (id: string) => this.subs.isCurrentPlan(id);
+  isCurrent = (sku: string) => this.subs.isCurrentPlan(sku);
 
   periodLabel(plan: Product): string {
     return plan.billingPeriod === 'annual' ? '/año' : '/mes';
@@ -39,6 +39,6 @@ export class SubscriptionListComponent {
   reactivate(): void { this.subs.reactivate(); }
 
   changePlan(plan: Product): void {
-    if (!this.isCurrent(plan.id)) this.subs.changePlan(plan.id);
+    if (!this.isCurrent(plan.sku)) this.subs.changePlan(plan.sku);
   }
 }

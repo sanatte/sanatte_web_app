@@ -151,13 +151,13 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
       @for (plan of availablePlans(); track plan.id) {
         <div class="glass-card rounded-lg p-6 flex flex-col transition-all"
-             [class]="isCurrent(plan.id) ? 'ring-2 ring-primary' : ''">
+             [class]="isCurrent(plan.sku) ? 'ring-2 ring-primary' : ''">
           <div class="flex items-start justify-between mb-3">
             <div>
               <h4 class="font-heading text-headline-md text-on-surface">{{ plan.name }}</h4>
               <p class="font-sans text-label-md text-on-surface-variant mt-0.5 line-clamp-2">{{ plan.description }}</p>
             </div>
-            @if (isCurrent(plan.id)) {
+            @if (isCurrent(plan.sku)) {
               <span class="px-3 py-1 rounded-full bg-primary text-white text-label-sm font-heading font-bold flex-shrink-0">
                 Tu plan
               </span>
@@ -177,12 +177,12 @@
               }
             </ul>
           }
-          <button (click)="changePlan(plan)" [disabled]="isCurrent(plan.id)"
+          <button (click)="changePlan(plan)" [disabled]="isCurrent(plan.sku)"
                   class="w-full py-2.5 rounded-full font-heading font-bold text-label-md transition-all"
-                  [class]="isCurrent(plan.id)
+                  [class]="isCurrent(plan.sku)
                     ? 'bg-surface-container text-outline cursor-default'
                     : 'bg-primary text-white hover:opacity-90 active:scale-95'">
-            {{ isCurrent(plan.id) ? 'Plan actual' : 'Cambiar a este plan' }}
+            {{ isCurrent(plan.sku) ? 'Plan actual' : 'Cambiar a este plan' }}
           </button>
         </div>
       }

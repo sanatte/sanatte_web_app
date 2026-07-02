@@ -14,11 +14,12 @@ const ACTIVATED_KEY = 'sanatte_activated_products';
  * La API pública (signals/getters) no cambia.
  */
 
-// Progreso simulado — SOLO productos obtenidos sin activación (compra directa / suscripción).
-// Los físicos (p. ej. Plena) NO se listan aquí: aparecen únicamente tras activar su QR.
+// Progreso simulado por SKU (clave estable mock/API) — SOLO productos obtenidos
+// sin activación (compra directa / suscripción). Los físicos (Plena) NO se listan:
+// aparecen únicamente tras activar su QR.
 const MOCK_PROGRESS: Record<string, number> = {
-  p3: 100,  // The Silent Mind (eBook — compra directa)
-  p2: 30,   // Guided Flow Pro (suscripción)
+  'DIG-115': 100,  // The Silent Mind (eBook — compra directa)
+  'DIG-082': 30,   // Guided Flow Pro (suscripción)
 };
 
 @Injectable({ providedIn: 'root' })
@@ -33,8 +34,8 @@ export class UserLibraryService {
     const activated = this._activatedIds();
     return this.productService
       .products()
-      .filter((p) => p.id in MOCK_PROGRESS || activated.includes(p.id))
-      .map((p) => this.toOwnedProduct(p, MOCK_PROGRESS[p.id] ?? 0));
+      .filter((p) => p.sku in MOCK_PROGRESS || activated.includes(p.id))
+      .map((p) => this.toOwnedProduct(p, MOCK_PROGRESS[p.sku] ?? 0));
   });
 
   readonly hasProducts = computed(() => this.ownedProducts().length > 0);
@@ -46,7 +47,7 @@ export class UserLibraryService {
   }
 
   isActivated(productId: string): boolean {
-    return productId in MOCK_PROGRESS || this._activatedIds().includes(productId);
+    return this._activatedIds().includes(productId);
   }
 
   private restoreActivated(): string[] {

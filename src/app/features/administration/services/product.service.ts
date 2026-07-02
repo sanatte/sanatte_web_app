@@ -52,6 +52,11 @@ export class ProductService {
     return this._products().find((p) => p.id === id);
   }
 
+  /** Busca por SKU — clave de negocio estable (no cambia entre mock y API). */
+  getBySku(sku: string): Product | undefined {
+    return this._products().find((p) => p.sku === sku);
+  }
+
   async create(product: Omit<Product, 'id' | 'createdAt' | 'salesCount'>): Promise<void> {
     const raw = await firstValueFrom(this.http.post<unknown>(this.base, product));
     const created = mapApiProduct(raw);

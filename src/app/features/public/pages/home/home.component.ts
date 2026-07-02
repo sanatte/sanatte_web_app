@@ -9,7 +9,7 @@ import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
 import { Product, getPrimaryImage } from '../../../administration/models/product.model';
 import { Resource, RESOURCE_TYPE_META } from '../../../administration/models/resource.model';
 
-const PLENA_ID = 'p1';
+const PLENA_SKU = 'WLN-001'; // clave de negocio estable (mock y API)
 
 @Component({
   selector: 'app-home',
@@ -170,7 +170,7 @@ export class HomeComponent {
   private readonly cart         = inject(CartService);
   readonly ctx                  = inject(StoreContextService);
 
-  readonly plena = computed<Product | null>(() => this.products.getById(PLENA_ID) ?? null);
+  readonly plena = computed<Product | null>(() => this.products.getBySku(PLENA_SKU) ?? null);
 
   readonly plenaGradient = computed(() =>
     (this.plena() && getPrimaryImage(this.plena()!)?.gradient) || 'from-violet-400 via-purple-500 to-indigo-700'
@@ -183,7 +183,7 @@ export class HomeComponent {
 
   /** Otros productos activos (excluye Plena, que ya es el hero). */
   readonly more = computed<Product[]>(() =>
-    this.products.products().filter((p) => p.status === 'active' && p.id !== PLENA_ID).slice(0, 4)
+    this.products.products().filter((p) => p.status === 'active' && p.sku !== PLENA_SKU).slice(0, 4)
   );
 
   readonly addedName = signal<string | null>(null);

@@ -6,7 +6,7 @@ import { Product } from '../../administration/models/product.model';
 export type SubscriptionStatus = 'active' | 'cancels_at_period_end' | 'none';
 
 export interface ActiveSubscription {
-  productId: string;
+  productSku: string;
   status: SubscriptionStatus;
   startedAt: string;       // fecha legible
   nextBillingDate: string; // fecha legible
@@ -38,7 +38,7 @@ export class UserSubscriptionService {
   private readonly entitlements = inject(EntitlementService);
 
   private readonly _subscription = signal<ActiveSubscription>({
-    productId: 'p2',                 // Guided Flow Pro
+    productSku: 'DIG-082',           // Guided Flow Pro (SKU estable)
     status: 'active',
     startedAt: '15 de enero, 2026',
     nextBillingDate: '15 de agosto, 2026',
@@ -55,8 +55,8 @@ export class UserSubscriptionService {
 
   /** Producto del plan actual. */
   readonly currentPlan = computed<Product | null>(() => {
-    const id = this._subscription().productId;
-    return id ? this.products.getById(id) ?? null : null;
+    const sku = this._subscription().productSku;
+    return sku ? this.products.getBySku(sku) ?? null : null;
   });
 
   readonly hasActive = computed(() => this._subscription().status !== 'none');
@@ -72,8 +72,8 @@ export class UserSubscriptionService {
     this.products.products().filter((p) => p.type === 'subscription' && p.status === 'active')
   );
 
-  isCurrentPlan(productId: string): boolean {
-    return this._subscription().productId === productId;
+  isCurrentPlan(sku: string): boolean {
+    return this._subscription().productSku === sku;
   }
 
   cancel(): void {
@@ -84,7 +84,7 @@ export class UserSubscriptionService {
     this._subscription.update((s) => ({ ...s, status: 'active' }));
   }
 
-  changePlan(productId: string): void {
-    this._subscription.update((s) => ({ ...s, productId, status: 'active' }));
+  changePlan(sku: string): void {
+    this._subscription.update((s) => ({ ...s, productSku: sku, status: 'active' }));
   }
 }
