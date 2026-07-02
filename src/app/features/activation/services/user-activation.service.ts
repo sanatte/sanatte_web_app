@@ -41,7 +41,7 @@ export class UserActivationService {
       return { status: 'already_active', message: 'Este código ya fue activado.' };
     }
 
-    const product = this.products.getBySku(license.productId);
+    const product = this.products.getById(license.productId);
     if (!product || product.accessType !== 'qr_activation') {
       return { status: 'not_activatable', message: 'Este producto no requiere activación.' };
     }
