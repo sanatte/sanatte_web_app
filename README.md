@@ -1,59 +1,86 @@
-# SanatteFrontend
+# Sanatte Web (Angular)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.1.
+Frontend del ecosistema **Sanatte**: landing + tienda + área de cliente
+(biblioteca, activación por QR, pedidos, perfil) + panel de administración.
+Todo en una sola app Angular.
 
-## Development server
+- **Framework:** Angular 21 (standalone components, signals)
+- **Auth:** Firebase Auth (email/contraseña, Google, Apple)
+- **Backend:** [Sanatte API (.NET)](../sanatte-api) por REST
 
-To start a local development server, run:
+## Requisitos
 
-```bash
-ng serve
-```
+- Node.js 20+ y npm
+- La **API .NET corriendo** (el frontend no funciona sin ella: sin backend no hay sesión válida)
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Instalación
 
 ```bash
-ng generate --help
+cd sanatte_web_app
+npm ci        # o: npm install
 ```
 
-## Building
+## Configuración
 
-To build the project run:
+Los valores viven en `src/environments/`:
+
+| Clave | Dev (`environment.ts`) | Prod (`environment.production.ts`) |
+|---|---|---|
+| `apiUrl` | `http://localhost:5129/api` | `https://api.sanatte.com/api` |
+| `publicBaseUrl` | `https://sanatte.com` | `https://sanatte.com` |
+| `firebase` | config web del proyecto `sanatte-d819d` | idem |
+
+- **`apiUrl`**: dónde está la API .NET.
+- **`publicBaseUrl`**: dominio público de la app; se usa para generar los **QR de recursos** (`{publicBaseUrl}/r/{slug}`). Apunta siempre al dominio de producción porque los QR se imprimen.
+- **`firebase`**: la config web de Firebase es **pública** (apiKey del cliente) y ya está versionada. Se obtiene en Firebase Console → ⚙️ Configuración del proyecto → *Tus apps* → app web.
+
+> No hay secretos en este repo. Los tokens de acceso los emite Firebase en el navegador; el backend solo los valida.
+
+## Arrancar en desarrollo
 
 ```bash
-ng build
+npm start          # ng serve → http://localhost:4200
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Requiere la **API corriendo en `http://localhost:5129`** (ver README de `sanatte-api`).
+Si el backend está caído, la app no deja iniciar sesión (muestra "No pudimos conectar con el servidor").
 
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## Build de producción
 
 ```bash
-ng test
+npm run build      # salida: dist/sanatte_frontend/browser
 ```
 
-## Running end-to-end tests
+## Autenticación y roles
 
-For end-to-end (e2e) testing, run:
+- **Clientes:** se registran solos (email con verificación de correo, o Google/Apple).
+- **Administradores:** NO se auto-registran; se crean desde el panel (*Usuarios → Crear administrador*). Un admin inicia sesión y cae en `/admin/dashboard`; desde el área de cliente puede volver con el enlace **"Panel de administración"** del menú de cuenta.
+- El rol lo entrega el backend (`GET /api/users/me`) al iniciar sesión.
+
+**Firebase (producción):** agrega el dominio `sanatte.com` en Firebase Console →
+Authentication → Settings → *Authorized domains* para que el login con Google/Apple funcione.
+
+## Códigos QR de recursos
+
+Los recursos (audios de Plena, etc.) tienen un **slug** editable en su formulario.
+El botón **"Descargar QR"** en *Recursos* genera un PNG que apunta a
+`https://sanatte.com/r/{slug}`. Al escanearlo pide sesión y que el usuario tenga el
+producto activado (p. ej. Plena).
+
+## Despliegue (Docker / Coolify)
+
+Incluye `Dockerfile` (build Angular → Nginx) y `nginx.conf` con **fallback SPA**
+(`try_files → index.html`), necesario para que las rutas profundas (QR `/r/:slug`,
+recargar `/app/...`, links directos) funcionen al abrir en frío.
+
+En Coolify:
+1. Build Pack: **Dockerfile** · Ports Exposes: **80** · Domain: `https://sanatte.com`
+2. No requiere variables de entorno (la config va compilada en el bundle).
+
+## Comandos útiles
 
 ```bash
-ng e2e
+npm start            # servidor de desarrollo (http://localhost:4200)
+npm run build        # build de producción
+npx ng generate ...  # scaffolding de Angular
 ```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
