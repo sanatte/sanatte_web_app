@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, computed } from '@angular/core';
+import { Injectable, inject, signal, computed, effect } from '@angular/core';
 import { ProductService } from '../../administration/services/product.service';
 import { Product, getPrimaryImage } from '../../administration/models/product.model';
 
@@ -30,8 +30,6 @@ export class CartService {
   private readonly _items = signal<CartItem[]>(this.restore());
   readonly items = this._items.asReadonly();
 
-  readonly count = computed(() => this._items().reduce((n, i) => n + i.quantity, 0));
-
   readonly lines = computed<CartLine[]>(() =>
     this._items()
       .map((i) => {
@@ -47,7 +45,26 @@ export class CartService {
       .filter((l): l is CartLine => l !== null)
   );
 
+  // El contador refleja solo productos válidos (evita badge≠carrito por items huérfanos).
+  readonly count = computed(() => this.lines().reduce((n, l) => n + l.quantity, 0));
+
   readonly subtotal = computed(() => this.lines().reduce((sum, l) => sum + l.lineTotal, 0));
+
+  constructor() {
+    // Depura items huérfanos (productos que ya no existen en el catálogo) una vez
+    // que el catálogo cargó. Suele pasar tras resembrar la BD (cambian los GUID).
+    effect(() => {
+      const catalog = this.products.products();
+      if (catalog.length === 0) return; // aún no carga el catálogo
+      const validIds = new Set(catalog.map((p) => p.id));
+      const current = this._items();
+      const pruned = current.filter((i) => validIds.has(i.productId));
+      if (pruned.length !== current.length) {
+        this._items.set(pruned);
+        this.persist();
+      }
+    });
+  }
 
   add(productId: string, quantity = 1): void {
     this._items.update((items) => {
