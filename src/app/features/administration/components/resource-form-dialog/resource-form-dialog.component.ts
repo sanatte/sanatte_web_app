@@ -18,6 +18,7 @@ export class ResourceFormDialogComponent {
 
   readonly form = this.fb.nonNullable.group({
     title:       ['', Validators.required],
+    slug:        [''],
     type:        ['audio' as ResourceType, Validators.required],
     description: [''],
     status:      ['draft'],
@@ -36,6 +37,7 @@ export class ResourceFormDialogComponent {
       if (r) {
         this.form.patchValue({
           title:       r.title,
+          slug:        r.slug ?? '',
           type:        r.type,
           description: r.description,
           status:      r.status,
@@ -46,7 +48,7 @@ export class ResourceFormDialogComponent {
         });
         this.selectedType.set(r.type);
       } else {
-        this.form.reset({ title: '', type: 'audio', description: '',
+        this.form.reset({ title: '', slug: '', type: 'audio', description: '',
                           status: 'draft', duration: '', fileSize: '',
                           readTime: '', tags: '' });
         this.selectedType.set('audio');
@@ -64,6 +66,7 @@ export class ResourceFormDialogComponent {
     const type = raw.type as ResourceType;
     this.save.emit({
       title:       raw.title,
+      slug:        raw.slug?.trim() || undefined,
       type,
       description: raw.description,
       status:      raw.status as any,

@@ -32,6 +32,7 @@ function mapApiResource(raw: any): Resource {
 function toApiBody(r: Partial<Resource>): any {
   return {
     title: r.title,
+    slug: r.slug?.trim() || null,
     description: r.description,
     type: r.type ? TYPE_TO_INT[r.type] : 0,
     status: r.status ? STATUS_TO_INT[r.status] : 0,

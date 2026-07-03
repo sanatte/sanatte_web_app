@@ -106,10 +106,17 @@ export class AdminResourcesComponent {
   }
   closeModal(): void { this.isModalOpen.set(false); this.editingResource.set(null); }
 
-  onSave(data: Partial<Resource>): void {
+  async onSave(data: Partial<Resource>): Promise<void> {
     const editing = this.editingResource();
-    editing ? this.resourceService.update(editing.id, data) : this.resourceService.create(data as any);
-    this.closeModal();
+    try {
+      if (editing) await this.resourceService.update(editing.id, data);
+      else await this.resourceService.create(data as Omit<Resource, 'id' | 'createdAt'>);
+      this.closeModal();
+    } catch (e: unknown) {
+      const msg = (e as { error?: { detail?: string } })?.error?.detail
+        ?? 'No se pudo guardar el recurso.';
+      alert(msg); // ej. "El slug 'x' ya está en uso por otro recurso."
+    }
   }
 
   requestDelete(r: Resource): void { this.resourceToDelete.set(r); this.isConfirmOpen.set(true); }

@@ -43,6 +43,23 @@
             }
           </div>
 
+          <!-- Slug (código del QR) -->
+          <div class="col-span-2 space-y-2">
+            <label class="text-label-md font-heading font-semibold text-on-surface">
+              Código del QR (slug)
+            </label>
+            <div class="flex items-center bg-surface-container-low rounded-lg px-4
+                        focus-within:ring-2 focus-within:ring-primary/50 transition-all">
+              <span class="text-label-md font-heading text-on-surface-variant whitespace-nowrap">sanatte.com/r/</span>
+              <input formControlName="slug" type="text"
+                     placeholder="se genera del título si lo dejas vacío"
+                     class="flex-1 bg-transparent border-none py-3 outline-none text-label-md font-heading"/>
+            </div>
+            <p class="text-label-sm text-on-surface-variant">
+              Es el enlace del QR impreso. Si renombras el recurso, el slug NO cambia solo — edítalo aquí si lo necesitas.
+            </p>
+          </div>
+
           <div class="space-y-2">
             <label class="text-label-md font-heading font-semibold text-on-surface">
               Tipo <span class="text-error">*</span>
