@@ -56,7 +56,9 @@ export class AuthService {
 
     onAuthStateChanged(this.auth, async (fbUser) => {
       if (fbUser && (fbUser.emailVerified || this.isFederated(fbUser))) {
-        await this.hydrate(fbUser);
+        // Sin confirmación del backend NO hay sesión válida (backend caído → fuera).
+        try { await this.hydrate(fbUser); }
+        catch { this._currentUser.set(null); }
       } else {
         this._currentUser.set(null);
       }
@@ -77,7 +79,7 @@ export class AuthService {
         localStorage.setItem(PENDING_KEY, email);
         throw new Error('email-not-verified');
       }
-      await this.hydrate(cred.user); // asegura el rol antes de resolver
+      await this.establishSession(cred.user); // exige confirmación del backend
     } finally {
       this._loading.set(false);
     }
@@ -102,7 +104,7 @@ export class AuthService {
     this._loading.set(true);
     try {
       const cred = await signInWithPopup(this.auth, new GoogleAuthProvider());
-      await this.hydrate(cred.user);
+      await this.establishSession(cred.user);
     } finally {
       this._loading.set(false);
     }
@@ -112,7 +114,7 @@ export class AuthService {
     this._loading.set(true);
     try {
       const cred = await signInWithPopup(this.auth, new OAuthProvider('apple.com'));
-      await this.hydrate(cred.user);
+      await this.establishSession(cred.user);
     } finally {
       this._loading.set(false);
     }
@@ -169,24 +171,32 @@ export class AuthService {
     return fbUser.providerData.some((p) => p.providerId !== 'password');
   }
 
-  /** Sincroniza con el backend (crea la cuenta la 1ª vez) y fija el rol real. */
-  private async hydrate(fbUser: FbUser): Promise<void> {
-    let role = UserRole.User;
-    let email = fbUser.email ?? '';
-    let displayName = fbUser.displayName ?? '';
+  /**
+   * Establece la sesión exigiendo que el backend la confirme. Si el backend no
+   * responde, cierra la sesión de Firebase y lanza — no se entra a la app.
+   */
+  private async establishSession(fbUser: FbUser): Promise<void> {
     try {
-      const dto = await firstValueFrom(this.http.get<ApiUser>(`${environment.apiUrl}/users/me`));
-      role = dto.role === 1 ? UserRole.Admin : UserRole.User;
-      email = dto.email || email;
-      displayName = dto.displayName || displayName;
+      await this.hydrate(fbUser);
     } catch {
-      // Si el backend no responde, deja sesión con rol User.
+      await signOut(this.auth);
+      this._currentUser.set(null);
+      throw new Error('backend-unreachable');
     }
+  }
+
+  /**
+   * Sincroniza con el backend (crea la cuenta la 1ª vez) y fija el rol real.
+   * LANZA si el backend no confirma la sesión: sin backend NO hay sesión válida
+   * (no se degrada el rol en silencio).
+   */
+  private async hydrate(fbUser: FbUser): Promise<void> {
+    const dto = await firstValueFrom(this.http.get<ApiUser>(`${environment.apiUrl}/users/me`));
     this._currentUser.set({
       uid: fbUser.uid,
-      email,
-      displayName: displayName || email.split('@')[0] || 'Usuario',
-      role,
+      email: dto.email || fbUser.email || '',
+      displayName: dto.displayName || fbUser.displayName || fbUser.email?.split('@')[0] || 'Usuario',
+      role: dto.role === 1 ? UserRole.Admin : UserRole.User,
       emailVerified: fbUser.emailVerified,
     });
   }

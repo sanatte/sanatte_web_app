@@ -117,14 +117,26 @@ export class LoginComponent {
         await this.router.navigate(['/auth/verify-email']);
         return;
       }
+      if (e instanceof Error && e.message === 'backend-unreachable') {
+        this.errorMessage.set('No pudimos conectar con el servidor. Intenta más tarde.');
+        return;
+      }
       this.errorMessage.set('Credenciales inválidas. Intenta de nuevo.');
     }
   }
 
   async withGoogle(): Promise<void> {
     this.errorMessage.set('');
-    await this.auth.signInWithGoogle();
-    await this.redirect();
+    try {
+      await this.auth.signInWithGoogle();
+      await this.redirect();
+    } catch (e) {
+      this.errorMessage.set(
+        e instanceof Error && e.message === 'backend-unreachable'
+          ? 'No pudimos conectar con el servidor. Intenta más tarde.'
+          : 'No se pudo iniciar sesión con Google.'
+      );
+    }
   }
 
   private async redirect(): Promise<void> {

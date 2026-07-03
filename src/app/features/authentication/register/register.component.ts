@@ -14,6 +14,14 @@ import { AuthShellComponent } from '../components/auth-shell/auth-shell.componen
         Empieza tu camino de bienestar con Sanatte.
       </p>
 
+      @if (errorMessage()) {
+        <div class="mb-4 p-3 rounded-xl bg-error-container/50 border border-error/20 text-error
+                    text-label-md font-heading flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px]">error</span>
+          {{ errorMessage() }}
+        </div>
+      }
+
       <!-- Google -->
       <button (click)="withGoogle()" [disabled]="loading()"
               class="w-full py-3 rounded-full border border-outline-variant bg-white font-heading
@@ -109,6 +117,7 @@ export class RegisterComponent {
 
   readonly loading = this.auth.loading;
   readonly showPassword = signal(false);
+  readonly errorMessage = signal('');
   readonly returnUrl = signal(this.route.snapshot.queryParamMap.get('returnUrl') ?? '');
 
   async onSubmit(): Promise<void> {
@@ -122,7 +131,16 @@ export class RegisterComponent {
   }
 
   async withGoogle(): Promise<void> {
-    await this.auth.signInWithGoogle(); // Google entra ya verificado
-    await this.router.navigateByUrl(this.returnUrl() || '/app/library');
+    this.errorMessage.set('');
+    try {
+      await this.auth.signInWithGoogle(); // Google entra ya verificado
+      await this.router.navigateByUrl(this.returnUrl() || '/app/library');
+    } catch (e) {
+      this.errorMessage.set(
+        e instanceof Error && e.message === 'backend-unreachable'
+          ? 'No pudimos conectar con el servidor. Intenta más tarde.'
+          : 'No se pudo continuar con Google.'
+      );
+    }
   }
 }
