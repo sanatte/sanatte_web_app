@@ -17,7 +17,7 @@ const DELIVERY_MAP: Record<number, DeliveryStatus> = {
 const TYPE_MAP: Record<number, ProductType> = { 0: 'physical', 1: 'digital', 2: 'subscription' };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function mapApiOrder(raw: any): Order {
+export function mapApiOrder(raw: any): Order {
   return {
     id:                  raw.id,
     orderNumber:         raw.orderNumber,

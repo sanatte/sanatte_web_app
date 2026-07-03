@@ -1,29 +1,41 @@
-import { Injectable, inject, computed } from '@angular/core';
-import { OrderService } from '../../administration/services/order.service';
+import { Injectable, inject, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+import { mapApiOrder } from '../../administration/services/order.service';
 import { Order } from '../../administration/models/order.model';
+import { environment } from '../../../../environments/environment';
 
 /**
  * UserOrdersService — pedidos del usuario autenticado (vista cliente).
  *
- * Fase actual: filtra los pedidos por número de pedido (clave estable) como
- * subconjunto del usuario. Migración final: endpoint `/api/me/orders` que
- * devuelve los pedidos del usuario autenticado (por FirebaseUid). La API
- * pública (signals) no cambia.
+ * Consume `GET /api/me/orders`, que devuelve los pedidos del usuario resuelto
+ * por FirebaseUid. Reutiliza el mapper del servicio admin (mismo DTO).
  */
-const MY_ORDER_NUMBERS = ['#SAN-9021', '#SAN-9020', '#SAN-9019'];
-
 @Injectable({ providedIn: 'root' })
 export class UserOrdersService {
-  private readonly orderService = inject(OrderService);
+  private readonly http = inject(HttpClient);
 
-  readonly orders = computed<Order[]>(() =>
-    this.orderService
-      .orders()
-      .filter((o) => MY_ORDER_NUMBERS.includes(o.orderNumber))
-      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-  );
+  private readonly _orders  = signal<Order[]>([]);
+  private readonly _loading = signal(false);
+
+  readonly orders  = this._orders.asReadonly();
+  readonly loading = this._loading.asReadonly();
+
+  constructor() { this.load(); }
+
+  async load(): Promise<void> {
+    this._loading.set(true);
+    try {
+      const list = await firstValueFrom(
+        this.http.get<unknown[]>(`${environment.apiUrl}/me/orders`)
+      );
+      this._orders.set(list.map(mapApiOrder));
+    } finally {
+      this._loading.set(false);
+    }
+  }
 
   getById(id: string): Order | undefined {
-    return this.orders().find((o) => o.id === id);
+    return this._orders().find((o) => o.id === id);
   }
 }

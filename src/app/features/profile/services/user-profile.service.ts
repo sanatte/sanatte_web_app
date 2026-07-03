@@ -1,12 +1,15 @@
 import { Injectable, inject, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { MockAuthService } from '../../../core/services/mock-auth.service';
+import { environment } from '../../../../environments/environment';
 
 /**
  * Perfil editable del usuario (vista cliente).
  *
- * Fase Mock: nombre/email vienen de MockAuth; los campos extra (fecha de
- * nacimiento, ubicación) y la preferencia de newsletter se persisten en
- * localStorage. Migración: reemplazar por el perfil del backend (Firebase/NestJS).
+ * Consume `GET/PUT /api/me/profile`. Mientras carga, se muestra un perfil base
+ * derivado de la sesión (nombre/email). Los campos extra (fecha de nacimiento,
+ * ubicación, newsletter) se persisten en el backend contra el usuario.
  */
 export interface UserProfile {
   fullName: string;
@@ -16,47 +19,68 @@ export interface UserProfile {
   newsletterSubscribed: boolean;
 }
 
-const STORAGE_KEY = 'sanatte_profile_prefs';
+interface ApiProfile {
+  fullName: string;
+  email: string;
+  dateOfBirth: string | null;
+  location: string | null;
+  newsletterSubscribed: boolean;
+}
 
 @Injectable({ providedIn: 'root' })
 export class UserProfileService {
+  private readonly http = inject(HttpClient);
   private readonly auth = inject(MockAuthService);
+  private readonly base = `${environment.apiUrl}/me/profile`;
 
-  private readonly _profile = signal<UserProfile>(this.restore());
+  private readonly _profile = signal<UserProfile>(this.seed());
   readonly profile = this._profile.asReadonly();
 
-  /** Actualiza campos editables del perfil (persistidos). */
-  save(changes: Partial<UserProfile>): void {
-    this._profile.update((p) => ({ ...p, ...changes }));
-    this.persist();
+  constructor() { this.load(); }
+
+  async load(): Promise<void> {
+    const raw = await firstValueFrom(this.http.get<ApiProfile>(this.base));
+    this._profile.set(this.fromApi(raw));
+  }
+
+  /** Actualiza campos editables del perfil y persiste en el backend. */
+  async save(changes: Partial<UserProfile>): Promise<void> {
+    const next = { ...this._profile(), ...changes };
+    this._profile.set(next);
+    const raw = await firstValueFrom(
+      this.http.put<ApiProfile>(this.base, {
+        fullName: next.fullName,
+        dateOfBirth: next.dateOfBirth || null,
+        location: next.location || null,
+        newsletterSubscribed: next.newsletterSubscribed,
+      })
+    );
+    this._profile.set(this.fromApi(raw));
   }
 
   setNewsletter(subscribed: boolean): void {
     this.save({ newsletterSubscribed: subscribed });
   }
 
-  private restore(): UserProfile {
+  private fromApi(raw: ApiProfile): UserProfile {
+    return {
+      fullName: raw.fullName,
+      email: raw.email,
+      dateOfBirth: raw.dateOfBirth ?? '',
+      location: raw.location ?? '',
+      newsletterSubscribed: raw.newsletterSubscribed,
+    };
+  }
+
+  /** Perfil base inmediato desde la sesión, hasta que responde el backend. */
+  private seed(): UserProfile {
     const user = this.auth.currentUser();
-    const base: UserProfile = {
-      fullName: user?.displayName
-        ? user.displayName.charAt(0).toUpperCase() + user.displayName.slice(1)
-        : 'Usuario Sanatte',
+    return {
+      fullName: user?.displayName ?? 'Usuario Sanatte',
       email: user?.email ?? 'usuario@sanatte.com',
       dateOfBirth: '',
       location: '',
       newsletterSubscribed: true,
     };
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) return base;
-    try {
-      return { ...base, ...(JSON.parse(stored) as Partial<UserProfile>) };
-    } catch {
-      return base;
-    }
-  }
-
-  private persist(): void {
-    const { dateOfBirth, location, newsletterSubscribed } = this._profile();
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ dateOfBirth, location, newsletterSubscribed }));
   }
 }

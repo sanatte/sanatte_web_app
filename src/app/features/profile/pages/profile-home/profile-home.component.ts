@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, effect } from '@angular/core';
 import { UserProfileService } from '../../services/user-profile.service';
 import { MockAuthService } from '../../../../core/services/mock-auth.service';
 
@@ -12,19 +12,31 @@ export class ProfileHomeComponent {
 
   // Copia editable del perfil (se confirma con "Guardar cambios").
   readonly form = signal({ ...this.profileService.profile() });
+  private dirty = false;
 
   readonly newsletter = computed(() => this.profileService.profile().newsletterSubscribed);
   readonly initial    = computed(() => (this.form().fullName.charAt(0) || 'U').toUpperCase());
 
   readonly savedFlag = signal(false);
 
+  constructor() {
+    // El perfil llega async del backend; resincroniza el form hasta que el
+    // usuario empiece a editar (para no pisar sus cambios en curso).
+    effect(() => {
+      const p = this.profileService.profile();
+      if (!this.dirty) this.form.set({ ...p });
+    });
+  }
+
   update(key: 'fullName' | 'dateOfBirth' | 'location', value: string): void {
+    this.dirty = true;
     this.form.update((f) => ({ ...f, [key]: value }));
   }
 
   saveChanges(): void {
     const { fullName, dateOfBirth, location } = this.form();
     this.profileService.save({ fullName, dateOfBirth, location });
+    this.dirty = false;
     this.savedFlag.set(true);
     setTimeout(() => this.savedFlag.set(false), 2500);
   }

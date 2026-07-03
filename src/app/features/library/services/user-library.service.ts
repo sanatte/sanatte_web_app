@@ -1,59 +1,72 @@
 import { Injectable, inject, computed, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { ProductService } from '../../administration/services/product.service';
 import { Product } from '../../administration/models/product.model';
 import { OwnedProduct, DailyFocus, WeeklyProgress, ProgressStatus } from '../models/user-library.model';
+import { environment } from '../../../../environments/environment';
 
-const ACTIVATED_KEY = 'sanatte_activated_products';
+interface ApiLibraryItem { productId: string; sku: string; resourcesIncluded: number; }
 
 /**
  * UserLibraryService — datos de la Biblioteca del usuario autenticado.
  *
- * Fase Mock: el usuario "posee" un subconjunto de productos con un progreso simulado.
- * Migración: reemplazar `OWNED` por la respuesta del backend (productos activados vía
- * QR / comprados) y calcular `progress` desde el consumo real de recursos.
- * La API pública (signals/getters) no cambia.
+ * La propiedad de productos proviene de `GET /api/me/library` (pedidos pagados ∪
+ * licencias activadas por QR). El `Product` completo se hidrata desde el catálogo
+ * ya cargado en ProductService. El "progreso", el enfoque del día y el resumen
+ * semanal siguen como presentación (mock): son gamificación que requiere tracking
+ * de consumo real de recursos, aún no implementado.
  */
 
-// Progreso simulado por SKU (clave estable mock/API) — SOLO productos obtenidos
-// sin activación (compra directa / suscripción). Los físicos (Plena) NO se listan:
-// aparecen únicamente tras activar su QR.
+// Progreso simulado por SKU (clave estable). Presentación hasta que exista
+// tracking real de consumo por recurso.
 const MOCK_PROGRESS: Record<string, number> = {
+  'WLN-001': 45,   // Plena (activada por QR)
   'DIG-115': 100,  // The Silent Mind (eBook — compra directa)
   'DIG-082': 30,   // Guided Flow Pro (suscripción)
 };
 
 @Injectable({ providedIn: 'root' })
 export class UserLibraryService {
+  private readonly http           = inject(HttpClient);
   private readonly productService = inject(ProductService);
 
-  // IDs de productos activados por el usuario en esta sesión/dispositivo (además del seed mock).
-  private readonly _activatedIds = signal<string[]>(this.restoreActivated());
+  private readonly _owned   = signal<ApiLibraryItem[]>([]);
+  private readonly _loading = signal(false);
+  readonly loading = this._loading.asReadonly();
+
+  constructor() { this.load(); }
+
+  async load(): Promise<void> {
+    this._loading.set(true);
+    try {
+      const items = await firstValueFrom(
+        this.http.get<ApiLibraryItem[]>(`${environment.apiUrl}/me/library`)
+      );
+      this._owned.set(items);
+    } finally {
+      this._loading.set(false);
+    }
+  }
 
   /** Productos que el usuario posee/activó, con su progreso. */
   readonly ownedProducts = computed<OwnedProduct[]>(() => {
-    const activated = this._activatedIds();
-    return this.productService
-      .products()
-      .filter((p) => p.sku in MOCK_PROGRESS || activated.includes(p.id))
+    const catalog = this.productService.products();
+    return this._owned()
+      .map((item) => catalog.find((p) => p.id === item.productId))
+      .filter((p): p is Product => !!p)
       .map((p) => this.toOwnedProduct(p, MOCK_PROGRESS[p.sku] ?? 0));
   });
 
   readonly hasProducts = computed(() => this.ownedProducts().length > 0);
 
-  /** Marca un producto como activado → aparece en la biblioteca. */
-  registerActivated(productId: string): void {
-    this._activatedIds.update((ids) => (ids.includes(productId) ? ids : [...ids, productId]));
-    localStorage.setItem(ACTIVATED_KEY, JSON.stringify(this._activatedIds()));
+  /** Tras activar un producto, refresca la biblioteca desde el backend. */
+  registerActivated(_productId: string): void {
+    this.load();
   }
 
   isActivated(productId: string): boolean {
-    return this._activatedIds().includes(productId);
-  }
-
-  private restoreActivated(): string[] {
-    const stored = localStorage.getItem(ACTIVATED_KEY);
-    if (!stored) return [];
-    try { return JSON.parse(stored) as string[]; } catch { return []; }
+    return this._owned().some((o) => o.productId === productId);
   }
 
   readonly dailyFocus: DailyFocus = {
