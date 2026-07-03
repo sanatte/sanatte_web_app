@@ -85,8 +85,9 @@ export class UserAdminService {
     this._users.update((list) => list.map((u) => u.id === id ? updated : u));
   }
 
-  delete(id: string): void {
-    // Soft delete pendiente de endpoint — optimistic local
+  /** Elimina el usuario (local + Firebase). Lanza si tiene pedidos (409). */
+  async delete(id: string): Promise<void> {
+    await firstValueFrom(this.http.delete(`${this.base}/${id}`));
     this._users.update((list) => list.filter((u) => u.id !== id));
     this._total.update((t) => Math.max(0, t - 1));
   }

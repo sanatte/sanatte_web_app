@@ -10,6 +10,11 @@ import { Entitlement, EntitlementType } from '../models/entitlement.model';
 const TYPE_MAP: Record<number, ProductType>   = { 0: 'physical', 1: 'digital', 2: 'subscription' };
 const STATUS_MAP: Record<number, ProductStatus> = { 0: 'active', 1: 'inactive' };
 const ACCESS_MAP: Record<number, AccessType>   = { 0: 'qr_activation', 1: 'direct_purchase', 2: 'subscription' };
+
+// Inverso: el backend (System.Text.Json) espera los enums como enteros.
+const TYPE_TO_INT: Record<ProductType, number>     = { physical: 0, digital: 1, subscription: 2 };
+const STATUS_TO_INT: Record<ProductStatus, number> = { active: 0, inactive: 1 };
+const ACCESS_TO_INT: Record<AccessType, number>    = { qr_activation: 0, direct_purchase: 1, subscription: 2 };
 const ENTITLEMENT_TYPE_MAP: Record<number, EntitlementType> = {
   0: 'content_item', 1: 'download', 2: 'license_key', 3: 'qr_access', 4: 'subscription_tier',
 };
@@ -44,5 +49,29 @@ export function mapApiProduct(raw: any): Product {
     tags:                raw.tags ?? [],
     specs:               (raw.specs ?? []).map((s: { label: string; value: string }) => ({ label: s.label, value: s.value })),
     createdAt:           raw.createdAt ?? new Date().toISOString().split('T')[0],
+  };
+}
+
+/**
+ * Convierte el Product del front (enums string) al body que espera la API
+ * .NET (enums int). Sirve tanto para crear como para editar.
+ */
+export function toApiProductBody(p: Partial<Product>) {
+  return {
+    sku:                p.sku,
+    name:               p.name,
+    description:        p.description ?? '',
+    type:               TYPE_TO_INT[p.type ?? 'digital'],
+    price:              p.price ?? 0,
+    billingPeriod:      p.billingPeriod ?? null,
+    status:             STATUS_TO_INT[p.status ?? 'active'],
+    accessType:         ACCESS_TO_INT[p.accessType ?? 'direct_purchase'],
+    requiresActivation: p.requiresActivation ?? false,
+    stock:              p.stock ?? null,
+    images:             (p.images ?? []).map((i) => ({
+                          gradient: i.gradient, altText: i.altText, isPrimary: i.isPrimary,
+                        })),
+    specs:              (p.specs ?? []).map((s) => ({ label: s.label, value: s.value })),
+    tags:               p.tags ?? [],
   };
 }

@@ -91,16 +91,23 @@ export class AdminUsersComponent {
     this.isConfirmOpen.set(true);
   }
 
-  onConfirm(): void {
+  async onConfirm(): Promise<void> {
     const user = this.userToDelete();
     if (!user) return;
     const { action } = this.confirmConfig();
-    if (action === 'delete') this.userService.delete(user.id);
-    else if (action === 'status') {
-      this.userService.updateStatus(user.id, user.status === 'active' ? 'blocked' : 'active');
+    try {
+      if (action === 'delete') await this.userService.delete(user.id);
+      else if (action === 'status') {
+        await this.userService.updateStatus(user.id, user.status === 'active' ? 'blocked' : 'active');
+      }
+    } catch (e: unknown) {
+      const msg = (e as { error?: { detail?: string } })?.error?.detail
+        ?? 'No se pudo completar la acción.';
+      alert(msg);
+    } finally {
+      this.isConfirmOpen.set(false);
+      this.userToDelete.set(null);
     }
-    this.isConfirmOpen.set(false);
-    this.userToDelete.set(null);
   }
 
   onCancel(): void { this.isConfirmOpen.set(false); this.userToDelete.set(null); }

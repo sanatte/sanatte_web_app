@@ -4,7 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { Product, ProductImage } from '../models/product.model';
 import { Resource } from '../models/resource.model';
 import { environment } from '../../../../environments/environment';
-import { mapApiProduct } from './api-mappers';
+import { mapApiProduct, toApiProductBody } from './api-mappers';
 
 interface PagedResult<T> { items: T[]; page: number; pageSize: number; totalItems: number; }
 
@@ -57,51 +57,50 @@ export class ProductService {
   }
 
   async create(product: Omit<Product, 'id' | 'createdAt' | 'salesCount'>): Promise<void> {
-    const raw = await firstValueFrom(this.http.post<unknown>(this.base, product));
+    const raw = await firstValueFrom(this.http.post<unknown>(this.base, toApiProductBody(product)));
     const created = mapApiProduct(raw);
     this._products.update((list) => [created, ...list]);
     this._total.update((t) => t + 1);
   }
 
-  update(id: string, changes: Partial<Product>): void {
-    // Actualización optimista local (sin esperar la API por ahora — siguiente slice)
-    this._products.update((list) =>
-      list.map((p) => (p.id === id ? { ...p, ...changes } : p))
-    );
+  /** Edita un producto: mezcla los cambios con el actual y persiste (PUT). */
+  async update(id: string, changes: Partial<Product>): Promise<void> {
+    const current = this._products().find((p) => p.id === id);
+    if (!current) return;
+    const merged = { ...current, ...changes };
+    const raw = await firstValueFrom(this.http.put<unknown>(`${this.base}/${id}`, toApiProductBody(merged)));
+    const updated = mapApiProduct(raw);
+    this._products.update((list) => list.map((p) => (p.id === id ? updated : p)));
   }
 
-  delete(id: string): void {
+  async delete(id: string): Promise<void> {
+    await firstValueFrom(this.http.delete(`${this.base}/${id}`));
     this._products.update((list) => list.filter((p) => p.id !== id));
     this._total.update((t) => Math.max(0, t - 1));
   }
 
-  // ─── Imágenes y entitlements (local, pendiente de endpoints propios) ────────
+  // ─── Imágenes (persisten vía PUT del producto completo) ─────────────────────
 
-  setPrimaryImage(productId: string, imageId: string): void {
-    this._products.update((list) =>
-      list.map((p) =>
-        p.id === productId
-          ? { ...p, images: p.images.map((img) => ({ ...img, isPrimary: img.id === imageId })) }
-          : p
-      )
-    );
+  setPrimaryImage(productId: string, imageId: string): Promise<void> {
+    const p = this._products().find((x) => x.id === productId);
+    if (!p) return Promise.resolve();
+    const images = p.images.map((img) => ({ ...img, isPrimary: img.id === imageId }));
+    return this.update(productId, { images });
   }
 
-  addImage(productId: string, image: ProductImage): void {
-    this._products.update((list) =>
-      list.map((p) => p.id === productId ? { ...p, images: [...p.images, image] } : p)
-    );
+  addImage(productId: string, image: ProductImage): Promise<void> {
+    const p = this._products().find((x) => x.id === productId);
+    if (!p) return Promise.resolve();
+    return this.update(productId, { images: [...p.images, image] });
   }
 
-  removeImage(productId: string, imageId: string): void {
-    this._products.update((list) =>
-      list.map((p) => {
-        if (p.id !== productId) return p;
-        const filtered = p.images.filter((img) => img.id !== imageId);
-        const hasPrimary = filtered.some((img) => img.isPrimary);
-        return { ...p, images: hasPrimary ? filtered : filtered.map((img, i) => ({ ...img, isPrimary: i === 0 })) };
-      })
-    );
+  removeImage(productId: string, imageId: string): Promise<void> {
+    const p = this._products().find((x) => x.id === productId);
+    if (!p) return Promise.resolve();
+    const filtered = p.images.filter((img) => img.id !== imageId);
+    const hasPrimary = filtered.some((img) => img.isPrimary);
+    const images = hasPrimary ? filtered : filtered.map((img, i) => ({ ...img, isPrimary: i === 0 }));
+    return this.update(productId, { images });
   }
 
   /** Vincula un recurso al producto (capa Entitlement en la API — ruta admin). */
