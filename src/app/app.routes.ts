@@ -69,6 +69,11 @@ export const routes: Routes = [
           import('./features/public/pages/checkout/checkout.component').then((m) => m.CheckoutComponent),
       },
       {
+        path: 'checkout/result',
+        loadComponent: () =>
+          import('./features/public/pages/checkout-result/checkout-result.component').then((m) => m.CheckoutResultComponent),
+      },
+      {
         path: 'activate',
         loadComponent: () =>
           import('./features/activation/pages/activate/activate.component').then((m) => m.ActivateComponent),
