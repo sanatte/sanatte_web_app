@@ -1,5 +1,4 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { initializeApp, getApps } from 'firebase/app';
@@ -34,7 +33,6 @@ interface ApiUser { id: string; email: string; displayName: string; role: number
  */
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly router = inject(Router);
   private readonly http = inject(HttpClient);
   private readonly auth: Auth;
 
@@ -154,7 +152,10 @@ export class AuthService {
   async logout(): Promise<void> {
     await signOut(this.auth);
     this._currentUser.set(null);
-    await this.router.navigate(['/auth/login']);
+    // Recarga dura: destruye todos los servicios singleton (biblioteca, perfil,
+    // pedidos, etc.) para que no queden datos del usuario anterior al cambiar de
+    // cuenta. La navegación SPA no basta porque los `providedIn: 'root'` persisten.
+    window.location.assign('/auth/login');
   }
 
   /** Token de Firebase para el interceptor (Bearer). */

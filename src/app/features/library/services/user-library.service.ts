@@ -2,6 +2,7 @@ import { Injectable, inject, computed, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { ProductService } from '../../administration/services/product.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { Product } from '../../administration/models/product.model';
 import { OwnedProduct, DailyFocus, WeeklyProgress, ProgressStatus } from '../models/user-library.model';
 import { environment } from '../../../../environments/environment';
@@ -30,6 +31,7 @@ const MOCK_PROGRESS: Record<string, number> = {
 export class UserLibraryService {
   private readonly http           = inject(HttpClient);
   private readonly productService = inject(ProductService);
+  private readonly auth           = inject(AuthService);
 
   private readonly _owned   = signal<ApiLibraryItem[]>([]);
   private readonly _loading = signal(false);
@@ -38,6 +40,8 @@ export class UserLibraryService {
   constructor() { this.load(); }
 
   async load(): Promise<void> {
+    await this.auth.whenReady();
+    if (!this.auth.currentUser()) { this._owned.set([]); return; }
     this._loading.set(true);
     try {
       const items = await firstValueFrom(

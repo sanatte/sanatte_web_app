@@ -2,6 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { mapApiOrder } from '../../administration/services/order.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { Order } from '../../administration/models/order.model';
 import { environment } from '../../../../environments/environment';
 
@@ -14,6 +15,7 @@ import { environment } from '../../../../environments/environment';
 @Injectable({ providedIn: 'root' })
 export class UserOrdersService {
   private readonly http = inject(HttpClient);
+  private readonly auth = inject(AuthService);
 
   private readonly _orders  = signal<Order[]>([]);
   private readonly _loading = signal(false);
@@ -24,6 +26,8 @@ export class UserOrdersService {
   constructor() { this.load(); }
 
   async load(): Promise<void> {
+    await this.auth.whenReady();
+    if (!this.auth.currentUser()) { this._orders.set([]); return; }
     this._loading.set(true);
     try {
       const list = await firstValueFrom(

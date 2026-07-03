@@ -39,6 +39,8 @@ export class UserProfileService {
   constructor() { this.load(); }
 
   async load(): Promise<void> {
+    await this.auth.whenReady();
+    if (!this.auth.currentUser()) return; // sin sesión no hay perfil que cargar
     const raw = await firstValueFrom(this.http.get<ApiProfile>(this.base));
     this._profile.set(this.fromApi(raw));
   }
