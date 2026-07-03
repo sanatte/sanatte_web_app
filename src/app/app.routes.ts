@@ -73,6 +73,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/activation/pages/activate/activate.component').then((m) => m.ActivateComponent),
       },
+      {
+        path: 'r/:slug',
+        loadComponent: () =>
+          import('./features/resource-viewer/pages/resource-view/resource-view.component').then((m) => m.ResourceViewComponent),
+      },
       { path: '', redirectTo: 'library', pathMatch: 'full' },
     ],
   },
@@ -82,6 +87,13 @@ export const routes: Routes = [
     path: 'activate',
     loadComponent: () =>
       import('./features/activation/pages/activate-redirect/activate-redirect.component').then((m) => m.ActivateRedirectComponent),
+  },
+
+  // ── Recurso por QR (entrada pública corta: sanatte.com/r/:slug) ───────────
+  {
+    path: 'r/:slug',
+    loadComponent: () =>
+      import('./features/resource-viewer/pages/resource-redirect/resource-redirect.component').then((m) => m.ResourceRedirectComponent),
   },
 
   // ── Sitio público ───────────────────────────────────────────────────────
