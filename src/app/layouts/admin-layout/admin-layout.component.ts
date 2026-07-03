@@ -1,6 +1,6 @@
 import { Component, inject, computed, signal } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
-import { MockAuthService } from '../../core/services/mock-auth.service';
+import { AuthService } from '../../core/services/auth.service';
 
 interface NavItem {
   label: string;
@@ -14,7 +14,7 @@ interface NavItem {
   templateUrl: './admin-layout.component.html',
 })
 export class AdminLayoutComponent {
-  private readonly auth = inject(MockAuthService);
+  private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
   readonly displayName = computed(() => this.auth.currentUser()?.displayName ?? 'Admin');

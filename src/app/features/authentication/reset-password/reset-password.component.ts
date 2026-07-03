@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { MockAuthService } from '../../../core/services/mock-auth.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { AuthShellComponent } from '../components/auth-shell/auth-shell.component';
 
 @Component({
@@ -74,7 +74,7 @@ import { AuthShellComponent } from '../components/auth-shell/auth-shell.componen
 })
 export class ResetPasswordComponent {
   private readonly fb = inject(FormBuilder);
-  private readonly auth = inject(MockAuthService);
+  private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 

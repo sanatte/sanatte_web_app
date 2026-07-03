@@ -1,5 +1,5 @@
 import { Injectable, inject, computed } from '@angular/core';
-import { MockAuthService } from '../../../core/services/mock-auth.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 /**
  * StoreContextService — resuelve las rutas de la tienda según el contexto.
@@ -11,7 +11,7 @@ import { MockAuthService } from '../../../core/services/mock-auth.service';
  */
 @Injectable({ providedIn: 'root' })
 export class StoreContextService {
-  private readonly auth = inject(MockAuthService);
+  private readonly auth = inject(AuthService);
 
   /** '/app' si hay sesión; '' si es visitante. */
   readonly base = computed(() => (this.auth.isAuthenticated() ? '/app' : ''));

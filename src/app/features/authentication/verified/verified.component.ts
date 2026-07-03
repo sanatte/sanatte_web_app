@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { MockAuthService } from '../../../core/services/mock-auth.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { AuthShellComponent } from '../components/auth-shell/auth-shell.component';
 
 /**
@@ -49,7 +49,7 @@ import { AuthShellComponent } from '../components/auth-shell/auth-shell.componen
   `,
 })
 export class VerifiedComponent {
-  private readonly auth = inject(MockAuthService);
+  private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 

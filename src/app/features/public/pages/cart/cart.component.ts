@@ -3,7 +3,7 @@ import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
 import { Router, RouterLink } from '@angular/router';
 import { CartService } from '../../services/cart.service';
 import { StoreContextService } from '../../services/store-context.service';
-import { MockAuthService } from '../../../../core/services/mock-auth.service';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-cart',
@@ -12,7 +12,7 @@ import { MockAuthService } from '../../../../core/services/mock-auth.service';
 })
 export class CartComponent {
   private readonly cart   = inject(CartService);
-  private readonly auth   = inject(MockAuthService);
+  private readonly auth   = inject(AuthService);
   private readonly router = inject(Router);
   readonly ctx            = inject(StoreContextService);
 

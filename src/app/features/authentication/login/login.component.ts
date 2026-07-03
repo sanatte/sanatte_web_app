@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
-import { MockAuthService } from '../../../core/services/mock-auth.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { UserRole } from '../../../core/models/role.model';
 import { AuthShellComponent } from '../components/auth-shell/auth-shell.component';
 
@@ -91,7 +91,7 @@ import { AuthShellComponent } from '../components/auth-shell/auth-shell.componen
 })
 export class LoginComponent {
   private readonly fb = inject(FormBuilder);
-  private readonly auth = inject(MockAuthService);
+  private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
@@ -112,7 +112,11 @@ export class LoginComponent {
       const { email, password } = this.form.getRawValue();
       await this.auth.login(email, password);
       await this.redirect();
-    } catch {
+    } catch (e) {
+      if (e instanceof Error && e.message === 'email-not-verified') {
+        await this.router.navigate(['/auth/verify-email']);
+        return;
+      }
       this.errorMessage.set('Credenciales inválidas. Intenta de nuevo.');
     }
   }

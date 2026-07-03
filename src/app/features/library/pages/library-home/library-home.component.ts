@@ -1,6 +1,6 @@
 import { Component, inject, computed } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
-import { MockAuthService } from '../../../../core/services/mock-auth.service';
+import { AuthService } from '../../../../core/services/auth.service';
 import { UserLibraryService } from '../../services/user-library.service';
 import { DailyFocusCardComponent } from '../../components/daily-focus-card/daily-focus-card.component';
 import { WeeklyProgressCardComponent } from '../../components/weekly-progress-card/weekly-progress-card.component';
@@ -85,7 +85,7 @@ import { OwnedProduct } from '../../models/user-library.model';
   `,
 })
 export class LibraryHomeComponent {
-  private readonly auth    = inject(MockAuthService);
+  private readonly auth    = inject(AuthService);
   private readonly library = inject(UserLibraryService);
   private readonly router  = inject(Router);
 

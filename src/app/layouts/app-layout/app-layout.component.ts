@@ -1,6 +1,6 @@
 import { Component, inject, computed, signal } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
-import { MockAuthService } from '../../core/services/mock-auth.service';
+import { AuthService } from '../../core/services/auth.service';
 import { CartService } from '../../features/public/services/cart.service';
 
 interface NavItem {
@@ -20,7 +20,7 @@ interface NavItem {
   templateUrl: './app-layout.component.html',
 })
 export class AppLayoutComponent {
-  private readonly auth   = inject(MockAuthService);
+  private readonly auth   = inject(AuthService);
   private readonly router = inject(Router);
   private readonly cart   = inject(CartService);
 

@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { MockAuthService } from './mock-auth.service';
+import { AuthService } from './auth.service';
 import { UserRole } from '../models/role.model';
 
 /**
@@ -10,7 +10,7 @@ import { UserRole } from '../models/role.model';
  */
 @Injectable({ providedIn: 'root' })
 export class RoleService {
-  private readonly auth = inject(MockAuthService);
+  private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
   switchToAdmin(): void {

@@ -1,7 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { MockAuthService } from '../../../core/services/mock-auth.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { environment } from '../../../../environments/environment';
 
 /**
@@ -30,7 +30,7 @@ interface ApiProfile {
 @Injectable({ providedIn: 'root' })
 export class UserProfileService {
   private readonly http = inject(HttpClient);
-  private readonly auth = inject(MockAuthService);
+  private readonly auth = inject(AuthService);
   private readonly base = `${environment.apiUrl}/me/profile`;
 
   private readonly _profile = signal<UserProfile>(this.seed());

@@ -1,6 +1,6 @@
 import { Component, inject, input, computed } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { MockAuthService } from '../../../core/services/mock-auth.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 interface NavItem {
   label: string;
@@ -83,7 +83,7 @@ interface NavItem {
   `,
 })
 export class SidebarComponent {
-  private readonly authService = inject(MockAuthService);
+  private readonly authService = inject(AuthService);
 
   readonly displayName = computed(() => this.authService.currentUser()?.displayName ?? 'User');
   readonly userRole = computed(() => this.authService.currentUser()?.role ?? 'user');

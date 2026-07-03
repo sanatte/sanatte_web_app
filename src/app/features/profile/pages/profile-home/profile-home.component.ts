@@ -1,6 +1,6 @@
 import { Component, inject, signal, computed, effect } from '@angular/core';
 import { UserProfileService } from '../../services/user-profile.service';
-import { MockAuthService } from '../../../../core/services/mock-auth.service';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-profile-home',
@@ -8,7 +8,7 @@ import { MockAuthService } from '../../../../core/services/mock-auth.service';
 })
 export class ProfileHomeComponent {
   private readonly profileService = inject(UserProfileService);
-  private readonly auth           = inject(MockAuthService);
+  private readonly auth           = inject(AuthService);
 
   // Copia editable del perfil (se confirma con "Guardar cambios").
   readonly form = signal({ ...this.profileService.profile() });

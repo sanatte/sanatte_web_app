@@ -1,7 +1,7 @@
 import { Component, inject, computed, signal } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { CartService } from '../../features/public/services/cart.service';
-import { MockAuthService } from '../../core/services/mock-auth.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-public-layout',
@@ -129,7 +129,7 @@ import { MockAuthService } from '../../core/services/mock-auth.service';
 })
 export class PublicLayoutComponent {
   private readonly cart   = inject(CartService);
-  private readonly auth   = inject(MockAuthService);
+  private readonly auth   = inject(AuthService);
   private readonly router = inject(Router);
 
   readonly cartCount       = this.cart.count;

@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { CartService } from '../../services/cart.service';
 import { StoreContextService } from '../../services/store-context.service';
-import { MockAuthService } from '../../../../core/services/mock-auth.service';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-checkout',
@@ -13,7 +13,7 @@ import { MockAuthService } from '../../../../core/services/mock-auth.service';
 })
 export class CheckoutComponent {
   private readonly cart = inject(CartService);
-  private readonly auth = inject(MockAuthService);
+  private readonly auth = inject(AuthService);
   readonly ctx          = inject(StoreContextService);
 
   readonly lines    = this.cart.lines;
