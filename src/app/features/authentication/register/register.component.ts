@@ -122,12 +122,23 @@ export class RegisterComponent {
 
   async onSubmit(): Promise<void> {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+    this.errorMessage.set('');
     const { name, email, password } = this.form.getRawValue();
-    await this.auth.register(name, email, password);
-    // Verificación estricta: va a "verifica tu correo" (aún sin sesión activa).
-    await this.router.navigate(['/auth/verify-email'], {
-      queryParams: this.returnUrl() ? { returnUrl: this.returnUrl() } : {},
-    });
+    try {
+      await this.auth.register(name, email, password);
+      // Verificación estricta: va a "verifica tu correo" (aún sin sesión activa).
+      await this.router.navigate(['/auth/verify-email'], {
+        queryParams: this.returnUrl() ? { returnUrl: this.returnUrl() } : {},
+      });
+    } catch (e) {
+      const code = (e as { code?: string })?.code;
+      this.errorMessage.set(
+        code === 'auth/email-already-in-use' ? 'Ese correo ya está registrado. Inicia sesión.'
+        : code === 'auth/weak-password'      ? 'La contraseña debe tener al menos 6 caracteres.'
+        : code === 'auth/invalid-email'      ? 'El correo no es válido.'
+        : 'No se pudo crear la cuenta. Intenta de nuevo.'
+      );
+    }
   }
 
   async withGoogle(): Promise<void> {
