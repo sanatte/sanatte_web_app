@@ -21,6 +21,8 @@ export const RESOURCE_TYPE_META: Record<ResourceType, { icon: string; label: str
 export interface Resource {
   id: string;
   title: string;
+  /** Código público estable para el QR: sanatte.com/r/{slug}. */
+  slug: string;
   description: string;
   type: ResourceType;
   status: ResourceStatus;

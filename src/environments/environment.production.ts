@@ -1,6 +1,8 @@
 export const environment = {
   production: true,
   apiUrl: '/api/v1',
+  /** Dominio público donde se publica la app — usado en los QR impresos. */
+  publicBaseUrl: 'https://sanatte.com',
   firebase: {
     apiKey: 'AIzaSyCzAYUzoFH276GYf_BE1JBSaYFjUhwOTAs',
     authDomain: 'sanatte-d819d.firebaseapp.com',

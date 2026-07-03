@@ -93,6 +93,12 @@ import { Resource, RESOURCE_TYPE_META } from '../../models/resource.model';
 
           <!-- Actions -->
           <div class="flex gap-1">
+            <button (click)="downloadQr.emit(resource())"
+                    class="p-2 rounded-full text-on-surface-variant hover:text-primary
+                           hover:bg-primary-fixed transition-colors"
+                    title="Descargar QR">
+              <span class="material-symbols-outlined text-[18px]">qr_code_2</span>
+            </button>
             <button (click)="edit.emit(resource())"
                     class="p-2 rounded-full text-on-surface-variant hover:text-primary
                            hover:bg-primary-fixed transition-colors"
@@ -114,9 +120,10 @@ import { Resource, RESOURCE_TYPE_META } from '../../models/resource.model';
 export class ResourceCardComponent {
   readonly resource           = input.required<Resource>();
   readonly linkedProductCount = input(0);
-  readonly edit    = output<Resource>();
-  readonly delete  = output<Resource>();
-  readonly preview = output<Resource>();
+  readonly edit       = output<Resource>();
+  readonly delete     = output<Resource>();
+  readonly preview    = output<Resource>();
+  readonly downloadQr = output<Resource>();
 
   readonly typeMeta = computed(() => RESOURCE_TYPE_META[this.resource().type]);
 

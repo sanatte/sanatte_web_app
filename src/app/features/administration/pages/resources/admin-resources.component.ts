@@ -10,6 +10,8 @@ import { AdminPageHeaderComponent } from '../../../../shared/components/admin-pa
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
 import { SearchInputComponent } from '../../../../shared/components/search-input/search-input.component';
 import { Resource, ResourceType } from '../../models/resource.model';
+import { QrService } from '../../../../shared/services/qr.service';
+import { environment } from '../../../../../environments/environment';
 
 type TabFilter = 'all' | ResourceType | 'exercise';
 
@@ -28,6 +30,7 @@ export class AdminResourcesComponent {
   private readonly resourceService    = inject(ResourceService);
   private readonly productService     = inject(ProductService);
   private readonly entitlementService = inject(EntitlementService);
+  private readonly qr                 = inject(QrService);
 
   readonly linkedCountMap = computed(() =>
     this.entitlementService.buildLinkedCountMap(this.productService.products())
@@ -94,6 +97,13 @@ export class AdminResourcesComponent {
 
   openCreate(): void { this.editingResource.set(null); this.isModalOpen.set(true); }
   openEdit(r: Resource): void { this.editingResource.set(r); this.isModalOpen.set(true); }
+
+  /** Descarga el QR (PNG) que apunta al recurso: {publicBaseUrl}/r/{slug}. */
+  onDownloadQr(r: Resource): void {
+    if (!r.slug) return;
+    const url = `${environment.publicBaseUrl}/r/${r.slug}`;
+    this.qr.downloadPng(url, `qr-${r.slug}`);
+  }
   closeModal(): void { this.isModalOpen.set(false); this.editingResource.set(null); }
 
   onSave(data: Partial<Resource>): void {

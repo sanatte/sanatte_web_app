@@ -15,6 +15,7 @@ function mapApiResource(raw: any): Resource {
   return {
     id:                raw.id,
     title:             raw.title,
+    slug:              raw.slug ?? '',
     description:       raw.description,
     type:              TYPE_MAP[raw.type] ?? 'article',
     status:            STATUS_MAP[raw.status] ?? 'draft',

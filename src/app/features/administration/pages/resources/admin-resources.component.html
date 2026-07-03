@@ -44,6 +44,7 @@
         [linkedProductCount]="linkedCountMap()[resource.id] ?? 0"
         (preview)="openPreview($event)"
         (edit)="openEdit($event)"
+        (downloadQr)="onDownloadQr($event)"
         (delete)="requestDelete($event)" />
     }
 
