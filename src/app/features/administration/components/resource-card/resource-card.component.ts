@@ -74,39 +74,37 @@ import { Resource, RESOURCE_TYPE_META } from '../../models/resource.model';
         </div>
 
         <!-- Footer -->
-        <div class="mt-4 flex items-center justify-between">
-          <div class="flex items-center gap-3">
+        <div class="mt-4 flex flex-wrap items-center justify-between gap-y-2 gap-x-2">
+          <div class="flex items-center gap-2 min-w-0">
             <!-- Status -->
             <app-status-badge [status]="resource().status" />
 
-            <!-- Productos vinculados (resuelto via EntitlementService en el padre) -->
+            <!-- Productos vinculados (compacto para no desbordar) -->
             @if (linkedProductCount() > 0) {
-              <div class="flex items-center gap-1 text-primary">
-                <span class="material-symbols-outlined text-[13px]">link</span>
-                <span class="text-label-sm font-heading font-semibold">
-                  {{ linkedProductCount() }}
-                  producto{{ linkedProductCount() !== 1 ? 's' : '' }}
-                </span>
+              <div class="flex items-center gap-0.5 text-primary shrink-0"
+                   [title]="linkedProductCount() + ' producto' + (linkedProductCount() !== 1 ? 's' : '') + ' vinculado' + (linkedProductCount() !== 1 ? 's' : '')">
+                <span class="material-symbols-outlined text-[15px]">link</span>
+                <span class="text-label-sm font-heading font-semibold">{{ linkedProductCount() }}</span>
               </div>
             }
           </div>
 
           <!-- Actions -->
-          <div class="flex gap-1">
+          <div class="flex items-center gap-0.5 shrink-0">
             <button (click)="downloadQr.emit(resource())"
-                    class="p-2 rounded-full text-on-surface-variant hover:text-primary
+                    class="p-1.5 rounded-full text-on-surface-variant hover:text-primary
                            hover:bg-primary-fixed transition-colors"
                     title="Descargar QR">
               <span class="material-symbols-outlined text-[18px]">qr_code_2</span>
             </button>
             <button (click)="edit.emit(resource())"
-                    class="p-2 rounded-full text-on-surface-variant hover:text-primary
+                    class="p-1.5 rounded-full text-on-surface-variant hover:text-primary
                            hover:bg-primary-fixed transition-colors"
                     title="Editar">
               <span class="material-symbols-outlined text-[18px]">edit</span>
             </button>
             <button (click)="delete.emit(resource())"
-                    class="p-2 rounded-full text-on-surface-variant hover:text-error
+                    class="p-1.5 rounded-full text-on-surface-variant hover:text-error
                            hover:bg-error-container transition-colors"
                     title="Eliminar">
               <span class="material-symbols-outlined text-[18px]">delete</span>
