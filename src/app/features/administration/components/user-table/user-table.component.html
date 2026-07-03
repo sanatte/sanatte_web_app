@@ -108,15 +108,6 @@
             <!-- Acciones — siempre -->
             <td class="px-4 md:px-6 py-3 md:py-4 text-right">
               <div class="flex justify-end gap-1">
-                <!-- Toggle rol -->
-                <button (click)="toggleRole.emit(user)"
-                        class="p-1.5 md:p-2 rounded-full text-outline hover:text-primary
-                               hover:bg-primary-fixed transition-colors"
-                        [title]="user.role === UserRole.Admin ? 'Cambiar a Usuario' : 'Cambiar a Admin'">
-                  <span class="material-symbols-outlined text-[18px]">
-                    {{ user.role === UserRole.Admin ? 'person' : 'admin_panel_settings' }}
-                  </span>
-                </button>
                 <!-- Toggle estado -->
                 <button (click)="toggleStatus.emit(user)"
                         class="p-1.5 md:p-2 rounded-full transition-colors"

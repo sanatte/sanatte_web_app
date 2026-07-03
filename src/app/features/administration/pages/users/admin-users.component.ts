@@ -1,9 +1,10 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, viewChild } from '@angular/core';
 import { UserAdminService } from '../../services/user-admin.service';
 import { UserTableComponent } from '../../components/user-table/user-table.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { AdminPageHeaderComponent } from '../../../../shared/components/admin-page-header/admin-page-header.component';
 import { SearchInputComponent } from '../../../../shared/components/search-input/search-input.component';
+import { CreateAdminDialogComponent, CreateAdminInput } from '../../components/create-admin-dialog/create-admin-dialog.component';
 import { AdminUser } from '../../models/user-admin.model';
 import { UserRole } from '../../../../core/models/role.model';
 
@@ -11,15 +12,17 @@ const PAGE_SIZE = 10;
 
 @Component({
   selector: 'app-admin-users',
-  imports: [UserTableComponent, ConfirmDialogComponent, AdminPageHeaderComponent, SearchInputComponent],
+  imports: [UserTableComponent, ConfirmDialogComponent, AdminPageHeaderComponent, SearchInputComponent, CreateAdminDialogComponent],
   templateUrl: './admin-users.component.html',
 })
 export class AdminUsersComponent {
   private readonly userService = inject(UserAdminService);
+  private readonly createDialog = viewChild(CreateAdminDialogComponent);
 
   readonly searchTerm    = signal('');
   readonly currentPage   = signal(1);
   readonly isConfirmOpen = signal(false);
+  readonly isCreateOpen  = signal(false);
   readonly userToDelete  = signal<AdminUser | null>(null);
   readonly confirmConfig = signal({ title: '', message: '', confirmText: '', variant: 'danger' as 'danger' | 'primary', action: '' });
 
@@ -45,18 +48,22 @@ export class AdminUsersComponent {
 
   onSearch(term: string): void { this.searchTerm.set(term); this.currentPage.set(1); }
 
-  onToggleRole(user: AdminUser): void {
-    const newRole = user.role === UserRole.Admin ? UserRole.User : UserRole.Admin;
-    const label = newRole === UserRole.Admin ? 'Administrador' : 'Usuario';
-    this.userToDelete.set(user);
-    this.confirmConfig.set({
-      title: `Cambiar rol a ${label}`,
-      message: `¿Cambiar el rol de "${user.displayName}" a ${label}?`,
-      confirmText: `Sí, cambiar`,
-      variant: 'primary',
-      action: 'role',
-    });
-    this.isConfirmOpen.set(true);
+  // ─── Crear administrador ──────────────────────────────────────────────────
+  openCreate(): void { this.isCreateOpen.set(true); }
+  onCreateCancel(): void { this.isCreateOpen.set(false); }
+
+  async onCreateAdmin(input: CreateAdminInput): Promise<void> {
+    const dialog = this.createDialog();
+    dialog?.setSubmitting(true);
+    try {
+      await this.userService.createAdmin(input);
+      dialog?.reset();
+      this.isCreateOpen.set(false);
+    } catch (e: unknown) {
+      const msg = (e as { error?: { detail?: string } })?.error?.detail
+        ?? 'No se pudo crear el administrador. Intenta de nuevo.';
+      dialog?.setError(msg);
+    }
   }
 
   onToggleStatus(user: AdminUser): void {
@@ -89,9 +96,7 @@ export class AdminUsersComponent {
     if (!user) return;
     const { action } = this.confirmConfig();
     if (action === 'delete') this.userService.delete(user.id);
-    else if (action === 'role') {
-      this.userService.updateRole(user.id, user.role === UserRole.Admin ? UserRole.User : UserRole.Admin);
-    } else if (action === 'status') {
+    else if (action === 'status') {
       this.userService.updateStatus(user.id, user.status === 'active' ? 'blocked' : 'active');
     }
     this.isConfirmOpen.set(false);

@@ -2,7 +2,10 @@
 
   <app-admin-page-header
     title="Usuarios"
-    description="Gestiona las cuentas, roles y accesos de los usuarios de la plataforma." />
+    description="Gestiona las cuentas y accesos de los usuarios de la plataforma."
+    actionLabel="Crear administrador"
+    actionIcon="admin_panel_settings"
+    (action)="openCreate()" />
 
   <!-- Stats chips -->
   <div class="flex flex-wrap gap-3 mb-6">
@@ -45,12 +48,17 @@
     [totalItems]="filtered().length"
     [currentPage]="currentPage()"
     [pageSize]="10"
-    (toggleRole)="onToggleRole($event)"
     (toggleStatus)="onToggleStatus($event)"
     (deleteUser)="onDeleteUser($event)"
     (pageChange)="onPageChange($event)" />
 
 </section>
+
+<!-- Crear administrador -->
+<app-create-admin-dialog
+  [isOpen]="isCreateOpen()"
+  (save)="onCreateAdmin($event)"
+  (cancel)="onCreateCancel()" />
 
 <!-- Confirm Dialog (reutilizado para rol, estado y eliminar) -->
 <app-confirm-dialog

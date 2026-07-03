@@ -59,6 +59,14 @@ export class UserAdminService {
     }
   }
 
+  /** Crea un administrador (cuenta en Firebase + registro local rol Admin). */
+  async createAdmin(input: { displayName: string; email: string; password: string }): Promise<void> {
+    const raw = await firstValueFrom(this.http.post<unknown>(this.base, input));
+    const created = mapApiUser(raw);
+    this._users.update((list) => [created, ...list]);
+    this._total.update((t) => t + 1);
+  }
+
   async updateRole(id: string, role: UserRole): Promise<void> {
     const roleNum = role === UserRole.Admin ? 1 : 0;
     const raw = await firstValueFrom(

@@ -16,7 +16,6 @@ export class UserTableComponent {
   readonly pageSize    = input(10);
 
   readonly toggleStatus = output<AdminUser>();
-  readonly toggleRole   = output<AdminUser>();
   readonly deleteUser   = output<AdminUser>();
   readonly pageChange   = output<number>();
 

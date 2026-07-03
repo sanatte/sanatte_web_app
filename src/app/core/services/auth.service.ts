@@ -162,14 +162,6 @@ export class AuthService {
     return this.auth.currentUser ? this.auth.currentUser.getIdToken() : null;
   }
 
-  /**
-   * Cambio de rol en caliente SOLO para la vista (herramienta de desarrollo).
-   * El rol real vive en la BD; las llamadas admin seguirán su rol de BD.
-   */
-  switchRole(role: UserRole): void {
-    this._currentUser.update((u) => (u ? { ...u, role } : u));
-  }
-
   // ─── Internos ─────────────────────────────────────────────────────────────
 
   private isFederated(fbUser: FbUser): boolean {
