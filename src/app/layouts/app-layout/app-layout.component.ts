@@ -26,6 +26,7 @@ export class AppLayoutComponent {
 
   readonly displayName = computed(() => this.auth.currentUser()?.displayName ?? 'Usuario');
   readonly userInitial = computed(() => this.displayName().charAt(0).toUpperCase());
+  readonly isAdmin     = computed(() => this.auth.isAdmin());
   readonly cartCount   = this.cart.count;
 
   readonly pageTitle   = signal('Mi Biblioteca');
