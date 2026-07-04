@@ -1,8 +1,9 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://api.sanatte.com/api',
-  /** Dominio público donde se publica la app — usado en los QR impresos. */
-  publicBaseUrl: 'https://sanatte.com',
+  // Ambiente de DESARROLLO en el VPS (rama develop → Coolify).
+  apiUrl: 'https://api-dev.sanatte.com/api',
+  /** Dominio público de la app en dev — usado en los QR. */
+  publicBaseUrl: 'https://dev.sanatte.com',
   firebase: {
     apiKey: 'AIzaSyCzAYUzoFH276GYf_BE1JBSaYFjUhwOTAs',
     authDomain: 'sanatte-d819d.firebaseapp.com',
