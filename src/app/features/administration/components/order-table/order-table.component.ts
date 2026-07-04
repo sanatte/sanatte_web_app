@@ -41,6 +41,7 @@ export class OrderTableComponent {
 
   readonly viewOrder           = output<Order>();
   readonly changeDelivery      = output<Order>();
+  readonly generateActivation  = output<Order>();
   readonly pageChange          = output<number>();
 
   deliveryConfig = (s: DeliveryStatus) => {
@@ -52,5 +53,9 @@ export class OrderTableComponent {
 
   canChangeDelivery(order: Order): boolean {
     return ['preparing', 'shipped', 'pending_activation'].includes(order.deliveryStatus);
+  }
+
+  hasPhysical(order: Order): boolean {
+    return order.products.some((p) => p.type === 'physical');
   }
 }

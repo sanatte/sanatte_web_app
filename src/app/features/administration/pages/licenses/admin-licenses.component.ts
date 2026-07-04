@@ -6,6 +6,8 @@ import { AdminPageHeaderComponent } from '../../../../shared/components/admin-pa
 import { SearchInputComponent } from '../../../../shared/components/search-input/search-input.component';
 import { License } from '../../models/license.model';
 import { GenerateBatchDialogComponent } from '../../components/generate-batch-dialog/generate-batch-dialog.component';
+import { QrService } from '../../../../shared/services/qr.service';
+import { environment } from '../../../../../environments/environment';
 import { DecimalPipe } from '@angular/common';
 
 const PAGE_SIZE = 10;
@@ -17,6 +19,7 @@ const PAGE_SIZE = 10;
 })
 export class AdminLicensesComponent {
   private readonly licenseService = inject(LicenseService);
+  private readonly qr             = inject(QrService);
 
   readonly searchTerm    = signal('');
   readonly currentPage   = signal(1);
@@ -62,6 +65,12 @@ export class AdminLicensesComponent {
 
   onViewOrder(license: License): void {
     // Navigate to order - placeholder
+  }
+
+  /** Descarga la tarjeta QR de activación: {publicBaseUrl}/activate?code=CODE. */
+  onDownloadQr(license: License): void {
+    const url = `${environment.publicBaseUrl}/activate?code=${encodeURIComponent(license.code)}`;
+    this.qr.downloadPng(url, `qr-activacion-${license.code}`);
   }
 
   onRevoke(license: License): void {

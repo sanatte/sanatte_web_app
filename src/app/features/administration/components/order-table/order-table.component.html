@@ -169,6 +169,14 @@
                     </span>
                   </button>
                 }
+                @if (hasPhysical(order)) {
+                  <button (click)="generateActivation.emit(order)"
+                          class="p-2 text-outline hover:text-primary hover:bg-primary/5
+                                 rounded-full transition-colors"
+                          title="Generar QR de activación (al empacar)">
+                    <span class="material-symbols-outlined text-[18px] md:text-[20px]">qr_code_2</span>
+                  </button>
+                }
                 <button class="p-2 text-outline hover:text-primary hover:bg-primary/5
                                rounded-full transition-colors hidden sm:block"
                         title="Imprimir">

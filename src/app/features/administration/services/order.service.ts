@@ -76,6 +76,14 @@ export class OrderService {
     }
   }
 
+  /** Genera la(s) licencia(s) de activación del pedido (al empacar). Devuelve los códigos. */
+  async generateActivationLicenses(orderId: string): Promise<{ code: string }[]> {
+    const created = await firstValueFrom(
+      this.http.post<{ code: string }[]>(`${this.base}/${orderId}/activation-licenses`, {})
+    );
+    return created;
+  }
+
   async updateDeliveryStatus(
     id: string,
     status: DeliveryStatus,

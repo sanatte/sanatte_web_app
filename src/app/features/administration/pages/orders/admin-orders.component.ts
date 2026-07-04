@@ -8,6 +8,8 @@ import { AdminPageHeaderComponent } from '../../../../shared/components/admin-pa
 import { SearchInputComponent } from '../../../../shared/components/search-input/search-input.component';
 import { ShipOrderDialogComponent } from '../../components/ship-order-dialog/ship-order-dialog.component';
 import { Order, DeliveryStatus } from '../../models/order.model';
+import { QrService } from '../../../../shared/services/qr.service';
+import { environment } from '../../../../../environments/environment';
 
 type TabFilter = 'all' | 'pending' | 'completed' | 'cancelled';
 const PAGE_SIZE = 10;
@@ -22,6 +24,7 @@ const PAGE_SIZE = 10;
 })
 export class AdminOrdersComponent {
   private readonly orderService = inject(OrderService);
+  private readonly qr           = inject(QrService);
 
   readonly searchTerm  = signal('');
   readonly activeTab   = signal<TabFilter>('all');
@@ -76,6 +79,22 @@ export class AdminOrdersComponent {
 
   onViewOrder(order: Order): void {
     alert(`Detalle del pedido ${order.orderNumber} — próximamente`);
+  }
+
+  /** Al empacar: genera la(s) licencia(s) de activación del pedido y descarga su QR. */
+  async onGenerateActivation(order: Order): Promise<void> {
+    try {
+      const licenses = await this.orderService.generateActivationLicenses(order.id);
+      if (licenses.length === 0) { alert('El pedido no tiene productos físicos que requieran activación.'); return; }
+      for (const l of licenses) {
+        const url = `${environment.publicBaseUrl}/activate?code=${encodeURIComponent(l.code)}`;
+        await this.qr.downloadPng(url, `qr-activacion-${l.code}`);
+      }
+      alert(`Se generó ${licenses.length} licencia(s) de activación para ${order.orderNumber}. Se descargó su QR para imprimir e incluir en el empaque.`);
+    } catch (e: unknown) {
+      const msg = (e as { error?: { detail?: string } })?.error?.detail ?? 'No se pudo generar la licencia de activación.';
+      alert(msg);
+    }
   }
 
   onChangeDelivery(order: Order): void {

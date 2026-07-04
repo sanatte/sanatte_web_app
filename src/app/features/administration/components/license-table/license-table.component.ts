@@ -17,6 +17,7 @@ export class LicenseTableComponent {
   readonly revoke     = output<License>();
   readonly copyCode   = output<License>();
   readonly viewOrder  = output<License>();
+  readonly downloadQr = output<License>();
   readonly pageChange = output<number>();
 
   statusLabel(status: LicenseStatus): string {
