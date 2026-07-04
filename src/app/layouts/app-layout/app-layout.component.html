@@ -74,7 +74,7 @@
         </div>
         <div class="min-w-0 flex-1 text-left">
           <p class="text-label-md font-heading font-bold text-on-surface truncate">{{ displayName() }}</p>
-          <p class="text-[10px] uppercase tracking-wider text-primary font-bold">Premium Plan</p>
+          <p class="text-[10px] uppercase tracking-wider text-primary font-bold">{{ roleLabel() }}</p>
         </div>
         <span class="material-symbols-outlined text-on-surface-variant text-[20px]">
           {{ footerMenuOpen() ? 'expand_more' : 'expand_less' }}
@@ -145,7 +145,7 @@
                         border border-outline-variant/20 overflow-hidden py-1">
               <div class="px-4 py-3 border-b border-outline-variant/20">
                 <p class="font-heading font-bold text-on-surface truncate">{{ displayName() }}</p>
-                <p class="text-label-sm font-heading text-primary">Miembro Premium</p>
+                <p class="text-label-sm font-heading text-on-surface-variant truncate">{{ userEmail() }}</p>
               </div>
               <a routerLink="/app/profile"
                  class="flex items-center gap-3 px-4 py-2.5 text-label-md font-heading text-on-surface

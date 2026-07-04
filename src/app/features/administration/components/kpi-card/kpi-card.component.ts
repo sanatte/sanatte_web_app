@@ -13,10 +13,11 @@ import { KpiMetric } from '../../models/kpi-metric.model';
             {{ metric().icon }}
           </span>
         </div>
-        <span class="text-label-sm px-2 py-1 rounded font-heading"
-              [class]="trendClass()">
-          {{ trendPrefix() }}{{ metric().trend | number:'1.1-1' }}%
-        </span>
+        @if (metric().trend !== 0) {
+          <span class="text-label-sm px-2 py-1 rounded font-heading" [class]="trendClass()">
+            {{ trendPrefix() }}{{ metric().trend | number:'1.1-1' }}%
+          </span>
+        }
       </div>
       <p class="text-on-surface-variant text-label-md font-heading">{{ metric().label }}</p>
       <h3 class="font-heading text-headline-lg text-on-surface mt-1">{{ metric().value }}</h3>

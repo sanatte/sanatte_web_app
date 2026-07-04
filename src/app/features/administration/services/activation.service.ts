@@ -2,7 +2,6 @@ import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { Activation, ActivationStatus } from '../models/activation.model';
-import { MOCK_DEVICE_STATS, MOCK_SECURITY_ALERTS } from '../mocks/activations.mock';
 import { environment } from '../../../../environments/environment';
 
 interface ApiStats { total: number; pending: number; failed: number; }
@@ -42,9 +41,6 @@ export class ActivationService {
 
   readonly activations    = this._activations.asReadonly();
   readonly stats          = computed(() => this._stats());
-  // Distribución por dispositivo y alertas: presentación (mock por ahora).
-  readonly deviceStats    = signal(MOCK_DEVICE_STATS).asReadonly();
-  readonly securityAlerts = signal(MOCK_SECURITY_ALERTS).asReadonly();
 
   constructor() { this.loadAll(); }
 

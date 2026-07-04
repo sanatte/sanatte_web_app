@@ -25,8 +25,6 @@ export class AdminActivationsComponent {
   readonly activationToRevoke = signal<Activation | null>(null);
 
   readonly stats        = this.activationService.stats;
-  readonly deviceStats  = this.activationService.deviceStats;
-  readonly alerts       = this.activationService.securityAlerts;
 
   readonly statusOptions = [
     { value: 'all',     label: 'Estado: Todos'  },
@@ -80,18 +78,5 @@ export class AdminActivationsComponent {
   cancelRevoke(): void {
     this.isConfirmOpen.set(false);
     this.activationToRevoke.set(null);
-  }
-
-  alertBgClass(type: string): string {
-    return type === 'error' ? 'bg-red-50 border-red-100' : 'bg-amber-50 border-amber-100';
-  }
-  alertIconClass(type: string): string {
-    return type === 'error' ? 'text-red-500' : 'text-amber-500';
-  }
-  alertTitleClass(type: string): string {
-    return type === 'error' ? 'text-red-700' : 'text-amber-700';
-  }
-  alertDetailClass(type: string): string {
-    return type === 'error' ? 'text-red-600' : 'text-amber-600';
   }
 }

@@ -25,8 +25,10 @@ export class AppLayoutComponent {
   private readonly cart   = inject(CartService);
 
   readonly displayName = computed(() => this.auth.currentUser()?.displayName ?? 'Usuario');
+  readonly userEmail   = computed(() => this.auth.currentUser()?.email ?? '');
   readonly userInitial = computed(() => this.displayName().charAt(0).toUpperCase());
   readonly isAdmin     = computed(() => this.auth.isAdmin());
+  readonly roleLabel   = computed(() => (this.isAdmin() ? 'Administrador' : 'Cliente'));
   readonly cartCount   = this.cart.count;
 
   readonly pageTitle   = signal('Mi Biblioteca');

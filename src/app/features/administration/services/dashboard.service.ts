@@ -2,9 +2,7 @@ import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { KpiMetric } from '../models/kpi-metric.model';
-import { DashboardResource } from '../models/dashboard-resource.model';
 import { DashboardOrder, OrderStatus } from '../models/dashboard-order.model';
-import { MOCK_TOP_RESOURCES } from '../mocks/dashboard.mock';
 import { CurrencyService } from '../../../shared/services/currency.service';
 import { environment } from '../../../../environments/environment';
 
@@ -39,12 +37,9 @@ const ORDER_BG = [
 ];
 
 /**
- * DashboardService — KPIs y resumen del panel admin.
- *
- * KPIs y pedidos recientes provienen de `GET /api/admin/dashboard` (datos reales).
- * El "Top de recursos" queda como presentación (mock) hasta que exista analítica
- * de reproducciones/vistas. Las tendencias (%) también son presentación: requieren
- * histórico por periodo que aún no se calcula.
+ * DashboardService — KPIs y pedidos recientes del panel admin, desde
+ * `GET /api/admin/dashboard` (datos reales). Las tendencias (%) de los KPIs no se
+ * muestran porque aún no se calcula histórico por periodo (trend=0 → oculto).
  */
 @Injectable({ providedIn: 'root' })
 export class DashboardService {
@@ -52,7 +47,6 @@ export class DashboardService {
   private readonly currency = inject(CurrencyService);
 
   readonly kpiMetrics   = signal<KpiMetric[]>([]);
-  readonly topResources = signal<DashboardResource[]>(MOCK_TOP_RESOURCES);
   readonly recentOrders = signal<DashboardOrder[]>([]);
   readonly loading      = signal(false);
 

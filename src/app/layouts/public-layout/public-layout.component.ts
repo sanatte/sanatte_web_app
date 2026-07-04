@@ -57,7 +57,7 @@ import { AuthService } from '../../core/services/auth.service';
                             border border-outline-variant/20 overflow-hidden py-1">
                   <div class="px-4 py-3 border-b border-outline-variant/20">
                     <p class="font-heading font-bold text-on-surface truncate">{{ displayName() }}</p>
-                    <p class="text-label-sm font-heading text-primary">Miembro Premium</p>
+                    <p class="text-label-sm font-heading text-on-surface-variant truncate">{{ userEmail() }}</p>
                   </div>
                   @for (item of accountMenu; track item.route) {
                     <a [routerLink]="item.route"
@@ -135,6 +135,7 @@ export class PublicLayoutComponent {
   readonly cartCount       = this.cart.count;
   readonly isAuthenticated = computed(() => this.auth.isAuthenticated());
   readonly displayName     = computed(() => this.auth.currentUser()?.displayName ?? 'Usuario');
+  readonly userEmail       = computed(() => this.auth.currentUser()?.email ?? '');
   readonly userInitial     = computed(() => this.displayName().charAt(0).toUpperCase());
 
   readonly menuOpen = signal(false);
