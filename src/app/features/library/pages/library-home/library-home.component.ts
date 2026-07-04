@@ -2,19 +2,12 @@ import { Component, inject, computed } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { UserLibraryService } from '../../services/user-library.service';
-import { DailyFocusCardComponent } from '../../components/daily-focus-card/daily-focus-card.component';
-import { WeeklyProgressCardComponent } from '../../components/weekly-progress-card/weekly-progress-card.component';
 import { OwnedProductCardComponent } from '../../components/owned-product-card/owned-product-card.component';
 import { OwnedProduct } from '../../models/user-library.model';
 
 @Component({
   selector: 'app-library-home',
-  imports: [
-    RouterLink,
-    DailyFocusCardComponent,
-    WeeklyProgressCardComponent,
-    OwnedProductCardComponent,
-  ],
+  imports: [RouterLink, OwnedProductCardComponent],
   template: `
     <div class="space-y-section-gap max-w-7xl mx-auto w-full">
       <!-- Bienvenida -->
@@ -23,17 +16,11 @@ import { OwnedProduct } from '../../models/user-library.model';
           Hola, <span class="text-primary">{{ firstName() }}</span>
         </h3>
         <p class="font-sans text-body-lg text-on-surface-variant max-w-2xl">
-          Qué alegría tenerte de vuelta. Tu camino hacia el bienestar continúa justo donde lo dejaste.
+          Qué alegría tenerte de vuelta. Aquí están tus productos y recursos de bienestar.
         </p>
       </section>
 
       @if (hasProducts()) {
-        <!-- Bento: Enfoque del día + Progreso semanal -->
-        <section class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
-          <app-daily-focus-card [focus]="dailyFocus" (start)="onStartFocus()" />
-          <app-weekly-progress-card [progress]="weeklyProgress" />
-        </section>
-
         <!-- Mis Productos -->
         <section class="space-y-gutter">
           <div class="flex items-center justify-between">
@@ -46,10 +33,7 @@ import { OwnedProduct } from '../../models/user-library.model';
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             @for (owned of ownedProducts(); track owned.product.id) {
-              <app-owned-product-card
-                [owned]="owned"
-                (open)="onOpenProduct($event)"
-                (continue)="onContinue($event)" />
+              <app-owned-product-card [owned]="owned" (open)="onOpenProduct($event)" />
             }
           </div>
         </section>
@@ -91,33 +75,13 @@ export class LibraryHomeComponent {
 
   readonly ownedProducts = this.library.ownedProducts;
   readonly hasProducts   = this.library.hasProducts;
-  readonly dailyFocus    = this.library.dailyFocus;
-  readonly weeklyProgress = this.library.weeklyProgress;
 
   readonly firstName = computed(() => {
     const name = this.auth.currentUser()?.displayName ?? 'Bienvenido';
     return name.charAt(0).toUpperCase() + name.slice(1);
   });
 
-  onStartFocus(): void {
-    // Abre el recurso destacado dentro de su primer producto contenedor (si existe).
-    const resId = this.dailyFocus.resourceId;
-    const owner = resId
-      ? this.ownedProducts().find((o) =>
-          o.product.entitlements.some((e) => e.referenceId === resId)
-        )
-      : undefined;
-    if (owner && resId) {
-      this.router.navigate(['/app/library', owner.product.id, resId]);
-    }
-  }
-
   onOpenProduct(owned: OwnedProduct): void {
-    this.router.navigate(['/app/library', owned.product.id]);
-  }
-
-  onContinue(owned: OwnedProduct): void {
-    // Abre el visor del producto (elige el primer recurso automáticamente).
     this.router.navigate(['/app/library', owned.product.id]);
   }
 }

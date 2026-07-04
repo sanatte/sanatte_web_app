@@ -4,7 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { ProductService } from '../../administration/services/product.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Product } from '../../administration/models/product.model';
-import { OwnedProduct, DailyFocus, WeeklyProgress, ProgressStatus } from '../models/user-library.model';
+import { OwnedProduct } from '../models/user-library.model';
 import { environment } from '../../../../environments/environment';
 
 interface ApiLibraryItem { productId: string; sku: string; resourcesIncluded: number; }
@@ -12,21 +12,10 @@ interface ApiLibraryItem { productId: string; sku: string; resourcesIncluded: nu
 /**
  * UserLibraryService — datos de la Biblioteca del usuario autenticado.
  *
- * La propiedad de productos proviene de `GET /api/me/library` (pedidos pagados ∪
- * licencias activadas por QR). El `Product` completo se hidrata desde el catálogo
- * ya cargado en ProductService. El "progreso", el enfoque del día y el resumen
- * semanal siguen como presentación (mock): son gamificación que requiere tracking
- * de consumo real de recursos, aún no implementado.
+ * La propiedad de productos proviene de `GET /api/me/library` (compras de
+ * digital/suscripción ∪ productos físicos activados por QR). El `Product` completo
+ * se hidrata desde el catálogo ya cargado en ProductService.
  */
-
-// Progreso simulado por SKU (clave estable). Presentación hasta que exista
-// tracking real de consumo por recurso.
-const MOCK_PROGRESS: Record<string, number> = {
-  'WLN-001': 45,   // Plena (activada por QR)
-  'DIG-115': 100,  // The Silent Mind (eBook — compra directa)
-  'DIG-082': 30,   // Guided Flow Pro (suscripción)
-};
-
 @Injectable({ providedIn: 'root' })
 export class UserLibraryService {
   private readonly http           = inject(HttpClient);
@@ -53,13 +42,16 @@ export class UserLibraryService {
     }
   }
 
-  /** Productos que el usuario posee/activó, con su progreso. */
+  /** Productos que el usuario posee/activó. */
   readonly ownedProducts = computed<OwnedProduct[]>(() => {
     const catalog = this.productService.products();
     return this._owned()
       .map((item) => catalog.find((p) => p.id === item.productId))
       .filter((p): p is Product => !!p)
-      .map((p) => this.toOwnedProduct(p, MOCK_PROGRESS[p.sku] ?? 0));
+      .map((p) => {
+        const { label, tone } = this.categoryOf(p);
+        return { product: p, categoryLabel: label, categoryTone: tone };
+      });
   });
 
   readonly hasProducts = computed(() => this.ownedProducts().length > 0);
@@ -71,31 +63,6 @@ export class UserLibraryService {
 
   isActivated(productId: string): boolean {
     return this._owned().some((o) => o.productId === productId);
-  }
-
-  readonly dailyFocus: DailyFocus = {
-    badge: 'Enfoque del día',
-    title: 'Meditación: Claridad Mental',
-    description:
-      'Una sesión de 15 minutos diseñada para reducir el ruido cognitivo y centrar tu atención en lo esencial.',
-    durationMinutes: 15,
-    gradient: 'from-indigo-500 via-purple-600 to-violet-800',
-    resourceId: 'res-7',
-  };
-
-  readonly weeklyProgress: WeeklyProgress = {
-    percentage: 85,
-    daysCompleted: 4,
-    daysTotal: 5,
-    quote: 'La constancia es la llave del bienestar profundo.',
-  };
-
-  private toOwnedProduct(product: Product, progress: number): OwnedProduct {
-    const status: ProgressStatus =
-      progress >= 100 ? 'completed' : progress > 0 ? 'in_progress' : 'not_started';
-
-    const { label, tone } = this.categoryOf(product);
-    return { product, progress, status, categoryLabel: label, categoryTone: tone };
   }
 
   /** Etiqueta de categoría derivada del tipo/tags del producto. */
