@@ -1,11 +1,11 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { License, LicenseStatus } from '../models/license.model';
-import { MOCK_LICENSE_ACTIVITY, MOCK_TREND_DATA } from '../mocks/licenses.mock';
+import { License, LicenseStatus, LicenseActivity, TrendPoint } from '../models/license.model';
 import { environment } from '../../../../environments/environment';
 
 interface ApiStats { total: number; pending: number; activated: number; }
+interface ApiActivity { type: string; message: string; detail: string; timeAgo: string; }
 
 const STATUS_MAP: Record<number, LicenseStatus> = { 0: 'available', 1: 'active', 2: 'revoked' };
 
@@ -35,22 +35,33 @@ export class LicenseService {
 
   private readonly _licenses = signal<License[]>([]);
   private readonly _stats    = signal<ApiStats>({ total: 0, pending: 0, activated: 0 });
+  private readonly _activity = signal<LicenseActivity[]>([]);
+  private readonly _trend    = signal<TrendPoint[]>([]);
 
   readonly licenses  = this._licenses.asReadonly();
   readonly stats     = computed(() => this._stats());
-  // Feed de actividad y tendencia: presentación (mock por ahora).
-  readonly activity  = signal(MOCK_LICENSE_ACTIVITY).asReadonly();
-  readonly trendData = signal(MOCK_TREND_DATA).asReadonly();
+  readonly activity  = this._activity.asReadonly();
+  readonly trendData = this._trend.asReadonly();
 
   constructor() { this.loadAll(); }
 
   async loadAll(): Promise<void> {
-    const [list, stats] = await Promise.all([
+    const [list, stats, activity, trend] = await Promise.all([
       firstValueFrom(this.http.get<unknown[]>(this.base)),
       firstValueFrom(this.http.get<ApiStats>(`${this.base}/stats`)),
+      firstValueFrom(this.http.get<ApiActivity[]>(`${this.base}/activity`)),
+      firstValueFrom(this.http.get<TrendPoint[]>(`${this.base}/trend`)),
     ]);
     this._licenses.set(list.map(mapApiLicense));
     this._stats.set(stats);
+    this._activity.set(activity.map((a, i) => ({
+      id: `act-${i}`,
+      type: (a.type as LicenseActivity['type']) ?? 'activation',
+      message: a.message,
+      detail: a.detail,
+      timeAgo: a.timeAgo,
+    })));
+    this._trend.set(trend);
   }
 
   async generateBatch(productId: string, _productName: string, quantity: number): Promise<void> {
@@ -86,7 +97,19 @@ export class LicenseService {
     );
   }
 
+  /** Refresca stats + feed de actividad + tendencia tras una mutación. */
   private async refreshStats(): Promise<void> {
-    this._stats.set(await firstValueFrom(this.http.get<ApiStats>(`${this.base}/stats`)));
+    const [stats, activity, trend] = await Promise.all([
+      firstValueFrom(this.http.get<ApiStats>(`${this.base}/stats`)),
+      firstValueFrom(this.http.get<ApiActivity[]>(`${this.base}/activity`)),
+      firstValueFrom(this.http.get<TrendPoint[]>(`${this.base}/trend`)),
+    ]);
+    this._stats.set(stats);
+    this._activity.set(activity.map((a, i) => ({
+      id: `act-${i}`,
+      type: (a.type as LicenseActivity['type']) ?? 'activation',
+      message: a.message, detail: a.detail, timeAgo: a.timeAgo,
+    })));
+    this._trend.set(trend);
   }
 }
