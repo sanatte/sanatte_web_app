@@ -21,10 +21,16 @@ export class LicenseTableComponent {
   readonly pageChange = output<number>();
 
   statusLabel(status: LicenseStatus): string {
-    return { available: 'Disponible', active: 'Activa', revoked: 'Revocada' }[status];
+    return {
+      available: 'Disponible',
+      assigned: 'Asignada',
+      sold: 'Vendida',
+      active: 'Activa',
+      revoked: 'Revocada',
+    }[status];
   }
 
   canRevoke(license: License): boolean {
-    return license.status === 'active';
+    return license.status !== 'revoked' && license.status !== 'active';
   }
 }

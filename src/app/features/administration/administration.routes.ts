@@ -44,6 +44,12 @@ export const administrationRoutes: Routes = [
       import('./pages/licenses/admin-licenses.component').then((m) => m.AdminLicensesComponent),
   },
   {
+    path: 'locations',
+    data: { title: 'Ubicaciones' },
+    loadComponent: () =>
+      import('./pages/locations/admin-locations.component').then((m) => m.AdminLocationsComponent),
+  },
+  {
     path: 'activations',
     data: { title: 'Activaciones' },
     loadComponent: () =>

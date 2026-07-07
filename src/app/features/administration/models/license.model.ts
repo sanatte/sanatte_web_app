@@ -1,4 +1,4 @@
-export type LicenseStatus = 'available' | 'active' | 'revoked';
+export type LicenseStatus = 'available' | 'active' | 'revoked' | 'assigned' | 'sold';
 
 export interface License {
   id: string;

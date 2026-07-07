@@ -7,7 +7,9 @@ import { environment } from '../../../../environments/environment';
 interface ApiStats { total: number; pending: number; activated: number; }
 interface ApiActivity { type: string; message: string; detail: string; timeAgo: string; }
 
-const STATUS_MAP: Record<number, LicenseStatus> = { 0: 'available', 1: 'active', 2: 'revoked' };
+const STATUS_MAP: Record<number, LicenseStatus> = {
+  0: 'available', 1: 'active', 2: 'revoked', 3: 'assigned', 4: 'sold',
+};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function mapApiLicense(raw: any): License {

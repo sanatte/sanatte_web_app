@@ -43,6 +43,7 @@ export class AdminLayoutComponent {
           '/admin/users':        'Usuarios',
           '/admin/orders':       'Pedidos',
           '/admin/licenses':     'Licencias',
+          '/admin/locations':    'Ubicaciones',
           '/admin/activations':  'Activaciones',
           '/admin/reports':      'Reportes',
           '/admin/settings':     'Configuración',
@@ -59,6 +60,7 @@ export class AdminLayoutComponent {
     { label: 'Usuarios',    route: '/admin/users',        icon: 'group' },
     { label: 'Logística',   route: '/admin/orders',       icon: 'local_shipping' },
     { label: 'Licencias',   route: '/admin/licenses',     icon: 'key' },
+    { label: 'Ubicaciones', route: '/admin/locations',    icon: 'store' },
     { label: 'Activaciones',route: '/admin/activations',  icon: 'verified' },
     { label: 'Reportes',    route: '/admin/reports',      icon: 'bar_chart' },
   ];

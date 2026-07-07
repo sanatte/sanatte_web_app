@@ -1,0 +1,112 @@
+import { Component, inject, signal, computed } from '@angular/core';
+import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { LocationService } from '../../services/location.service';
+import { ProductService } from '../../services/product.service';
+import { ThousandsSeparatorDirective } from '../../../../shared/directives/thousands-separator.directive';
+import {
+  SalesLocation, LocationType, SalesModel, InventoryRow,
+  LOCATION_TYPE_LABEL, SALES_MODEL_LABEL,
+} from '../../models/location.model';
+
+interface InventoryGroup { name: string; rows: InventoryRow[] }
+
+@Component({
+  selector: 'app-admin-locations',
+  imports: [ReactiveFormsModule, ThousandsSeparatorDirective],
+  templateUrl: './admin-locations.component.html',
+})
+export class AdminLocationsComponent {
+  private readonly fb = inject(FormBuilder);
+  private readonly locationsService = inject(LocationService);
+  private readonly productService = inject(ProductService);
+
+  readonly locations = this.locationsService.locations;
+  readonly inventory = this.locationsService.inventory;
+  readonly products = this.productService.products;
+
+  readonly typeLabel = (t: LocationType) => LOCATION_TYPE_LABEL[t];
+  readonly modelLabel = (m: SalesModel) => SALES_MODEL_LABEL[m];
+
+  // ── Crear ubicación ──────────────────────────────────────────────
+  readonly showCreate = signal(false);
+  readonly createForm = this.fb.nonNullable.group({
+    name:              ['', Validators.required],
+    type:              ['physical_point' as LocationType],
+    salesModel:        ['consignment' as SalesModel],
+    commissionPercent: [0],
+    contactName:       [''],
+    contactPhone:      [''],
+  });
+
+  openCreate(): void {
+    this.createForm.reset({
+      name: '', type: 'physical_point', salesModel: 'consignment',
+      commissionPercent: 0, contactName: '', contactPhone: '',
+    });
+    this.showCreate.set(true);
+  }
+
+  closeCreate(): void { this.showCreate.set(false); }
+
+  async submitCreate(): Promise<void> {
+    if (this.createForm.invalid) { this.createForm.markAllAsTouched(); return; }
+    const v = this.createForm.getRawValue();
+    await this.locationsService.create({
+      name: v.name.trim(),
+      type: v.type,
+      salesModel: v.salesModel,
+      commissionPercent: Number(v.commissionPercent) || 0,
+      contactName: v.contactName?.trim() || undefined,
+      contactPhone: v.contactPhone?.trim() || undefined,
+    });
+    this.showCreate.set(false);
+  }
+
+  // ── Asignar unidades (bodega → ubicación) ────────────────────────
+  readonly allocateTarget = signal<SalesLocation | null>(null);
+  readonly allocateMessage = signal<string | null>(null);
+  readonly allocating = signal(false);
+  readonly allocateForm = this.fb.nonNullable.group({
+    productId: ['', Validators.required],
+    quantity:  [1 as number, [Validators.required, Validators.min(1)]],
+  });
+
+  openAllocate(location: SalesLocation): void {
+    this.allocateMessage.set(null);
+    this.allocateForm.reset({ productId: '', quantity: 1 });
+    this.allocateTarget.set(location);
+  }
+
+  closeAllocate(): void { this.allocateTarget.set(null); }
+
+  async submitAllocate(): Promise<void> {
+    const target = this.allocateTarget();
+    if (!target || this.allocateForm.invalid) { this.allocateForm.markAllAsTouched(); return; }
+    const { productId, quantity } = this.allocateForm.getRawValue();
+    this.allocating.set(true);
+    try {
+      const res = await this.locationsService.allocate(target.id, productId, Number(quantity));
+      this.allocateMessage.set(
+        res.allocated === res.requested
+          ? `Se asignaron ${res.allocated} unidad(es). Disponibles en bodega: ${res.availableRemaining}.`
+          : `Solo había ${res.allocated} de ${res.requested} disponibles. Genera más licencias en Licencias. Disponibles: ${res.availableRemaining}.`
+      );
+    } catch {
+      this.allocateMessage.set('No se pudo asignar. Intenta de nuevo.');
+    } finally {
+      this.allocating.set(false);
+    }
+  }
+
+  // ── Inventario agrupado por ubicación ────────────────────────────
+  readonly inventoryByLocation = computed<InventoryGroup[]>(() => {
+    const map = new Map<string, InventoryGroup>();
+    for (const row of this.inventory()) {
+      const key = row.locationId ?? '__unassigned__';
+      const group = map.get(key) ?? { name: row.locationName, rows: [] };
+      group.rows.push(row);
+      map.set(key, group);
+    }
+    return Array.from(map.values());
+  });
+}
