@@ -4,6 +4,7 @@ import { Product, ProductType, ProductImage } from '../../models/product.model';
 import { Entitlement } from '../../models/entitlement.model';
 import { Resource, ResourceType, RESOURCE_TYPE_META } from '../../models/resource.model';
 import { ResourceService } from '../../services/resource.service';
+import { ThousandsSeparatorDirective } from '../../../../shared/directives/thousands-separator.directive';
 
 const GRADIENT_PALETTE = [
   'from-violet-400 to-purple-600', 'from-indigo-400 to-violet-600',
@@ -14,7 +15,7 @@ const GRADIENT_PALETTE = [
 
 @Component({
   selector: 'app-product-form-dialog',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, ThousandsSeparatorDirective],
   templateUrl: './product-form-dialog.component.html',
 })
 export class ProductFormDialogComponent {

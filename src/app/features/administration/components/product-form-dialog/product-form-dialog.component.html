@@ -85,7 +85,8 @@
               Precio ($) <span class="text-error">*</span>
             </label>
             <div class="flex gap-2">
-              <input formControlName="price" type="number" step="0.01" min="0" placeholder="0.00"
+              <input formControlName="price" type="text" inputmode="numeric" appThousandsSeparator
+                     placeholder="0"
                      class="flex-1 bg-surface-container-low border-none rounded-lg px-4 py-3
                             focus:ring-2 focus:ring-primary/50 outline-none text-label-md
                             font-heading transition-all"/>
@@ -108,7 +109,7 @@
             <label class="text-label-md font-heading font-semibold text-on-surface">
               {{ selectedType() === 'physical' ? 'Stock disponible' : 'Límite de licencias' }}
             </label>
-            <input formControlName="stock" type="number" min="0"
+            <input formControlName="stock" type="text" inputmode="numeric" appThousandsSeparator
                    placeholder="Dejar vacío para ilimitado"
                    class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3
                           focus:ring-2 focus:ring-primary/50 outline-none text-label-md
