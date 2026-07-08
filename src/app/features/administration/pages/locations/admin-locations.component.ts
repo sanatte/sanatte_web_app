@@ -55,7 +55,9 @@ export class AdminLocationsComponent {
       name: v.name.trim(),
       type: v.type,
       salesModel: v.salesModel,
-      commissionPercent: Number(v.commissionPercent) || 0,
+      commissionPercent: (v.type === 'physical_point' && v.salesModel === 'consignment')
+        ? Number(v.commissionPercent) || 0
+        : 0,
       contactName: v.contactName?.trim() || undefined,
       contactPhone: v.contactPhone?.trim() || undefined,
     });
