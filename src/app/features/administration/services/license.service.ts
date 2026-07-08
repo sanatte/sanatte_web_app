@@ -8,7 +8,7 @@ interface ApiStats { total: number; pending: number; activated: number; }
 interface ApiActivity { type: string; message: string; detail: string; timeAgo: string; }
 
 const STATUS_MAP: Record<number, LicenseStatus> = {
-  0: 'available', 1: 'active', 2: 'revoked', 3: 'assigned', 4: 'sold',
+  0: 'available', 1: 'active', 2: 'revoked', 3: 'assigned', 4: 'sold', 5: 'preparing',
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -72,6 +72,20 @@ export class LicenseService {
     );
     this._licenses.update((list) => [...created.map(mapApiLicense), ...list]);
     await this.refreshStats();
+  }
+
+  /** Libera un lote completo (Preparing → Available): unidades disponibles para ecommerce. */
+  async releaseBatch(batchId: string): Promise<number> {
+    const result = await firstValueFrom(
+      this.http.post<{ released: number }>(`${this.base}/batches/${encodeURIComponent(batchId)}/release`, {})
+    );
+    this._licenses.update((list) =>
+      list.map((l) => l.batchId === batchId && l.status === 'preparing'
+        ? { ...l, status: 'available' as LicenseStatus }
+        : l)
+    );
+    await this.refreshStats();
+    return result.released;
   }
 
   async revoke(id: string): Promise<void> {

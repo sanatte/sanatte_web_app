@@ -137,12 +137,17 @@
           </div>
         </div>
 
-        <div class="space-y-2">
-          <label class="text-label-md font-heading font-semibold text-on-surface">Comisión (%)</label>
-          <input formControlName="commissionPercent" type="number" min="0" max="100"
-                 class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 outline-none
-                        focus:ring-2 focus:ring-primary/50 text-label-md font-heading"/>
-        </div>
+        @if (createForm.get('type')?.value === 'physical_point' && createForm.get('salesModel')?.value === 'consignment') {
+          <div class="space-y-2">
+            <label class="text-label-md font-heading font-semibold text-on-surface">Comisión (%)</label>
+            <input formControlName="commissionPercent" type="number" min="0" max="100"
+                   class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 outline-none
+                          focus:ring-2 focus:ring-primary/50 text-label-md font-heading"/>
+            <p class="text-label-sm font-heading text-on-surface-variant">
+              Porcentaje que retiene el punto al liquidar cada venta.
+            </p>
+          </div>
+        }
 
         <div class="grid grid-cols-2 gap-4">
           <div class="space-y-2">

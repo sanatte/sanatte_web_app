@@ -14,20 +14,29 @@ export class LicenseTableComponent {
   readonly currentPage = input.required<number>();
   readonly pageSize    = input(10);
 
-  readonly revoke     = output<License>();
-  readonly copyCode   = output<License>();
-  readonly viewOrder  = output<License>();
-  readonly downloadQr = output<License>();
-  readonly pageChange = output<number>();
+  readonly revoke        = output<License>();
+  readonly copyCode      = output<License>();
+  readonly viewOrder     = output<License>();
+  readonly downloadQr    = output<License>();
+  readonly pageChange    = output<number>();
+  readonly releaseBatch  = output<string>(); // emite el batchId
 
   statusLabel(status: LicenseStatus): string {
     return {
+      preparing: 'En preparación',
       available: 'Disponible',
       assigned: 'Asignada',
       sold: 'Vendida',
       active: 'Activa',
       revoked: 'Revocada',
-    }[status];
+    }[status] ?? status;
+  }
+
+  statusVariant(status: LicenseStatus): string {
+    return status === 'preparing' ? 'warning'
+         : status === 'available' ? 'pending'
+         : status === 'active'    ? 'active'
+         : 'cancelled';
   }
 
   canRevoke(license: License): boolean {

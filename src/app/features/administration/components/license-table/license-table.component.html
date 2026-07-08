@@ -140,9 +140,7 @@
             <!-- Estado — siempre -->
             <td class="px-4 md:px-6 py-5">
               <app-status-badge
-                [status]="license.status === 'available' ? 'pending'
-                        : license.status === 'active' ? 'active'
-                        : 'cancelled'"
+                [status]="statusVariant(license.status)"
                 [label]="statusLabel(license.status)" />
             </td>
 
@@ -169,6 +167,14 @@
                                  rounded-full transition-colors hidden sm:block"
                           title="Ver pedido">
                     <span class="material-symbols-outlined text-[18px]">receipt_long</span>
+                  </button>
+                }
+                @if (license.status === 'preparing') {
+                  <button (click)="releaseBatch.emit(license.batchId)"
+                          class="p-2 text-outline hover:text-success hover:bg-success/5
+                                 rounded-full transition-colors"
+                          title="Liberar lote a la venta">
+                    <span class="material-symbols-outlined text-[18px]">lock_open</span>
                   </button>
                 }
                 @if (canRevoke(license)) {

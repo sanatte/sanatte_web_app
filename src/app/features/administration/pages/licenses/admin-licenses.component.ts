@@ -73,6 +73,10 @@ export class AdminLicensesComponent {
     this.qr.downloadPng(url, `qr-activacion-${license.code}`);
   }
 
+  onReleaseBatch(batchId: string): void {
+    this.licenseService.releaseBatch(batchId);
+  }
+
   onRevoke(license: License): void {
     this.licenseToRevoke.set(license);
     this.isConfirmOpen.set(true);
