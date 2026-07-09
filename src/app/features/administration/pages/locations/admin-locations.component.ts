@@ -95,8 +95,9 @@ export class AdminLocationsComponent {
       ?.available ?? 0;
   });
 
-  /** Error de cantidad en modo devolver: excede asignadas en el punto. */
+  /** Error de cantidad: excede el stock disponible. Solo activo cuando hay producto seleccionado. */
   readonly quantityExceedsStock = computed(() => {
+    if (!this.selectedProductId()) return false;
     const qty = Number(this.allocateForm.get('quantity')?.value ?? 0);
     if (this.allocateMode() === 'return') return qty > 0 && qty > this.maxReturnable();
     if (this.allocateMode() === 'assign') return qty > 0 && qty > this.maxAssignable();

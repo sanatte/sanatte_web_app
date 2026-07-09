@@ -275,8 +275,8 @@
                          hover:bg-surface-container-low transition-colors">Cerrar</button>
           <button type="submit"
                   [disabled]="allocating() || quantityExceedsStock()
-                            || (allocateMode() === 'return' && maxReturnable() === 0)
-                            || (allocateMode() === 'assign' && maxAssignable() === 0)"
+                            || (allocateMode() === 'return' && !!selectedProductId() && maxReturnable() === 0)
+                            || (allocateMode() === 'assign' && !!selectedProductId() && maxAssignable() === 0)"
                   class="px-8 py-3 gradient-primary text-white rounded-full text-label-md font-heading font-bold
                          hover:opacity-90 active:scale-95 transition-all disabled:opacity-50">
             {{ allocating() ? 'Procesando…' : (allocateMode() === 'return' ? 'Devolver' : 'Asignar') }}
