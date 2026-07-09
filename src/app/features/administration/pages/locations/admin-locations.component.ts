@@ -64,8 +64,9 @@ export class AdminLocationsComponent {
     this.showCreate.set(false);
   }
 
-  // ── Asignar unidades (bodega → ubicación) ────────────────────────
+  // ── Asignar / devolver unidades ──────────────────────────────────
   readonly allocateTarget = signal<SalesLocation | null>(null);
+  readonly allocateMode   = signal<'assign' | 'return'>('assign');
   readonly allocateMessage = signal<string | null>(null);
   readonly allocating = signal(false);
   readonly allocateForm = this.fb.nonNullable.group({
@@ -76,6 +77,14 @@ export class AdminLocationsComponent {
   openAllocate(location: SalesLocation): void {
     this.allocateMessage.set(null);
     this.allocateForm.reset({ productId: '', quantity: 1 });
+    this.allocateMode.set('assign');
+    this.allocateTarget.set(location);
+  }
+
+  openReturn(location: SalesLocation): void {
+    this.allocateMessage.set(null);
+    this.allocateForm.reset({ productId: '', quantity: 1 });
+    this.allocateMode.set('return');
     this.allocateTarget.set(location);
   }
 
@@ -87,14 +96,23 @@ export class AdminLocationsComponent {
     const { productId, quantity } = this.allocateForm.getRawValue();
     this.allocating.set(true);
     try {
-      const res = await this.locationsService.allocate(target.id, productId, Number(quantity));
-      this.allocateMessage.set(
-        res.allocated === res.requested
-          ? `Se asignaron ${res.allocated} unidad(es). Disponibles en bodega: ${res.availableRemaining}.`
-          : `Solo había ${res.allocated} de ${res.requested} disponibles. Genera más licencias en Licencias. Disponibles: ${res.availableRemaining}.`
-      );
+      if (this.allocateMode() === 'return') {
+        const res = await this.locationsService.returnToWarehouse(target.id, productId, Number(quantity));
+        this.allocateMessage.set(
+          res.returned > 0
+            ? `Se devolvieron ${res.returned} unidad(es) a la bodega. Disponibles: ${res.availableInWarehouse}.`
+            : 'No había unidades asignadas a este punto para devolver.'
+        );
+      } else {
+        const res = await this.locationsService.allocate(target.id, productId, Number(quantity));
+        this.allocateMessage.set(
+          res.allocated === res.requested
+            ? `Se asignaron ${res.allocated} unidad(es). Disponibles en bodega: ${res.availableRemaining}.`
+            : `Solo había ${res.allocated} de ${res.requested} disponibles. Disponibles: ${res.availableRemaining}.`
+        );
+      }
     } catch {
-      this.allocateMessage.set('No se pudo asignar. Intenta de nuevo.');
+      this.allocateMessage.set('No se pudo completar la operación. Intenta de nuevo.');
     } finally {
       this.allocating.set(false);
     }

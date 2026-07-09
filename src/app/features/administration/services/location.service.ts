@@ -94,6 +94,17 @@ export class LocationService {
     return result;
   }
 
+  /** Devuelve unidades de un punto a la bodega (Assigned → Available). */
+  async returnToWarehouse(locationId: string, productId: string, quantity: number): Promise<{ returned: number; availableInWarehouse: number }> {
+    const result = await firstValueFrom(
+      this.http.post<{ returned: number; availableInWarehouse: number }>(
+        `${this.base}/${locationId}/return`, { productId, quantity }
+      )
+    );
+    await this.refreshInventory();
+    return result;
+  }
+
   private async refreshInventory(): Promise<void> {
     const inventory = await firstValueFrom(this.http.get<unknown[]>(`${this.base}/inventory`));
     this._inventory.set(inventory.map(mapInventory));

@@ -90,11 +90,18 @@
                 {{ loc.contactName }}@if (loc.contactPhone) {<span> · {{ loc.contactPhone }}</span>}
               </p>
             }
-            <button (click)="openAllocate(loc)"
-                    class="w-full py-2.5 rounded-full text-label-md font-heading font-bold
-                           bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
-              Asignar unidades
-            </button>
+            <div class="flex gap-2">
+              <button (click)="openAllocate(loc)"
+                      class="flex-1 py-2.5 rounded-full text-label-md font-heading font-bold
+                             bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
+                Asignar
+              </button>
+              <button (click)="openReturn(loc)"
+                      class="flex-1 py-2.5 rounded-full text-label-md font-heading font-bold
+                             bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-colors">
+                Devolver
+              </button>
+            </div>
           </div>
         }
       </div>
@@ -177,13 +184,17 @@
   </div>
 }
 
-<!-- Modal: asignar unidades -->
+<!-- Modal: asignar / devolver unidades -->
 @if (allocateTarget(); as target) {
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" (click)="closeAllocate()">
     <div class="bg-white rounded-3xl w-full max-w-md p-8 space-y-6" (click)="$event.stopPropagation()">
       <div>
-        <h2 class="text-title-lg font-heading font-bold text-on-surface">Asignar unidades</h2>
-        <p class="text-label-md font-heading text-on-surface-variant mt-1">a <strong>{{ target.name }}</strong></p>
+        <h2 class="text-title-lg font-heading font-bold text-on-surface">
+          {{ allocateMode() === 'return' ? 'Devolver a bodega' : 'Asignar unidades' }}
+        </h2>
+        <p class="text-label-md font-heading text-on-surface-variant mt-1">
+          {{ allocateMode() === 'return' ? 'desde' : 'a' }} <strong>{{ target.name }}</strong>
+        </p>
       </div>
 
       <form [formGroup]="allocateForm" (ngSubmit)="submitAllocate()" class="space-y-4">
@@ -205,7 +216,11 @@
                  class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 outline-none
                         focus:ring-2 focus:ring-primary/50 text-label-md font-heading"/>
           <p class="text-label-sm font-heading text-on-surface-variant">
-            Toma unidades <strong>disponibles</strong> en bodega y las mueve a este punto.
+            @if (allocateMode() === 'return') {
+              Mueve unidades <strong>asignadas</strong> en este punto de vuelta a la bodega.
+            } @else {
+              Toma unidades <strong>disponibles</strong> en bodega y las mueve a este punto.
+            }
           </p>
         </div>
 
@@ -222,7 +237,7 @@
           <button type="submit" [disabled]="allocating()"
                   class="px-8 py-3 gradient-primary text-white rounded-full text-label-md font-heading font-bold
                          hover:opacity-90 active:scale-95 transition-all disabled:opacity-50">
-            {{ allocating() ? 'Asignando…' : 'Asignar' }}
+            {{ allocating() ? 'Procesando…' : (allocateMode() === 'return' ? 'Devolver' : 'Asignar') }}
           </button>
         </div>
       </form>
