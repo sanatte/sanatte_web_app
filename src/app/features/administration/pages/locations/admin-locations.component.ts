@@ -76,7 +76,7 @@ export class AdminLocationsComponent {
     quantity:  [1 as number, [Validators.required, Validators.min(1)]],
   });
 
-  /** Unidades Assigned en este punto para el producto seleccionado (solo en modo devolver). */
+  /** Unidades Assigned en este punto para el producto seleccionado (modo devolver). */
   readonly maxReturnable = computed(() => {
     const target = this.allocateTarget();
     const pid = this.selectedProductId();
@@ -86,11 +86,21 @@ export class AdminLocationsComponent {
       ?.assigned ?? 0;
   });
 
-  /** Error de cantidad en modo devolver: excede lo disponible en el punto. */
+  /** Unidades Available en bodega (sin ubicación) para el producto seleccionado (modo asignar). */
+  readonly maxAssignable = computed(() => {
+    const pid = this.selectedProductId();
+    if (!pid) return 0;
+    return this.inventory()
+      .find(r => r.locationId === null && r.productId === pid)
+      ?.available ?? 0;
+  });
+
+  /** Error de cantidad en modo devolver: excede asignadas en el punto. */
   readonly quantityExceedsStock = computed(() => {
-    if (this.allocateMode() !== 'return') return false;
     const qty = Number(this.allocateForm.get('quantity')?.value ?? 0);
-    return qty > 0 && qty > this.maxReturnable();
+    if (this.allocateMode() === 'return') return qty > 0 && qty > this.maxReturnable();
+    if (this.allocateMode() === 'assign') return qty > 0 && qty > this.maxAssignable();
+    return false;
   });
 
   onProductChange(productId: string): void {

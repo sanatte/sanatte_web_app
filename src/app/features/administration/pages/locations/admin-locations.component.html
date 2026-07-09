@@ -210,16 +210,27 @@
             }
           </select>
 
-          <!-- Disponibles para devolver (solo modo return + producto seleccionado) -->
-          @if (allocateMode() === 'return' && selectedProductId()) {
-            <p class="text-label-sm font-heading"
-               [class]="maxReturnable() === 0 ? 'text-error' : 'text-on-surface-variant'">
-              @if (maxReturnable() === 0) {
-                Este punto no tiene unidades asignadas de este producto.
-              } @else {
-                Asignadas en este punto: <strong>{{ maxReturnable() }}</strong> unidad(es) disponibles para devolver.
-              }
-            </p>
+          <!-- Stock disponible según modo (aparece al seleccionar producto) -->
+          @if (selectedProductId()) {
+            @if (allocateMode() === 'return') {
+              <p class="text-label-sm font-heading"
+                 [class]="maxReturnable() === 0 ? 'text-error' : 'text-on-surface-variant'">
+                @if (maxReturnable() === 0) {
+                  Este punto no tiene unidades asignadas de este producto.
+                } @else {
+                  Asignadas en este punto: <strong>{{ maxReturnable() }}</strong> unidad(es).
+                }
+              </p>
+            } @else {
+              <p class="text-label-sm font-heading"
+                 [class]="maxAssignable() === 0 ? 'text-error' : 'text-on-surface-variant'">
+                @if (maxAssignable() === 0) {
+                  Sin unidades disponibles en bodega. Genera o libera un lote primero.
+                } @else {
+                  Disponibles en bodega: <strong>{{ maxAssignable() }}</strong> unidad(es).
+                }
+              </p>
+            }
           }
         </div>
 
@@ -233,7 +244,11 @@
 
           @if (quantityExceedsStock()) {
             <p class="text-label-sm font-heading text-error">
-              La cantidad supera las {{ maxReturnable() }} unidades asignadas en este punto.
+              @if (allocateMode() === 'return') {
+                La cantidad supera las {{ maxReturnable() }} unidades asignadas en este punto.
+              } @else {
+                La cantidad supera las {{ maxAssignable() }} unidades disponibles en bodega.
+              }
             </p>
           } @else {
             <p class="text-label-sm font-heading text-on-surface-variant">
@@ -257,7 +272,9 @@
                   class="px-6 py-3 rounded-full text-label-md font-heading font-bold text-on-surface-variant
                          hover:bg-surface-container-low transition-colors">Cerrar</button>
           <button type="submit"
-                  [disabled]="allocating() || (allocateMode() === 'return' && (maxReturnable() === 0 || quantityExceedsStock()))"
+                  [disabled]="allocating() || quantityExceedsStock()
+                            || (allocateMode() === 'return' && maxReturnable() === 0)
+                            || (allocateMode() === 'assign' && maxAssignable() === 0)"
                   class="px-8 py-3 gradient-primary text-white rounded-full text-label-md font-heading font-bold
                          hover:opacity-90 active:scale-95 transition-all disabled:opacity-50">
             {{ allocating() ? 'Procesando…' : (allocateMode() === 'return' ? 'Devolver' : 'Asignar') }}
