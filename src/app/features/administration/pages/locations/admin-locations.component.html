@@ -201,6 +201,7 @@
         <div class="space-y-2">
           <label class="text-label-md font-heading font-semibold text-on-surface">Producto <span class="text-error">*</span></label>
           <select formControlName="productId"
+                  (change)="onProductChange(allocateForm.get('productId')?.value ?? '')"
                   class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 outline-none
                          focus:ring-2 focus:ring-primary/50 text-label-md font-heading cursor-pointer">
             <option value="" disabled>Selecciona un producto</option>
@@ -208,20 +209,41 @@
               <option [value]="p.id">{{ p.name }}</option>
             }
           </select>
+
+          <!-- Disponibles para devolver (solo modo return + producto seleccionado) -->
+          @if (allocateMode() === 'return' && selectedProductId()) {
+            <p class="text-label-sm font-heading"
+               [class]="maxReturnable() === 0 ? 'text-error' : 'text-on-surface-variant'">
+              @if (maxReturnable() === 0) {
+                Este punto no tiene unidades asignadas de este producto.
+              } @else {
+                Asignadas en este punto: <strong>{{ maxReturnable() }}</strong> unidad(es) disponibles para devolver.
+              }
+            </p>
+          }
         </div>
 
         <div class="space-y-2">
           <label class="text-label-md font-heading font-semibold text-on-surface">Cantidad</label>
           <input formControlName="quantity" type="text" inputmode="numeric" appThousandsSeparator
                  class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 outline-none
-                        focus:ring-2 focus:ring-primary/50 text-label-md font-heading"/>
-          <p class="text-label-sm font-heading text-on-surface-variant">
-            @if (allocateMode() === 'return') {
-              Mueve unidades <strong>asignadas</strong> en este punto de vuelta a la bodega.
-            } @else {
-              Toma unidades <strong>disponibles</strong> en bodega y las mueve a este punto.
-            }
-          </p>
+                        focus:ring-2 focus:ring-primary/50 text-label-md font-heading"
+                 [class.ring-2]="quantityExceedsStock()"
+                 [class.ring-error]="quantityExceedsStock()"/>
+
+          @if (quantityExceedsStock()) {
+            <p class="text-label-sm font-heading text-error">
+              La cantidad supera las {{ maxReturnable() }} unidades asignadas en este punto.
+            </p>
+          } @else {
+            <p class="text-label-sm font-heading text-on-surface-variant">
+              @if (allocateMode() === 'return') {
+                Mueve unidades <strong>asignadas</strong> en este punto de vuelta a la bodega.
+              } @else {
+                Toma unidades <strong>disponibles</strong> en bodega y las mueve a este punto.
+              }
+            </p>
+          }
         </div>
 
         @if (allocateMessage()) {
@@ -234,7 +256,8 @@
           <button type="button" (click)="closeAllocate()"
                   class="px-6 py-3 rounded-full text-label-md font-heading font-bold text-on-surface-variant
                          hover:bg-surface-container-low transition-colors">Cerrar</button>
-          <button type="submit" [disabled]="allocating()"
+          <button type="submit"
+                  [disabled]="allocating() || (allocateMode() === 'return' && (maxReturnable() === 0 || quantityExceedsStock()))"
                   class="px-8 py-3 gradient-primary text-white rounded-full text-label-md font-heading font-bold
                          hover:opacity-90 active:scale-95 transition-all disabled:opacity-50">
             {{ allocating() ? 'Procesando…' : (allocateMode() === 'return' ? 'Devolver' : 'Asignar') }}

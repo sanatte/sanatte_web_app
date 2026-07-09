@@ -65,17 +65,44 @@ export class AdminLocationsComponent {
   }
 
   // ── Asignar / devolver unidades ──────────────────────────────────
-  readonly allocateTarget = signal<SalesLocation | null>(null);
-  readonly allocateMode   = signal<'assign' | 'return'>('assign');
-  readonly allocateMessage = signal<string | null>(null);
-  readonly allocating = signal(false);
+  readonly allocateTarget    = signal<SalesLocation | null>(null);
+  readonly allocateMode      = signal<'assign' | 'return'>('assign');
+  readonly allocateMessage   = signal<string | null>(null);
+  readonly allocating        = signal(false);
+  readonly selectedProductId = signal('');
+
   readonly allocateForm = this.fb.nonNullable.group({
     productId: ['', Validators.required],
     quantity:  [1 as number, [Validators.required, Validators.min(1)]],
   });
 
+  /** Unidades Assigned en este punto para el producto seleccionado (solo en modo devolver). */
+  readonly maxReturnable = computed(() => {
+    const target = this.allocateTarget();
+    const pid = this.selectedProductId();
+    if (!target || !pid) return 0;
+    return this.inventory()
+      .find(r => r.locationId === target.id && r.productId === pid)
+      ?.assigned ?? 0;
+  });
+
+  /** Error de cantidad en modo devolver: excede lo disponible en el punto. */
+  readonly quantityExceedsStock = computed(() => {
+    if (this.allocateMode() !== 'return') return false;
+    const qty = Number(this.allocateForm.get('quantity')?.value ?? 0);
+    return qty > 0 && qty > this.maxReturnable();
+  });
+
+  onProductChange(productId: string): void {
+    this.selectedProductId.set(productId);
+    this.allocateMessage.set(null);
+    // resetea cantidad al cambiar producto para evitar residuos
+    this.allocateForm.patchValue({ quantity: 1 });
+  }
+
   openAllocate(location: SalesLocation): void {
     this.allocateMessage.set(null);
+    this.selectedProductId.set('');
     this.allocateForm.reset({ productId: '', quantity: 1 });
     this.allocateMode.set('assign');
     this.allocateTarget.set(location);
@@ -83,6 +110,7 @@ export class AdminLocationsComponent {
 
   openReturn(location: SalesLocation): void {
     this.allocateMessage.set(null);
+    this.selectedProductId.set('');
     this.allocateForm.reset({ productId: '', quantity: 1 });
     this.allocateMode.set('return');
     this.allocateTarget.set(location);
@@ -93,6 +121,7 @@ export class AdminLocationsComponent {
   async submitAllocate(): Promise<void> {
     const target = this.allocateTarget();
     if (!target || this.allocateForm.invalid) { this.allocateForm.markAllAsTouched(); return; }
+    if (this.quantityExceedsStock()) return;
     const { productId, quantity } = this.allocateForm.getRawValue();
     this.allocating.set(true);
     try {
