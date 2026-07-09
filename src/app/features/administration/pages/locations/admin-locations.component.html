@@ -206,7 +206,9 @@
                          focus:ring-2 focus:ring-primary/50 text-label-md font-heading cursor-pointer">
             <option value="" disabled>Selecciona un producto</option>
             @for (p of products(); track p.id) {
-              <option [value]="p.id">{{ p.name }}</option>
+              @if (p.status === 'active') {
+                <option [value]="p.id">{{ p.name }}</option>
+              }
             }
           </select>
 

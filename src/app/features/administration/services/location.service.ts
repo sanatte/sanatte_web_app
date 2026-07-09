@@ -1,10 +1,21 @@
 import { Injectable, signal, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import {
   SalesLocation, LocationType, SalesModel, InventoryRow, AllocationResult,
 } from '../models/location.model';
 import { environment } from '../../../../environments/environment';
+
+/** Extrae el mensaje del ProblemDetails que devuelve la API en errores 4xx. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function apiErrorMessage(err: unknown, fallback: string): string {
+  if (err instanceof HttpErrorResponse) {
+    const body = err.error as Record<string, unknown> | null;
+    if (body?.['detail']) return body['detail'] as string;
+    if (body?.['title'])  return body['title'] as string;
+  }
+  return fallback;
+}
 
 const LOCATION_TYPE_MAP: Record<number, LocationType> = { 0: 'ecommerce', 1: 'physical_point' };
 const SALES_MODEL_MAP: Record<number, SalesModel> = { 0: 'consignment', 1: 'wholesale' };
@@ -87,22 +98,30 @@ export class LocationService {
 
   /** Asigna unidades disponibles de un producto a una ubicación (bodega → punto). */
   async allocate(locationId: string, productId: string, quantity: number): Promise<AllocationResult> {
-    const result = await firstValueFrom(
-      this.http.post<AllocationResult>(`${this.base}/${locationId}/allocate`, { productId, quantity })
-    );
-    await this.refreshInventory();
-    return result;
+    try {
+      const result = await firstValueFrom(
+        this.http.post<AllocationResult>(`${this.base}/${locationId}/allocate`, { productId, quantity })
+      );
+      await this.refreshInventory();
+      return result;
+    } catch (err) {
+      throw new Error(apiErrorMessage(err, 'No se pudo asignar. Intenta de nuevo.'));
+    }
   }
 
   /** Devuelve unidades de un punto a la bodega (Assigned → Available). */
   async returnToWarehouse(locationId: string, productId: string, quantity: number): Promise<{ returned: number; availableInWarehouse: number }> {
-    const result = await firstValueFrom(
-      this.http.post<{ returned: number; availableInWarehouse: number }>(
-        `${this.base}/${locationId}/return`, { productId, quantity }
-      )
-    );
-    await this.refreshInventory();
-    return result;
+    try {
+      const result = await firstValueFrom(
+        this.http.post<{ returned: number; availableInWarehouse: number }>(
+          `${this.base}/${locationId}/return`, { productId, quantity }
+        )
+      );
+      await this.refreshInventory();
+      return result;
+    } catch (err) {
+      throw new Error(apiErrorMessage(err, 'No se pudo devolver. Intenta de nuevo.'));
+    }
   }
 
   private async refreshInventory(): Promise<void> {

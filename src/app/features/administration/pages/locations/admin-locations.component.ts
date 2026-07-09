@@ -150,8 +150,8 @@ export class AdminLocationsComponent {
             : `Solo había ${res.allocated} de ${res.requested} disponibles. Disponibles: ${res.availableRemaining}.`
         );
       }
-    } catch {
-      this.allocateMessage.set('No se pudo completar la operación. Intenta de nuevo.');
+    } catch (err) {
+      this.allocateMessage.set(err instanceof Error ? err.message : 'No se pudo completar la operación.');
     } finally {
       this.allocating.set(false);
     }
