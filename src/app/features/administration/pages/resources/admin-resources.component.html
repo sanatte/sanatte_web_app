@@ -41,7 +41,7 @@
     @for (resource of paginated(); track resource.id) {
       <app-resource-card
         [resource]="resource"
-        [linkedProductCount]="linkedCountMap()[resource.id] ?? 0"
+        [linkedProductCount]="linkedCountMap()[resource.id]"
         (preview)="openPreview($event)"
         (edit)="openEdit($event)"
         (downloadQr)="onDownloadQr($event)"
@@ -92,7 +92,7 @@
 <app-resource-preview-modal
   [isOpen]="isPreviewOpen()"
   [resource]="previewingResource()"
-  [linkedProductCount]="previewingResource() ? (linkedCountMap()[previewingResource()!.id] ?? 0) : 0"
+  [linkedProductCount]="previewingResource() ? linkedCountMap()[previewingResource()!.id] : 0"
   (close)="closePreview()"
   (edit)="onPreviewEdit($event)" />
 

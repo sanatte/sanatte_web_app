@@ -14,14 +14,13 @@ import { Component, input } from '@angular/core';
                   bg-primary/10 rounded-full blur-[120px] pointer-events-none"></div>
 
       <div class="relative z-10 w-full max-w-md">
-        <!-- Logo -->
-        <div class="flex flex-col items-center mb-8">
-          <img src="images/logo.png" alt="Sanatte" style="height:80px;width:auto;" class="mb-4" />
-        </div>
-
         <!-- Tarjeta -->
         <div class="glass-card rounded-lg p-6 md:p-8 transition-all duration-500
                     hover:shadow-[0px_20px_50px_rgba(76,29,149,0.10)]">
+          <!-- Logo dentro de la tarjeta -->
+          <div class="flex justify-center" style="margin-top:-40px;margin-bottom:-40px;">
+            <img src="images/logo.png" alt="Sanatte" style="height:200px;width:auto;" />
+          </div>
           <ng-content />
         </div>
 
