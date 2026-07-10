@@ -12,8 +12,7 @@ import { AuthService } from '../../core/services/auth.service';
       <header class="sticky top-0 z-30 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/20
                      px-container-padding-mobile md:px-container-padding-desktop h-16 flex items-center justify-between">
         <a routerLink="/" class="flex items-center gap-2">
-          <img src="assets/images/logo.png" alt="Sanatte" class="h-9 w-9 object-contain" />
-          <span class="font-heading text-headline-md font-bold text-primary">Sanatte</span>
+          <img src="images/logo.png" alt="Sanatte" class="h-10 object-contain" />
         </a>
 
         <nav class="hidden md:flex items-center gap-6">

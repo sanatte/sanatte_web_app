@@ -16,8 +16,7 @@ import { Component, input } from '@angular/core';
       <div class="relative z-10 w-full max-w-md">
         <!-- Logo -->
         <div class="flex flex-col items-center mb-8">
-          <img src="assets/images/logo.png" alt="Sanatte" class="w-16 h-16 object-contain mb-4" />
-          <span class="font-heading text-headline-lg font-bold text-primary">Sanatte</span>
+          <img src="images/logo.png" alt="Sanatte" class="h-16 object-contain mb-4" />
         </div>
 
         <!-- Tarjeta -->
