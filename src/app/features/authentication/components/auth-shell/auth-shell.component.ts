@@ -16,10 +16,7 @@ import { Component, input } from '@angular/core';
       <div class="relative z-10 w-full max-w-md">
         <!-- Logo -->
         <div class="flex flex-col items-center mb-8">
-          <div class="w-16 h-16 rounded-xl gradient-primary flex items-center justify-center
-                      shadow-[0px_10px_30px_rgba(107,56,212,0.25)] mb-4">
-            <span class="material-symbols-outlined text-white text-[34px]">{{ icon() }}</span>
-          </div>
+          <img src="assets/images/logo.png" alt="Sanatte" class="w-16 h-16 object-contain mb-4" />
           <span class="font-heading text-headline-lg font-bold text-primary">Sanatte</span>
         </div>
 
