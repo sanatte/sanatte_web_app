@@ -41,21 +41,33 @@
     <!-- Galería -->
     <div class="space-y-3">
       <!-- Imagen principal -->
-      <div class="w-full aspect-square rounded-lg bg-gradient-to-br flex items-center
-                  justify-center overflow-hidden"
-           [class]="displayImage()?.gradient ?? 'from-violet-400 to-purple-600'">
-        <span class="material-symbols-outlined text-white/30 text-[80px]">image</span>
+      <div class="w-full aspect-square rounded-lg overflow-hidden relative">
+        @if (displayImage()?.url) {
+          <img [src]="displayImage()!.url!" [alt]="displayImage()!.altText"
+               class="w-full h-full object-cover">
+        } @else {
+          <div class="w-full h-full bg-gradient-to-br flex items-center justify-center"
+               [class]="displayImage()?.gradient ?? 'from-violet-400 to-purple-600'">
+            <span class="material-symbols-outlined text-white/30 text-[80px]">image</span>
+          </div>
+        }
       </div>
 
-      <!-- Miniaturas -->
-      <div class="flex gap-3 overflow-x-auto scrollbar-hide pb-1">
+      <!-- Miniaturas + botón agregar -->
+      <div class="flex gap-3 overflow-x-auto scrollbar-hide pb-1 items-start">
         @for (img of p.images; track img.id) {
           <div class="relative flex-shrink-0 cursor-pointer group"
                (click)="selectImage(img)">
-            <div class="w-20 h-20 rounded-lg bg-gradient-to-br flex items-center justify-center
-                        transition-all"
-                 [class]="img.gradient + (img.id === (displayImage()?.id) ? ' ring-2 ring-primary ring-offset-1' : ' opacity-60 hover:opacity-90')">
-              <span class="material-symbols-outlined text-white/60 text-[20px]">image</span>
+            <div class="w-20 h-20 rounded-lg overflow-hidden transition-all"
+                 [class]="img.id === (displayImage()?.id) ? 'ring-2 ring-primary ring-offset-1' : 'opacity-60 hover:opacity-90'">
+              @if (img.url) {
+                <img [src]="img.url" [alt]="img.altText" class="w-full h-full object-cover">
+              } @else {
+                <div class="w-full h-full bg-gradient-to-br flex items-center justify-center"
+                     [class]="img.gradient ?? 'from-violet-400 to-purple-600'">
+                  <span class="material-symbols-outlined text-white/60 text-[20px]">image</span>
+                </div>
+              }
             </div>
             @if (img.isPrimary) {
               <span class="absolute -top-1 -right-1 bg-primary text-white text-[9px]
@@ -63,7 +75,6 @@
                 Principal
               </span>
             }
-            <!-- Acciones hover -->
             <div class="absolute inset-0 bg-black/40 rounded-lg flex items-center justify-center
                         gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
               @if (!img.isPrimary) {
@@ -83,7 +94,22 @@
             </div>
           </div>
         }
+
+        <!-- Botón agregar imagen -->
+        <app-image-upload
+          class="flex-shrink-0 w-20 h-20 block"
+          aspectRatio="1 / 1"
+          [uploading]="uploadingImage()"
+          (fileSelected)="onImageFileSelected($event)"
+          (uploadError)="uploadError.set($event)" />
       </div>
+
+      @if (uploadError()) {
+        <p class="text-label-sm text-error flex items-center gap-1">
+          <span class="material-symbols-outlined text-[14px]">error</span>
+          {{ uploadError() }}
+        </p>
+      }
     </div>
 
     <!-- Info del producto -->

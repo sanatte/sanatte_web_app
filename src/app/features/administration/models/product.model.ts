@@ -8,7 +8,8 @@ export type BillingPeriod = 'monthly' | 'annual';
 
 export interface ProductImage {
   id: string;
-  gradient: string;
+  url?: string | null;      // URL real en Firebase Storage (null = sin imagen real)
+  gradient?: string | null; // fallback CSS gradient
   altText: string;
   isPrimary: boolean;
 }

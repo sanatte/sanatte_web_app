@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
@@ -9,10 +9,11 @@ import { StatusBadgeComponent } from '../../../../shared/components/status-badge
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { Product, ProductImage, getPrimaryImage } from '../../models/product.model';
 import { Resource, ResourceType, RESOURCE_TYPE_META } from '../../models/resource.model';
+import { ImageUploadComponent } from '../../../../shared/components/image-upload/image-upload.component';
 
 @Component({
   selector: 'app-admin-product-detail',
-  imports: [RouterLink, MoneyPipe, DecimalPipe, StatusBadgeComponent, ConfirmDialogComponent],
+  imports: [RouterLink, MoneyPipe, DecimalPipe, StatusBadgeComponent, ConfirmDialogComponent, ImageUploadComponent],
   templateUrl: './admin-product-detail.component.html',
 })
 export class AdminProductDetailComponent implements OnInit {
@@ -25,6 +26,8 @@ export class AdminProductDetailComponent implements OnInit {
   readonly selectedImage   = signal<ProductImage | null>(null);
   readonly isConfirmOpen   = signal(false);
   readonly isPickerOpen    = signal(false);
+  readonly uploadingImage  = signal(false);
+  readonly uploadError     = signal('');
 
   readonly linkedResources = computed<Resource[]>(() => {
     const p = this.product();
@@ -79,22 +82,6 @@ export class AdminProductDetailComponent implements OnInit {
     this.selectedImage.set(img);
   }
 
-  setPrimary(img: ProductImage): void {
-    const p = this.product();
-    if (!p) return;
-    this.service.setPrimaryImage(p.id, img.id);
-    this.product.set(this.service.getById(p.id) ?? null);
-    this.selectedImage.set(null);
-  }
-
-  removeImage(img: ProductImage): void {
-    const p = this.product();
-    if (!p || p.images.length <= 1) return;
-    this.service.removeImage(p.id, img.id);
-    this.product.set(this.service.getById(p.id) ?? null);
-    this.selectedImage.set(null);
-  }
-
   toggleStatus(): void {
     const p = this.product();
     if (!p) return;
@@ -115,6 +102,37 @@ export class AdminProductDetailComponent implements OnInit {
     if (!p) return;
     this.service.removeResourceEntitlement(p.id, resourceId);
     this.product.set(this.service.getById(p.id) ?? null);
+  }
+
+  async onImageFileSelected(file: File, isPrimary = false): Promise<void> {
+    const p = this.product();
+    if (!p) return;
+    this.uploadingImage.set(true);
+    this.uploadError.set('');
+    try {
+      await this.service.uploadImage(p.id, file, '', isPrimary || p.images.length === 0);
+      this.product.set(this.service.getById(p.id) ?? null);
+    } catch {
+      this.uploadError.set('No se pudo subir la imagen. Inténtalo de nuevo.');
+    } finally {
+      this.uploadingImage.set(false);
+    }
+  }
+
+  async setPrimary(img: ProductImage): Promise<void> {
+    const p = this.product();
+    if (!p) return;
+    await this.service.setPrimaryImage(p.id, img.id);
+    this.product.set(this.service.getById(p.id) ?? null);
+    this.selectedImage.set(null);
+  }
+
+  async removeImage(img: ProductImage): Promise<void> {
+    const p = this.product();
+    if (!p || p.images.length <= 1) return;
+    await this.service.removeImage(p.id, img.id);
+    this.product.set(this.service.getById(p.id) ?? null);
+    this.selectedImage.set(null);
   }
 
   confirmDelete(): void {

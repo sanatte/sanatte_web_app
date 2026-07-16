@@ -79,28 +79,61 @@ export class ProductService {
     this._total.update((t) => Math.max(0, t - 1));
   }
 
-  // ─── Imágenes (persisten vía PUT del producto completo) ─────────────────────
+  // ─── Imágenes — endpoints dedicados ────────────────────────────────────────
 
-  setPrimaryImage(productId: string, imageId: string): Promise<void> {
-    const p = this._products().find((x) => x.id === productId);
-    if (!p) return Promise.resolve();
-    const images = p.images.map((img) => ({ ...img, isPrimary: img.id === imageId }));
-    return this.update(productId, { images });
+  /** Sube una imagen al producto. Devuelve la imagen creada con su URL. */
+  async uploadImage(
+    productId: string, file: File, altText = '', isPrimary = false
+  ): Promise<ProductImage> {
+    const fd = new FormData();
+    fd.append('file', file, file.name);
+    fd.append('altText', altText);
+    fd.append('isPrimary', String(isPrimary));
+    const raw = await firstValueFrom(
+      this.http.post<ProductImage>(`${this.base}/${productId}/images`, fd)
+    );
+    const newImg: ProductImage = {
+      id: raw.id, url: (raw as any).url ?? null,
+      gradient: (raw as any).gradient ?? null,
+      altText: raw.altText, isPrimary: raw.isPrimary,
+    };
+    this._products.update((list) =>
+      list.map((p) => {
+        if (p.id !== productId) return p;
+        const images = isPrimary
+          ? [...p.images.map((i) => ({ ...i, isPrimary: false })), newImg]
+          : [...p.images, newImg];
+        return { ...p, images };
+      })
+    );
+    return newImg;
   }
 
-  addImage(productId: string, image: ProductImage): Promise<void> {
-    const p = this._products().find((x) => x.id === productId);
-    if (!p) return Promise.resolve();
-    return this.update(productId, { images: [...p.images, image] });
+  async setPrimaryImage(productId: string, imageId: string): Promise<void> {
+    await firstValueFrom(
+      this.http.patch(`${this.base}/${productId}/images/${imageId}/primary`, {})
+    );
+    this._products.update((list) =>
+      list.map((p) => p.id !== productId ? p : {
+        ...p,
+        images: p.images.map((i) => ({ ...i, isPrimary: i.id === imageId })),
+      })
+    );
   }
 
-  removeImage(productId: string, imageId: string): Promise<void> {
-    const p = this._products().find((x) => x.id === productId);
-    if (!p) return Promise.resolve();
-    const filtered = p.images.filter((img) => img.id !== imageId);
-    const hasPrimary = filtered.some((img) => img.isPrimary);
-    const images = hasPrimary ? filtered : filtered.map((img, i) => ({ ...img, isPrimary: i === 0 }));
-    return this.update(productId, { images });
+  async removeImage(productId: string, imageId: string): Promise<void> {
+    await firstValueFrom(
+      this.http.delete(`${this.base}/${productId}/images/${imageId}`)
+    );
+    this._products.update((list) =>
+      list.map((p) => {
+        if (p.id !== productId) return p;
+        const filtered = p.images.filter((i) => i.id !== imageId);
+        const hasPrimary = filtered.some((i) => i.isPrimary);
+        const images = hasPrimary ? filtered : filtered.map((i, idx) => ({ ...i, isPrimary: idx === 0 }));
+        return { ...p, images };
+      })
+    );
   }
 
   /** Vincula un recurso al producto (capa Entitlement en la API — ruta admin). */

@@ -13,18 +13,21 @@ import { Resource, RESOURCE_TYPE_META } from '../../models/resource.model';
       <!-- Thumbnail -->
       <div class="relative aspect-video overflow-hidden">
 
-        @if (resource().type === 'pdf') {
-          <!-- PDF: icono centrado -->
+        @if (resource().thumbnailUrl) {
+          <!-- Imagen real -->
+          <img [src]="resource().thumbnailUrl!" [alt]="resource().title"
+               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          <div class="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors"></div>
+        } @else if (resource().type === 'pdf') {
+          <!-- PDF sin thumbnail: icono centrado -->
           <div class="w-full h-full bg-surface-container-low flex flex-col items-center
                       justify-center gap-2 text-primary/40 group-hover:text-primary
                       transition-colors">
             <span class="material-symbols-outlined text-[48px]">picture_as_pdf</span>
-            <span class="text-label-sm font-heading font-bold uppercase tracking-tighter">
-              PDF
-            </span>
+            <span class="text-label-sm font-heading font-bold uppercase tracking-tighter">PDF</span>
           </div>
         } @else {
-          <!-- Audio/Video/Article: gradient de fondo -->
+          <!-- Gradient fallback -->
           <div class="w-full h-full bg-gradient-to-br group-hover:scale-105
                       transition-transform duration-500 flex items-center justify-center"
                [class]="resource().thumbnailGradient">
@@ -91,6 +94,14 @@ import { Resource, RESOURCE_TYPE_META } from '../../models/resource.model';
 
           <!-- Actions -->
           <div class="flex items-center gap-0.5 shrink-0">
+            <!-- Upload thumbnail -->
+            <label class="p-1.5 rounded-full text-on-surface-variant hover:text-primary
+                          hover:bg-primary-fixed transition-colors cursor-pointer"
+                   title="Subir thumbnail">
+              <span class="material-symbols-outlined text-[18px]">add_photo_alternate</span>
+              <input type="file" accept="image/jpeg,image/png,image/webp" class="hidden"
+                     (change)="onThumbnailFileChange($event)">
+            </label>
             <button (click)="downloadQr.emit(resource())"
                     class="p-1.5 rounded-full text-on-surface-variant hover:text-primary
                            hover:bg-primary-fixed transition-colors"
@@ -118,10 +129,12 @@ import { Resource, RESOURCE_TYPE_META } from '../../models/resource.model';
 export class ResourceCardComponent {
   readonly resource           = input.required<Resource>();
   readonly linkedProductCount = input(0);
-  readonly edit       = output<Resource>();
-  readonly delete     = output<Resource>();
-  readonly preview    = output<Resource>();
-  readonly downloadQr = output<Resource>();
+  readonly uploadingThumbnail = input(false);
+  readonly edit            = output<Resource>();
+  readonly delete          = output<Resource>();
+  readonly preview         = output<Resource>();
+  readonly downloadQr      = output<Resource>();
+  readonly thumbnailSelected = output<{ resource: Resource; file: File }>();
 
   readonly typeMeta = computed(() => RESOURCE_TYPE_META[this.resource().type]);
 
@@ -129,4 +142,10 @@ export class ResourceCardComponent {
     const r = this.resource();
     return r.duration ?? r.fileSize ?? (r.readTime ? `${r.readTime} lectura` : null);
   });
+
+  onThumbnailFileChange(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) this.thumbnailSelected.emit({ resource: this.resource(), file });
+    (event.target as HTMLInputElement).value = '';
+  }
 }

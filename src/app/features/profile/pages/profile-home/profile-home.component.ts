@@ -7,8 +7,8 @@ import { AuthService } from '../../../../core/services/auth.service';
   templateUrl: './profile-home.component.html',
 })
 export class ProfileHomeComponent {
-  private readonly profileService = inject(UserProfileService);
-  private readonly auth           = inject(AuthService);
+  readonly profileService = inject(UserProfileService);
+  private readonly auth   = inject(AuthService);
 
   // Copia editable del perfil (se confirma con "Guardar cambios").
   readonly form = signal({ ...this.profileService.profile() });
@@ -17,7 +17,9 @@ export class ProfileHomeComponent {
   readonly newsletter = computed(() => this.profileService.profile().newsletterSubscribed);
   readonly initial    = computed(() => (this.form().fullName.charAt(0) || 'U').toUpperCase());
 
-  readonly savedFlag = signal(false);
+  readonly savedFlag      = signal(false);
+  readonly uploadingAvatar = signal(false);
+  readonly avatarError    = signal('');
 
   constructor() {
     // El perfil llega async del backend; resincroniza el form hasta que el
@@ -43,6 +45,25 @@ export class ProfileHomeComponent {
 
   toggleNewsletter(): void {
     this.profileService.setNewsletter(!this.newsletter());
+  }
+
+  async onAvatarFileChange(event: Event): Promise<void> {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    if (file.size > 3 * 1024 * 1024) {
+      this.avatarError.set('El archivo supera 3 MB.');
+      return;
+    }
+    this.avatarError.set('');
+    this.uploadingAvatar.set(true);
+    try {
+      await this.profileService.uploadAvatar(file);
+    } catch {
+      this.avatarError.set('No se pudo subir el avatar. Inténtalo de nuevo.');
+    } finally {
+      this.uploadingAvatar.set(false);
+      (event.target as HTMLInputElement).value = '';
+    }
   }
 
   logout(): void { this.auth.logout(); }

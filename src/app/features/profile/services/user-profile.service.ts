@@ -14,7 +14,8 @@ import { environment } from '../../../../environments/environment';
 export interface UserProfile {
   fullName: string;
   email: string;
-  dateOfBirth: string;   // yyyy-mm-dd
+  avatarUrl: string | null;
+  dateOfBirth: string;
   location: string;
   newsletterSubscribed: boolean;
 }
@@ -22,6 +23,7 @@ export interface UserProfile {
 interface ApiProfile {
   fullName: string;
   email: string;
+  avatarUrl?: string | null;
   dateOfBirth: string | null;
   location: string | null;
   newsletterSubscribed: boolean;
@@ -64,10 +66,21 @@ export class UserProfileService {
     this.save({ newsletterSubscribed: subscribed });
   }
 
+  /** Sube o reemplaza el avatar del usuario autenticado. */
+  async uploadAvatar(file: File): Promise<void> {
+    const fd = new FormData();
+    fd.append('file', file, file.name);
+    const raw = await firstValueFrom(
+      this.http.put<ApiProfile>(`${environment.apiUrl}/me/avatar`, fd)
+    );
+    this._profile.set(this.fromApi(raw));
+  }
+
   private fromApi(raw: ApiProfile): UserProfile {
     return {
       fullName: raw.fullName,
       email: raw.email,
+      avatarUrl: raw.avatarUrl ?? null,
       dateOfBirth: raw.dateOfBirth ?? '',
       location: raw.location ?? '',
       newsletterSubscribed: raw.newsletterSubscribed,
@@ -80,6 +93,7 @@ export class UserProfileService {
     return {
       fullName: user?.displayName ?? 'Usuario Sanatte',
       email: user?.email ?? 'usuario@sanatte.com',
+      avatarUrl: user?.avatarUrl ?? null,
       dateOfBirth: '',
       location: '',
       newsletterSubscribed: true,

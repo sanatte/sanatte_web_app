@@ -30,6 +30,7 @@ export interface Resource {
   duration?: string;
   fileSize?: string;
   readTime?: string;
-  thumbnailGradient: string;
+  thumbnailUrl?: string | null;  // URL real en Firebase Storage
+  thumbnailGradient: string;     // fallback CSS gradient
   createdAt: string;
 }

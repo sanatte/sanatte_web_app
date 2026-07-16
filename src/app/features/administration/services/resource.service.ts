@@ -23,6 +23,7 @@ function mapApiResource(raw: any): Resource {
     duration:          raw.duration ?? undefined,
     fileSize:          raw.fileSize ?? undefined,
     readTime:          raw.readTime ?? undefined,
+    thumbnailUrl:      raw.thumbnailUrl ?? null,
     thumbnailGradient: raw.thumbnailGradient ?? 'from-violet-400 to-purple-600',
     createdAt:         raw.createdAt?.split('T')[0] ?? '',
   };
@@ -89,5 +90,16 @@ export class ResourceService {
   async delete(id: string): Promise<void> {
     await firstValueFrom(this.http.delete(`${this.base}/${id}`));
     this._resources.update((list) => list.filter((r) => r.id !== id));
+  }
+
+  /** Sube o reemplaza el thumbnail de un recurso existente. */
+  async uploadThumbnail(id: string, file: File): Promise<void> {
+    const fd = new FormData();
+    fd.append('file', file, file.name);
+    const raw = await firstValueFrom(
+      this.http.post<unknown>(`${this.base}/${id}/thumbnail`, fd)
+    );
+    const updated = mapApiResource(raw);
+    this._resources.update((list) => list.map((r) => r.id === id ? updated : r));
   }
 }

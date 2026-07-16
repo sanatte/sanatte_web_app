@@ -42,10 +42,12 @@
       <app-resource-card
         [resource]="resource"
         [linkedProductCount]="linkedCountMap()[resource.id]"
+        [uploadingThumbnail]="uploadingThumbnailId() === resource.id"
         (preview)="openPreview($event)"
         (edit)="openEdit($event)"
         (downloadQr)="onDownloadQr($event)"
-        (delete)="requestDelete($event)" />
+        (delete)="requestDelete($event)"
+        (thumbnailSelected)="onThumbnailSelected($event)" />
     }
 
     <!-- Empty state -->

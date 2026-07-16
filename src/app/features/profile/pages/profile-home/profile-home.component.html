@@ -2,13 +2,37 @@
 
   <!-- Encabezado de perfil -->
   <header class="flex items-center gap-5">
-    <div class="w-20 h-20 rounded-full gradient-primary flex items-center justify-center
-                text-white font-heading font-bold text-3xl flex-shrink-0">
-      {{ initial() }}
-    </div>
+    <!-- Avatar con botón de upload -->
+    <label class="relative w-20 h-20 flex-shrink-0 cursor-pointer group" title="Cambiar foto de perfil">
+      @if (profileService.profile().avatarUrl) {
+        <img [src]="profileService.profile().avatarUrl!"
+             alt="Avatar"
+             class="w-20 h-20 rounded-full object-cover">
+      } @else {
+        <div class="w-20 h-20 rounded-full gradient-primary flex items-center justify-center
+                    text-white font-heading font-bold text-3xl">
+          {{ initial() }}
+        </div>
+      }
+      <!-- Overlay hover -->
+      <div class="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center
+                  opacity-0 group-hover:opacity-100 transition-opacity">
+        @if (uploadingAvatar()) {
+          <div class="w-6 h-6 border-2 border-white/40 border-t-white rounded-full animate-spin"></div>
+        } @else {
+          <span class="material-symbols-outlined text-white text-[24px]">photo_camera</span>
+        }
+      </div>
+      <input type="file" accept="image/jpeg,image/png,image/webp" class="hidden"
+             (change)="onAvatarFileChange($event)">
+    </label>
+
     <div class="min-w-0">
       <h1 class="font-heading text-headline-lg text-on-surface truncate">{{ form().fullName }}</h1>
       <p class="text-label-md font-heading text-on-surface-variant mt-1 truncate">{{ form().email }}</p>
+      @if (avatarError()) {
+        <p class="text-label-sm text-error mt-1">{{ avatarError() }}</p>
+      }
     </div>
   </header>
 

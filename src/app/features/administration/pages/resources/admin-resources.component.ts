@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, WritableSignal } from '@angular/core';
 import { ResourceService } from '../../services/resource.service';
 import { ProductService } from '../../services/product.service';
 import { EntitlementService } from '../../services/entitlement.service';
@@ -45,6 +45,7 @@ export class AdminResourcesComponent {
   readonly resourceToDelete   = signal<Resource | null>(null);
   readonly isPreviewOpen      = signal(false);
   readonly previewingResource = signal<Resource | null>(null);
+  readonly uploadingThumbnailId = signal<string | null>(null);
 
   readonly tabs: { key: TabFilter; label: string }[] = [
     { key: 'all',      label: 'Todos'      },
@@ -129,4 +130,15 @@ export class AdminResourcesComponent {
   }
 
   cancelDelete(): void { this.isConfirmOpen.set(false); this.resourceToDelete.set(null); }
+
+  async onThumbnailSelected(event: { resource: Resource; file: File }): Promise<void> {
+    this.uploadingThumbnailId.set(event.resource.id);
+    try {
+      await this.resourceService.uploadThumbnail(event.resource.id, event.file);
+    } catch {
+      alert('No se pudo subir el thumbnail. Inténtalo de nuevo.');
+    } finally {
+      this.uploadingThumbnailId.set(null);
+    }
+  }
 }
