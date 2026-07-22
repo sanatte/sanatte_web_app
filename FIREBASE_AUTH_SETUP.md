@@ -82,6 +82,58 @@ por un proveedor con reputación de entrega — **Resend**, **Amazon SES** o **S
 
 ---
 
+---
+
+## 3. Firebase Storage — habilitar el bucket (imágenes de productos/recursos/avatares)
+
+El backend guarda las imágenes en **Firebase Storage**. El proyecto `sanatte-d819d`
+**no tenía Storage habilitado** → no existía ningún bucket → toda subida daba
+"The specified bucket does not exist" (500). Hay que provisionarlo **una vez**.
+
+### Habilitar Storage (crea el bucket)
+
+**Firebase Console → Build → Storage → "Comenzar"**:
+1. Deja el modo de reglas en **producción**.
+2. Elige la **ubicación** del bucket.
+   - ⚠️ **Es permanente**, no se puede cambiar después.
+   - Sugerido: `southamerica-east1` (São Paulo, cercano a Colombia) o `us-central1`.
+3. Al terminar se crea el bucket por defecto. **Anota el nombre exacto** que muestra
+   arriba, p. ej. `gs://sanatte-d819d.firebasestorage.app`.
+
+El service account `firebase-adminsdk-fbsvc@sanatte-d819d.iam.gserviceaccount.com`
+ya tiene permisos de Storage por defecto → no hay que tocar IAM.
+
+### Configurar el nombre del bucket (parametrizado)
+
+El backend lee el bucket de config **`Firebase:StorageBucket`**, sobrescribible por
+variable de entorno **sin tocar código**:
+
+| Entorno | Cómo se define | Valor |
+|---|---|---|
+| Local / default | `appsettings.json` → `Firebase:StorageBucket` | `sanatte-d819d.firebasestorage.app` |
+| Dev / Prod (Coolify) | Variable de entorno **`Firebase__StorageBucket`** | el nombre real del bucket creado |
+
+> Si el bucket que crea Firebase se llama exactamente `sanatte-d819d.firebasestorage.app`,
+> el default ya coincide y no hay que hacer nada. Si Firebase lo crea con otro nombre
+> (p. ej. `.appspot.com`), pon ese nombre en `Firebase__StorageBucket` en Coolify.
+
+### Cómo funciona el acceso a las imágenes
+
+- Se suben con un **token de descarga de Firebase** (`firebaseStorageDownloadTokens`)
+  y se devuelve la URL `https://firebasestorage.googleapis.com/v0/b/{bucket}/o/{path}?alt=media&token=…`.
+- No usa ACL por objeto (falla con *uniform bucket-level access*) ni expone el bucket
+  como público: el token da acceso de lectura a ese objeto puntual.
+
+### Verificar
+
+- Admin → Productos → un producto → detalle → subir imagen. Debe verse la foto.
+- Si falla con **409** "El bucket … no existe": Storage no está habilitado o el nombre
+  en `Firebase__StorageBucket` no coincide con el bucket real.
+- Para listar los buckets reales (con el service account):
+  `gcloud storage buckets list --project=sanatte-d819d`
+
+---
+
 ## Checklist
 
 - [ ] URL de acción = `https://sanatte.com/auth/action` (Templates)
@@ -89,3 +141,5 @@ por un proveedor con reputación de entrega — **Resend**, **Amazon SES** o **S
 - [ ] SPF + DKIM + DMARC en el DNS de `sanatte.com`
 - [ ] Remitente personalizado `@sanatte.com` (Opción A) o proveedor dedicado (Opción B)
 - [ ] Probado: verificar correo + restablecer contraseña, incluido en otro navegador
+- [ ] **Firebase Storage habilitado** (bucket creado) + `Firebase__StorageBucket` correcto
+- [ ] Probado: subir imagen de producto se ve correctamente

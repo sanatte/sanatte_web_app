@@ -13,9 +13,10 @@ Lo que falta para lanzar **no son features, es configuración/contenido**:
 
 | # | Bloqueador | Dónde se resuelve | Estado |
 |---|---|---|---|
-| 1 | **Foto real de Plena** en el hero de la landing | Admin → Productos → Plena → subir imagen (principal) | ⏳ |
-| 2 | **URL de acción de Firebase** (para que verificar correo y restablecer contraseña funcionen) | Firebase Console → Auth → Templates. Ver `FIREBASE_AUTH_SETUP.md` | ⏳ config |
-| 3 | **Correos fuera de Spam** (SPF/DKIM/DMARC o proveedor dedicado) | DNS de `sanatte.com`. Ver `FIREBASE_AUTH_SETUP.md` | ⏳ config |
+| 0 | **Habilitar Firebase Storage** (no hay bucket → toda subida de imagen falla) | Firebase Console → Build → Storage → Comenzar. Ver `FIREBASE_AUTH_SETUP.md` §3 | ⏳ config |
+| 1 | **Foto real de Plena** en el hero de la landing (requiere #0) | Admin → Productos → Plena → subir imagen (principal) | ⏳ |
+| 2 | **URL de acción de Firebase** (para que verificar correo y restablecer contraseña funcionen) | Firebase Console → Auth → Templates. Ver `FIREBASE_AUTH_SETUP.md` §1 | ⏳ config |
+| 3 | **Correos fuera de Spam** (SPF/DKIM/DMARC o proveedor dedicado) | DNS de `sanatte.com`. Ver `FIREBASE_AUTH_SETUP.md` §2 | ⏳ config |
 | 4 | **Credenciales de Mercado Pago de producción** (no las de test) | Variables en Coolify (`MercadoPago:AccessToken`) | ⏳ verificar |
 | 5 | **Deploy de la web en dominio de producción** (`sanatte.com`; hoy solo `dev.sanatte.com`) | Coolify / DNS | ⏳ |
 
