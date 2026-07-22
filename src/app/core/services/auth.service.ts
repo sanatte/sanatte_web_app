@@ -8,6 +8,7 @@ import {
   sendEmailVerification as fbSendEmailVerification,
   signInWithPopup, GoogleAuthProvider, OAuthProvider,
   sendPasswordResetEmail, confirmPasswordReset, signOut,
+  applyActionCode, verifyPasswordResetCode,
   User as FbUser,
 } from 'firebase/auth';
 import { environment } from '../../../environments/environment';
@@ -149,6 +150,28 @@ export class AuthService {
 
   async resetPassword(oobCode: string, newPassword: string): Promise<void> {
     await confirmPasswordReset(this.auth, oobCode, newPassword);
+  }
+
+  /**
+   * Aplica el código de verificación de correo (oobCode del enlace del email).
+   * Funciona SIN sesión activa: valida el código contra Firebase directamente,
+   * por lo que sirve aunque el usuario abra el enlace en otro navegador/dispositivo.
+   */
+  async applyEmailVerificationCode(oobCode: string): Promise<void> {
+    await applyActionCode(this.auth, oobCode);
+    localStorage.removeItem(PENDING_KEY);
+    // Si hay sesión en este navegador, refresca el flag para promover a sesión activa.
+    if (this.auth.currentUser) {
+      await this.auth.currentUser.reload();
+      if (this.auth.currentUser.emailVerified) {
+        try { await this.hydrate(this.auth.currentUser); } catch { /* backend caído: se hidrata al loguear */ }
+      }
+    }
+  }
+
+  /** Valida un código de restablecimiento y devuelve el email asociado (o lanza si es inválido). */
+  async verifyResetCode(oobCode: string): Promise<string> {
+    return verifyPasswordResetCode(this.auth, oobCode);
   }
 
   async logout(): Promise<void> {

@@ -22,14 +22,23 @@ import { AuthShellComponent } from '../components/auth-shell/auth-shell.componen
         </p>
       </div>
 
-      <!-- Simula el clic en el enlace del correo (en producción llega por email vía Firebase) -->
-      <button (click)="simulateLinkClick()"
+      <!-- Acción real: el usuario abre el enlace del correo y vuelve aquí a confirmar. -->
+      <button (click)="checkVerified()" [disabled]="checking()"
               class="w-full py-3.5 rounded-full gradient-primary text-white font-heading font-bold
                      shadow-primary hover:opacity-90 active:scale-95 transition-all
-                     flex items-center justify-center gap-2 mb-3">
-        <span class="material-symbols-outlined text-[20px]">open_in_new</span>
-        Abrir enlace de verificación
+                     flex items-center justify-center gap-2 mb-3 disabled:opacity-60">
+        @if (checking()) {
+          <span class="material-symbols-outlined animate-spin text-[20px]">progress_activity</span> Comprobando…
+        } @else {
+          <span class="material-symbols-outlined text-[20px]">check_circle</span> Ya verifiqué mi correo
+        }
       </button>
+
+      @if (notYet()) {
+        <p class="text-label-sm text-error font-heading text-center mb-3">
+          Aún no detectamos la verificación. Abre el enlace del correo y vuelve a intentar.
+        </p>
+      }
 
       <button (click)="resend()" [disabled]="resent()"
               class="w-full py-3 rounded-full border border-outline-variant font-heading font-semibold
@@ -52,6 +61,8 @@ export class VerifyEmailComponent {
 
   readonly email = signal(this.auth.pendingEmail());
   readonly resent = signal(false);
+  readonly checking = signal(false);
+  readonly notYet = signal(false);
   private readonly returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '';
 
   async resend(): Promise<void> {
@@ -60,10 +71,20 @@ export class VerifyEmailComponent {
     setTimeout(() => this.resent.set(false), 3000);
   }
 
-  simulateLinkClick(): void {
-    // El enlace real (Firebase) llega por correo a /auth/verified?oobCode=…
-    this.router.navigate(['/auth/verified'], {
-      queryParams: this.returnUrl ? { returnUrl: this.returnUrl } : {},
-    });
+  /** El usuario ya abrió el enlace del correo: recargamos su estado y, si quedó
+   *  verificado, lo promovemos a sesión activa y entramos. */
+  async checkVerified(): Promise<void> {
+    this.checking.set(true);
+    this.notYet.set(false);
+    try {
+      const ok = await this.auth.confirmEmailVerification();
+      if (ok) {
+        await this.router.navigateByUrl(this.returnUrl || '/app/library');
+      } else {
+        this.notYet.set(true);
+      }
+    } finally {
+      this.checking.set(false);
+    }
   }
 }

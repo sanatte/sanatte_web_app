@@ -22,8 +22,10 @@ export class ProductFormDialogComponent {
   private readonly fb              = inject(FormBuilder);
   private readonly resourceService = inject(ResourceService);
 
-  readonly isOpen  = input.required<boolean>();
-  readonly product = input<Product | null>(null);
+  readonly isOpen       = input.required<boolean>();
+  readonly product      = input<Product | null>(null);
+  readonly saving       = input(false);
+  readonly errorMessage = input('');
 
   readonly save   = output<Partial<Product>>();
   readonly cancel = output<void>();
@@ -39,12 +41,13 @@ export class ProductFormDialogComponent {
     stock:              [null as number | null],
     requiresActivation: [true],
     status:             ['active'],
-    description:        [''],
+    description:        ['', Validators.required],
     tags:               [''],
   });
 
   readonly isEditMode          = computed(() => this.product() !== null);
   readonly selectedType        = signal<ProductType>('physical');
+  readonly imagesError         = signal(false);
   readonly primaryImage        = computed(() => this.images().find((img) => img.isPrimary) ?? this.images()[0]);
   readonly selectedResourceIds = signal<Set<string>>(new Set());
   readonly allResources        = this.resourceService.resources;
@@ -111,6 +114,7 @@ export class ProductFormDialogComponent {
   }
 
   addImage(): void {
+    this.imagesError.set(false);
     const usedGradients = new Set(this.images().map((img) => img.gradient));
     const gradient = GRADIENT_PALETTE.find((g) => !usedGradients.has(g))
       ?? GRADIENT_PALETTE[this.images().length % GRADIENT_PALETTE.length];
@@ -135,9 +139,10 @@ export class ProductFormDialogComponent {
 
   onSubmit(): void {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+    const imgs = this.images();
+    if (imgs.length === 0) { this.imagesError.set(true); return; }
     const raw  = this.form.getRawValue();
     const type = raw.type as ProductType;
-    const imgs = this.images();
 
     this.save.emit({
       name: raw.name, sku: raw.sku, type,
@@ -160,10 +165,7 @@ export class ProductFormDialogComponent {
           label: r.title,
         })),
       specs: this.product()?.specs ?? [],
-      images: imgs.length ? imgs : [
-        { id: `img-${Date.now()}`, gradient: 'from-violet-400 to-purple-600',
-          altText: raw.name, isPrimary: true },
-      ],
+      images: imgs,
     });
   }
 }

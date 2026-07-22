@@ -55,9 +55,16 @@ export class VerifiedComponent {
 
   readonly ok = signal(false);
   private readonly returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '';
+  private readonly oobCode = this.route.snapshot.queryParamMap.get('oobCode') ?? '';
 
   constructor() {
-    this.auth.confirmEmailVerification().then((success) => this.ok.set(success));
+    // Con oobCode (enlace real del correo): aplica el código contra Firebase —
+    // funciona aun sin sesión en este navegador. Sin oobCode: reintenta con la
+    // sesión local (flujo de "ya verifiqué, recargar").
+    const verify = this.oobCode
+      ? this.auth.applyEmailVerificationCode(this.oobCode).then(() => true).catch(() => false)
+      : this.auth.confirmEmailVerification();
+    verify.then((success) => this.ok.set(success));
   }
 
   go(): void {

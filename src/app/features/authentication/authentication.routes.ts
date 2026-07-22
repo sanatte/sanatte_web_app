@@ -13,6 +13,13 @@ export const authenticationRoutes: Routes = [
     loadComponent: () => import('./register/register.component').then((m) => m.RegisterComponent),
   },
   {
+    // Handler único de los enlaces de correo de Firebase (mode + oobCode).
+    // Configurar en Firebase Console → Authentication → Templates → Action URL:
+    //   https://sanatte.com/auth/action
+    path: 'action',
+    loadComponent: () => import('./auth-action/auth-action.component').then((m) => m.AuthActionComponent),
+  },
+  {
     // Verifica tu correo (registro pendiente — aún sin sesión activa).
     path: 'verify-email',
     loadComponent: () => import('./verify-email/verify-email.component').then((m) => m.VerifyEmailComponent),

@@ -1,12 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { AuthShellComponent } from '../components/auth-shell/auth-shell.component';
 
 @Component({
   selector: 'app-reset-password',
-  imports: [ReactiveFormsModule, AuthShellComponent],
+  imports: [ReactiveFormsModule, AuthShellComponent, RouterLink],
   template: `
     <app-auth-shell icon="password">
       @if (!done()) {
@@ -14,6 +14,28 @@ import { AuthShellComponent } from '../components/auth-shell/auth-shell.componen
         <p class="font-sans text-label-md text-on-surface-variant mb-6">
           Define una nueva contraseña para tu cuenta.
         </p>
+
+        @if (!hasCode()) {
+          <div class="mb-4 p-4 rounded-xl bg-error-container/50 border border-error/20 text-error
+                      text-label-md font-heading flex items-start gap-2">
+            <span class="material-symbols-outlined text-[18px] flex-shrink-0 mt-0.5">error</span>
+            <div>
+              El enlace no es válido o ya expiró.
+              <a routerLink="/auth/forgot"
+                 class="block mt-1 text-primary font-bold hover:underline">
+                Solicitar un nuevo enlace
+              </a>
+            </div>
+          </div>
+        }
+
+        @if (errorMessage()) {
+          <div class="mb-4 p-3 rounded-xl bg-error-container/50 border border-error/20 text-error
+                      text-label-md font-heading flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px]">error</span>
+            {{ errorMessage() }}
+          </div>
+        }
 
         <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
           <div>
@@ -44,7 +66,7 @@ import { AuthShellComponent } from '../components/auth-shell/auth-shell.componen
             Mostrar contraseñas
           </label>
 
-          <button type="submit" [disabled]="loading() || form.invalid"
+          <button type="submit" [disabled]="loading() || form.invalid || !hasCode()"
                   class="w-full py-3.5 rounded-full gradient-primary text-white font-heading font-bold
                          shadow-primary hover:opacity-90 active:scale-95 transition-all
                          flex items-center justify-center gap-2 disabled:opacity-50">
@@ -87,9 +109,11 @@ export class ResetPasswordComponent {
     },
     { validators: [this.matchValidator] },
   );
-  readonly loading = this.auth.loading;
-  readonly show = signal(false);
-  readonly done = signal(false);
+  readonly loading    = this.auth.loading;
+  readonly show       = signal(false);
+  readonly done       = signal(false);
+  readonly hasCode    = signal(this.oobCode.length > 0);
+  readonly errorMessage = signal('');
 
   private matchValidator(group: AbstractControl) {
     const p = group.get('password')?.value;
@@ -98,9 +122,19 @@ export class ResetPasswordComponent {
   }
 
   async onSubmit(): Promise<void> {
-    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
-    await this.auth.resetPassword(this.oobCode, this.form.getRawValue().password);
-    this.done.set(true);
+    if (this.form.invalid || !this.oobCode) { this.form.markAllAsTouched(); return; }
+    this.errorMessage.set('');
+    try {
+      await this.auth.resetPassword(this.oobCode, this.form.getRawValue().password);
+      this.done.set(true);
+    } catch (e) {
+      const code = (e as { code?: string })?.code;
+      this.errorMessage.set(
+        code === 'auth/expired-action-code' || code === 'auth/invalid-action-code'
+          ? 'El enlace expiró o ya fue usado. Solicita uno nuevo.'
+          : 'No se pudo restablecer la contraseña. Intenta de nuevo.'
+      );
+    }
   }
 
   toLogin(): void {

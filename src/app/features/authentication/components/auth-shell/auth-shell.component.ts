@@ -1,4 +1,5 @@
 import { Component, input } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 /**
  * AuthShell — envoltorio visual común de las pantallas de autenticación
@@ -6,6 +7,7 @@ import { Component, input } from '@angular/core';
  */
 @Component({
   selector: 'app-auth-shell',
+  imports: [RouterLink],
   template: `
     <div class="min-h-screen bg-surface flex flex-col items-center justify-center
                 px-container-padding-mobile py-10 relative overflow-hidden">
@@ -17,9 +19,11 @@ import { Component, input } from '@angular/core';
         <!-- Tarjeta -->
         <div class="glass-card rounded-lg p-6 md:p-8 transition-all duration-500
                     hover:shadow-[0px_20px_50px_rgba(76,29,149,0.10)]">
-          <!-- Logo dentro de la tarjeta -->
+          <!-- Logo dentro de la tarjeta — lleva a inicio -->
           <div class="flex justify-center" style="margin-top:-40px;margin-bottom:-40px;">
-            <img src="images/logo.png" alt="Sanatte" style="height:200px;width:auto;" />
+            <a routerLink="/" title="Ir a inicio">
+              <img src="images/logo.png" alt="Sanatte" style="height:200px;width:auto;" />
+            </a>
           </div>
           <ng-content />
         </div>

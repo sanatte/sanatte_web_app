@@ -32,6 +32,8 @@
 <app-product-form-dialog
   [isOpen]="isModalOpen()"
   [product]="editingProduct()"
+  [saving]="saving()"
+  [errorMessage]="saveError()"
   (save)="onSave($event)"
   (cancel)="closeModal()" />
 
@@ -40,6 +42,7 @@
   [open]="isConfirmOpen()"
   title="Eliminar producto"
   [message]="deleteMessage()"
+  [errorMessage]="deleteError()"
   confirmText="Sí, eliminar"
   variant="danger"
   (confirm)="confirmDelete()"

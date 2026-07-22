@@ -28,6 +28,13 @@ import { Component, input, output, computed } from '@angular/core';
             <p class="text-label-md font-heading text-on-surface-variant mt-2 leading-relaxed">
               {{ message() }}
             </p>
+            @if (errorMessage()) {
+              <div class="mt-4 p-3 rounded-xl bg-error-container/50 border border-error/20 text-error
+                          text-label-sm font-heading flex items-start gap-2">
+                <span class="material-symbols-outlined text-[16px] flex-shrink-0 mt-0.5">error</span>
+                <span>{{ errorMessage() }}</span>
+              </div>
+            }
           </div>
 
           <!-- Actions -->
@@ -52,12 +59,13 @@ import { Component, input, output, computed } from '@angular/core';
   `,
 })
 export class ConfirmDialogComponent {
-  readonly open        = input(false);
-  readonly title       = input('¿Confirmar acción?');
-  readonly message     = input('¿Estás seguro de que deseas continuar?');
-  readonly confirmText = input('Confirmar');
-  readonly cancelText  = input('Cancelar');
-  readonly variant     = input<'danger' | 'primary'>('danger');
+  readonly open         = input(false);
+  readonly title        = input('¿Confirmar acción?');
+  readonly message      = input('¿Estás seguro de que deseas continuar?');
+  readonly errorMessage = input('');
+  readonly confirmText  = input('Confirmar');
+  readonly cancelText   = input('Cancelar');
+  readonly variant      = input<'danger' | 'primary'>('danger');
 
   readonly confirm = output<void>();
   readonly cancel  = output<void>();

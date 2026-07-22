@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
@@ -17,9 +17,18 @@ import { AuthShellComponent } from '../components/auth-shell/auth-shell.componen
 
       @if (errorMessage()) {
         <div class="mb-4 p-3 rounded-xl bg-error-container/50 border border-error/20 text-error
-                    text-label-md font-heading flex items-center gap-2">
-          <span class="material-symbols-outlined text-[18px]">error</span>
-          {{ errorMessage() }}
+                    text-label-md font-heading">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px] flex-shrink-0">error</span>
+            <span>{{ errorMessage() }}</span>
+          </div>
+          @if (isCredentialError()) {
+            <p class="mt-1.5 ml-7 text-label-sm text-on-surface-variant">
+              ¿No tienes cuenta?
+              <a routerLink="/auth/register" [queryParams]="{ returnUrl: returnUrl() }"
+                 class="text-primary font-bold hover:underline">Crear cuenta</a>
+            </p>
+          }
         </div>
       }
 
@@ -104,6 +113,7 @@ export class LoginComponent {
   readonly errorMessage = signal('');
   readonly showPassword = signal(false);
   readonly returnUrl = signal(this.route.snapshot.queryParamMap.get('returnUrl') ?? '');
+  readonly isCredentialError = computed(() => this.errorMessage() === 'Credenciales inválidas. Intenta de nuevo.');
 
   async onSubmit(): Promise<void> {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
