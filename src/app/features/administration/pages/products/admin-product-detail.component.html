@@ -56,10 +56,10 @@
       <!-- Miniaturas + botón agregar -->
       <div class="flex gap-3 overflow-x-auto scrollbar-hide pb-1 items-start">
         @for (img of p.images; track img.id) {
-          <div class="relative flex-shrink-0 cursor-pointer group"
-               (click)="selectImage(img)">
-            <div class="w-20 h-20 rounded-lg overflow-hidden transition-all"
-                 [class]="img.id === (displayImage()?.id) ? 'ring-2 ring-primary ring-offset-1' : 'opacity-60 hover:opacity-90'">
+          <div class="relative flex-shrink-0 pt-2 pr-2">
+            <div class="w-20 h-20 rounded-lg overflow-hidden transition-all cursor-pointer"
+                 [class]="img.id === (displayImage()?.id) ? 'ring-2 ring-primary ring-offset-1' : 'opacity-70 hover:opacity-100'"
+                 (click)="selectImage(img)">
               @if (img.url) {
                 <img [src]="img.url" [alt]="img.altText" class="w-full h-full object-cover">
               } @else {
@@ -69,29 +69,30 @@
                 </div>
               }
             </div>
+
+            <!-- Marcar principal (siempre visible) o badge si ya lo es -->
             @if (img.isPrimary) {
-              <span class="absolute -top-1 -right-1 bg-primary text-white text-[9px]
+              <span class="absolute bottom-1 left-1 bg-primary text-white text-[9px]
                            font-heading font-bold px-1.5 py-0.5 rounded-full leading-none">
                 Principal
               </span>
+            } @else {
+              <button (click)="setPrimary(img); $event.stopPropagation()"
+                      class="absolute bottom-1 left-1 w-6 h-6 bg-white shadow-md rounded-full
+                             text-primary flex items-center justify-center hover:bg-primary hover:text-white
+                             transition-colors"
+                      title="Marcar como principal">
+                <span class="material-symbols-outlined text-[15px]">star</span>
+              </button>
             }
-            <div class="absolute inset-0 bg-black/40 rounded-lg flex items-center justify-center
-                        gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              @if (!img.isPrimary) {
-                <button (click)="setPrimary(img); $event.stopPropagation()"
-                        class="p-1 bg-white/90 rounded-full text-primary"
-                        title="Marcar como principal">
-                  <span class="material-symbols-outlined text-[14px]">star</span>
-                </button>
-              }
-              @if (p.images.length > 1) {
-                <button (click)="removeImage(img); $event.stopPropagation()"
-                        class="p-1 bg-white/90 rounded-full text-error"
-                        title="Eliminar imagen">
-                  <span class="material-symbols-outlined text-[14px]">close</span>
-                </button>
-              }
-            </div>
+
+            <!-- Eliminar (siempre visible; permite borrar cualquiera, incluida la última) -->
+            <button (click)="removeImage(img); $event.stopPropagation()"
+                    class="absolute top-0 right-0 w-6 h-6 bg-error text-white shadow-md rounded-full
+                           flex items-center justify-center hover:bg-red-700 transition-colors"
+                    title="Eliminar imagen">
+              <span class="material-symbols-outlined text-[14px]">close</span>
+            </button>
           </div>
         }
 

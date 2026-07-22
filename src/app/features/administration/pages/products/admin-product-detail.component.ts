@@ -129,7 +129,7 @@ export class AdminProductDetailComponent implements OnInit {
 
   async removeImage(img: ProductImage): Promise<void> {
     const p = this.product();
-    if (!p || p.images.length <= 1) return;
+    if (!p) return;
     await this.service.removeImage(p.id, img.id);
     this.product.set(this.service.getById(p.id) ?? null);
     this.selectedImage.set(null);
