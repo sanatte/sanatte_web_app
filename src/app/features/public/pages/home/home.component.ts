@@ -56,20 +56,28 @@ const PLENA_SKU = 'WLN-001'; // clave de negocio estable (mock y API)
           </div>
         </div>
 
-        <!-- Visual Plena -->
-        <div class="relative aspect-[4/3] rounded-lg overflow-hidden shadow-2xl bg-gradient-to-br {{ plenaGradient() }}">
-          <div class="absolute top-[-15%] right-[-10%] w-64 h-64 bg-white/15 rounded-full blur-3xl"></div>
-          <div class="absolute inset-0 flex items-center justify-center">
-            <span class="material-symbols-outlined text-white/90 text-[120px]" style="font-variation-settings: 'FILL' 1;">
-              auto_stories
-            </span>
-          </div>
+        <!-- Visual Plena — imagen real si existe, gradiente como fallback -->
+        <div class="relative aspect-[4/3] rounded-lg overflow-hidden shadow-2xl">
+          @if (plenaImageUrl(); as url) {
+            <img [src]="url" [alt]="p.name" class="absolute inset-0 w-full h-full object-cover" />
+          } @else {
+            <div class="absolute inset-0 bg-gradient-to-br {{ plenaGradient() }}">
+              <div class="absolute top-[-15%] right-[-10%] w-64 h-64 bg-white/15 rounded-full blur-3xl"></div>
+              <div class="absolute inset-0 flex items-center justify-center">
+                <span class="material-symbols-outlined text-white/90 text-[120px]" style="font-variation-settings: 'FILL' 1;">
+                  auto_stories
+                </span>
+              </div>
+            </div>
+          }
           <!-- Chip QR -->
-          <div class="absolute bottom-4 left-4 flex items-center gap-2 px-3 py-2 rounded-full
-                      bg-white/90 backdrop-blur text-primary text-label-sm font-heading font-bold">
-            <span class="material-symbols-outlined text-[16px]">qr_code_2</span>
-            Activación por QR
-          </div>
+          @if (p.accessType === 'qr_activation') {
+            <div class="absolute bottom-4 left-4 flex items-center gap-2 px-3 py-2 rounded-full
+                        bg-white/90 backdrop-blur text-primary text-label-sm font-heading font-bold">
+              <span class="material-symbols-outlined text-[16px]">qr_code_2</span>
+              Activación por QR
+            </div>
+          }
         </div>
       </section>
 
@@ -170,7 +178,22 @@ export class HomeComponent {
   private readonly cart         = inject(CartService);
   readonly ctx                  = inject(StoreContextService);
 
-  readonly plena = computed<Product | null>(() => this.products.getBySku(PLENA_SKU) ?? null);
+  /**
+   * Producto destacado del hero. No se acopla a un SKU mágico (rompía si el
+   * producto real tenía otro SKU): usa Plena si existe, si no el primer físico
+   * activo, y como último recurso cualquier producto activo.
+   */
+  readonly plena = computed<Product | null>(() => {
+    const all = this.products.products();
+    return all.find((p) => p.sku === PLENA_SKU)
+        ?? all.find((p) => p.type === 'physical' && p.status === 'active')
+        ?? all.find((p) => p.status === 'active')
+        ?? null;
+  });
+
+  readonly plenaImageUrl = computed(() =>
+    this.plena() ? getPrimaryImage(this.plena()!)?.url ?? null : null
+  );
 
   readonly plenaGradient = computed(() =>
     (this.plena() && getPrimaryImage(this.plena()!)?.gradient) || 'from-violet-400 via-purple-500 to-indigo-700'
@@ -181,10 +204,11 @@ export class HomeComponent {
     return p ? this.entitlements.getResourcesForProduct(p) : [];
   });
 
-  /** Otros productos activos (excluye Plena, que ya es el hero). */
-  readonly more = computed<Product[]>(() =>
-    this.products.products().filter((p) => p.status === 'active' && p.sku !== PLENA_SKU).slice(0, 4)
-  );
+  /** Otros productos activos (excluye el que ya es el hero). */
+  readonly more = computed<Product[]>(() => {
+    const heroId = this.plena()?.id;
+    return this.products.products().filter((p) => p.status === 'active' && p.id !== heroId).slice(0, 4);
+  });
 
   readonly addedName = signal<string | null>(null);
 

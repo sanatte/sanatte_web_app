@@ -1,6 +1,8 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:5129/api',
+  // Ruta relativa: el dev server de Angular la proxya (ver proxy.conf.json).
+  // El proxy decide el backend real (local :5129 o el publicado api-dev).
+  apiUrl: '/api',
   /** Dominio público de la app — usado en los QR impresos (siempre producción). */
   publicBaseUrl: 'https://sanatte.com',
   /** Firebase Console → Project Settings → app web "sanatte-web". */

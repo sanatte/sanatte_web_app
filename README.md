@@ -26,11 +26,13 @@ Los valores viven en `src/environments/`:
 
 | Clave | Dev (`environment.ts`) | Prod (`environment.production.ts`) |
 |---|---|---|
-| `apiUrl` | `http://localhost:5129/api` | `https://api.sanatte.com/api` |
-| `publicBaseUrl` | `https://sanatte.com` | `https://sanatte.com` |
+| `apiUrl` | `/api` (relativo → proxy) | `https://api-dev.sanatte.com/api` |
+| `publicBaseUrl` | `https://sanatte.com` | `https://dev.sanatte.com` |
 | `firebase` | config web del proyecto `sanatte-d819d` | idem |
 
-- **`apiUrl`**: dónde está la API .NET.
+- **`apiUrl`**: dónde está la API .NET. En dev es **relativo** (`/api`): el dev
+  server de Angular lo proxya (ver **Arrancar en desarrollo**). Así se evita CORS
+  y cambiar de backend es solo editar `proxy.conf.json`.
 - **`publicBaseUrl`**: dominio público de la app; se usa para generar los **QR de recursos** (`{publicBaseUrl}/r/{slug}`). Apunta siempre al dominio de producción porque los QR se imprimen.
 - **`firebase`**: la config web de Firebase es **pública** (apiKey del cliente) y ya está versionada. Se obtiene en Firebase Console → ⚙️ Configuración del proyecto → *Tus apps* → app web.
 
@@ -42,8 +44,18 @@ Los valores viven en `src/environments/`:
 npm start          # ng serve → http://localhost:4200
 ```
 
-Requiere la **API corriendo en `http://localhost:5129`** (ver README de `sanatte-api`).
-Si el backend está caído, la app no deja iniciar sesión (muestra "No pudimos conectar con el servidor").
+El dev server **proxya `/api`** al backend definido en **`proxy.conf.json`**
+(`ng serve` lo toma automáticamente). Como el navegador solo habla con
+`localhost:4200`, **no hay CORS**. Hay dos modos — solo cambia `target` en
+`proxy.conf.json`:
+
+| Modo | `target` en `proxy.conf.json` | Cuándo |
+|---|---|---|
+| **API publicada** (por defecto) | `https://api-dev.sanatte.com` | Trabajar solo en frontend, contra datos dev reales |
+| **API local** | `http://localhost:5129` | Tocar el backend (requiere la API .NET corriendo) |
+
+> Si el backend está caído, la app no deja iniciar sesión (muestra
+> "No pudimos conectar con el servidor").
 
 ## Build de producción
 

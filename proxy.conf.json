@@ -1,0 +1,11 @@
+{
+  "//": "El dev server proxya /api al backend. Cambia 'target' según el modo:",
+  "//local": "  API local .NET   → \"target\": \"http://localhost:5129\"",
+  "//dev":   "  API publicada    → \"target\": \"https://api-dev.sanatte.com\"",
+  "/api": {
+    "target": "https://api-dev.sanatte.com",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}
