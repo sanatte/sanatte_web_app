@@ -17,38 +17,41 @@ const PLENA_SKU = 'WLN-001'; // clave de negocio estable (mock y API)
   template: `
     <!-- ══ HERO: spotlight Plena ══════════════════════════════════════════ -->
     @if (plena(); as p) {
-      <section class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 items-center py-8 lg:py-14">
-        <div>
+      <section class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-center py-6 lg:py-14">
+        <div class="order-2 lg:order-1">
           <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-fixed
-                       text-on-primary-fixed-variant text-label-sm font-heading font-bold uppercase tracking-wider mb-5">
+                       text-on-primary-fixed-variant text-[11px] sm:text-label-sm font-heading font-bold
+                       uppercase tracking-wider mb-3 sm:mb-5">
             <span class="material-symbols-outlined text-[14px]">star</span>
-            Nuestro primer producto
+            {{ heroBadge }}
           </span>
-          <h1 class="font-heading text-display-lg text-on-surface leading-tight mb-4">
+          <h1 class="font-heading text-5xl sm:text-display-lg text-on-surface leading-tight mb-3 sm:mb-4">
             {{ p.name }}<span class="text-primary">.</span>
           </h1>
-          <p class="font-sans text-body-lg text-on-surface-variant mb-6 max-w-md">{{ heroTagline }}</p>
+          <p class="font-sans text-body-md sm:text-body-lg text-on-surface-variant mb-5 sm:mb-6 max-w-md">
+            {{ heroTagline }}
+          </p>
 
-          <div class="flex items-baseline gap-2 mb-6">
-            <span class="font-heading text-headline-lg text-primary">{{ p.price | money }}</span>
+          <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-5 sm:mb-6">
+            <span class="font-heading text-headline-lg text-primary whitespace-nowrap">{{ p.price | money }}</span>
             @if (p.accessType === 'qr_activation') {
               <span class="inline-flex items-center gap-1 text-label-md font-heading text-on-surface-variant">
                 <span class="material-symbols-outlined text-[16px] text-primary">qr_code_scanner</span>
-                incluye recursos digitales
+                Escanea y accede
               </span>
             }
           </div>
 
-          <div class="flex flex-col sm:flex-row gap-3">
+          <div class="flex flex-col sm:flex-row gap-2.5 sm:gap-3">
             <a [routerLink]="ctx.productLink(p.id)"
-               class="px-8 py-3.5 rounded-full gradient-primary text-white font-heading font-bold text-center
+               class="px-6 sm:px-8 py-3 sm:py-3.5 rounded-full gradient-primary text-white font-heading font-bold text-center
                       shadow-[0px_10px_30px_rgba(107,56,212,0.25)] hover:opacity-95 active:scale-[0.98] transition-all
                       flex items-center justify-center gap-2">
               Conocer Plena
               <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
             </a>
             <button (click)="addToCart(p)"
-                    class="px-8 py-3.5 rounded-full border border-primary text-primary font-heading font-bold
+                    class="px-6 sm:px-8 py-3 sm:py-3.5 rounded-full border border-primary text-primary font-heading font-bold
                            hover:bg-primary/5 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
               <span class="material-symbols-outlined text-[20px]">add_shopping_cart</span>
               Agregar al carrito
@@ -57,7 +60,7 @@ const PLENA_SKU = 'WLN-001'; // clave de negocio estable (mock y API)
         </div>
 
         <!-- Visual Plena — imagen real si existe, gradiente como fallback -->
-        <div class="relative aspect-[4/3] rounded-lg overflow-hidden shadow-2xl">
+        <div class="order-1 lg:order-2 relative aspect-[4/3] rounded-lg overflow-hidden shadow-2xl">
           @if (plenaImageUrl(); as url) {
             <img [src]="url" [alt]="p.name" class="absolute inset-0 w-full h-full object-cover" />
           } @else {
@@ -75,7 +78,7 @@ const PLENA_SKU = 'WLN-001'; // clave de negocio estable (mock y API)
             <div class="absolute bottom-4 left-4 flex items-center gap-2 px-3 py-2 rounded-full
                         bg-white/90 backdrop-blur text-primary text-label-sm font-heading font-bold">
               <span class="material-symbols-outlined text-[16px]">qr_code_2</span>
-              Activación por QR
+              Desbloquea recursos digitales
             </div>
           }
         </div>
@@ -211,6 +214,9 @@ export class HomeComponent {
   });
 
   readonly addedName = signal<string | null>(null);
+
+  /** Etiqueta corta sobre el título del hero. */
+  readonly heroBadge = 'Bienestar en papel + digital';
 
   /** Tagline breve y profundo para el hero (la descripción completa vive en el detalle). */
   readonly heroTagline =

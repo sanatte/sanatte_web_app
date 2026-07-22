@@ -23,6 +23,7 @@ export class AdminProductDetailComponent implements OnInit {
   private readonly resourceService    = inject(ResourceService);
 
   readonly product         = signal<Product | null>(null);
+  readonly loading         = signal(true);
   readonly selectedImage   = signal<ProductImage | null>(null);
   readonly isConfirmOpen   = signal(false);
   readonly isPickerOpen    = signal(false);
@@ -70,12 +71,13 @@ export class AdminProductDetailComponent implements OnInit {
 
   resourceIcon = (type: string) => RESOURCE_TYPE_META[type as ResourceType]?.icon ?? 'description';
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      const p = this.service.getById(id);
-      this.product.set(p ?? null);
-    }
+    if (!id) { this.loading.set(false); return; }
+    // fetchById usa la caché o pide a la API (soporta F5 directo en el detalle).
+    const p = await this.service.fetchById(id);
+    this.product.set(p ?? null);
+    this.loading.set(false);
   }
 
   selectImage(img: ProductImage): void {

@@ -51,6 +51,24 @@ export class ProductService {
     return this._products().find((p) => p.id === id);
   }
 
+  /**
+   * Devuelve el producto desde la caché o, si no está (p. ej. F5 directo en el
+   * detalle antes de que cargue la lista), lo pide a la API por id y lo upserta
+   * en el signal para que las mutaciones posteriores (imágenes, etc.) funcionen.
+   */
+  async fetchById(id: string): Promise<Product | undefined> {
+    const cached = this._products().find((p) => p.id === id);
+    if (cached) return cached;
+    try {
+      const raw = await firstValueFrom(this.http.get<unknown>(`${this.base}/${id}`));
+      const product = mapApiProduct(raw);
+      this._products.update((list) => (list.some((p) => p.id === id) ? list : [product, ...list]));
+      return product;
+    } catch {
+      return undefined;
+    }
+  }
+
   /** Busca por SKU — clave de negocio estable (no cambia entre mock y API). */
   getBySku(sku: string): Product | undefined {
     return this._products().find((p) => p.sku === sku);
