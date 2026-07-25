@@ -1,4 +1,8 @@
-@if (order(); as o) {
+@if (loading()) {
+  <div class="flex items-center justify-center py-24">
+    <span class="material-symbols-outlined animate-spin text-primary text-[40px]">progress_activity</span>
+  </div>
+} @else if (order(); as o) {
   <div class="max-w-6xl mx-auto">
     <!-- Breadcrumb / back -->
     <nav class="flex items-center gap-2 text-on-surface-variant mb-6 text-label-md font-heading">

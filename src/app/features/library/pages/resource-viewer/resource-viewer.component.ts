@@ -1,6 +1,6 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toSignal, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { ProductService } from '../../../administration/services/product.service';
 import { EntitlementService } from '../../../administration/services/entitlement.service';
@@ -32,10 +32,23 @@ export class ResourceViewerComponent {
     { initialValue: { productId: null, resourceId: null } }
   );
 
+  readonly loading = signal(true);
+
   readonly product = computed(() => {
     const id = this.params().productId;
     return id ? this.products.getById(id) ?? null : null;
   });
+
+  constructor() {
+    // F5 directo: asegura cargar el producto desde la API si no está en caché.
+    this.route.paramMap.pipe(takeUntilDestroyed()).subscribe(async (pm) => {
+      const id = pm.get('productId');
+      if (!id) { this.loading.set(false); return; }
+      this.loading.set(true);
+      await this.products.fetchById(id);
+      this.loading.set(false);
+    });
+  }
 
   readonly resources = computed<Resource[]>(() => {
     const p = this.product();

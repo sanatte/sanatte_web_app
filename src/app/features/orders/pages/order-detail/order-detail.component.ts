@@ -55,6 +55,10 @@ export class OrderDetailComponent {
 
   private readonly id = toSignal(this.route.paramMap.pipe(map((p) => p.get('id'))), { initialValue: null });
 
+  /** Mientras el servicio no termine su primera carga, mostramos spinner (evita
+   *  el flash "pedido no encontrado" al hacer F5 directo en el detalle). */
+  readonly loading = computed(() => !this.userOrders.loaded());
+
   readonly order = computed<Order | null>(() => {
     const id = this.id();
     return id ? this.userOrders.getById(id) ?? null : null;

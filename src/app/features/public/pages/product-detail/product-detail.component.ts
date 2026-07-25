@@ -2,7 +2,7 @@ import { Component, inject, signal, computed } from '@angular/core';
 import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toSignal, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { ProductService } from '../../../administration/services/product.service';
 import { CartService } from '../../services/cart.service';
@@ -34,10 +34,25 @@ export class ProductDetailComponent {
 
   private readonly id = toSignal(this.route.paramMap.pipe(map((p) => p.get('id'))), { initialValue: null });
 
+  readonly loading = signal(true);
+
   readonly product = computed<Product | null>(() => {
     const id = this.id();
     return id ? this.products.getById(id) ?? null : null;
   });
+
+  constructor() {
+    // Garantiza cargar el producto desde la API si no está en caché (F5 directo /
+    // link compartido) y reacciona a cambios de id. fetchById lo upserta en el
+    // signal → el computed 'product' lo encuentra.
+    this.route.paramMap.pipe(takeUntilDestroyed()).subscribe(async (pm) => {
+      const id = pm.get('id');
+      if (!id) { this.loading.set(false); return; }
+      this.loading.set(true);
+      await this.products.fetchById(id);
+      this.loading.set(false);
+    });
+  }
 
   readonly selectedImage = signal<ProductImage | null>(null);
   readonly displayImage = computed(() => {

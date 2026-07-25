@@ -19,15 +19,18 @@ export class UserOrdersService {
 
   private readonly _orders  = signal<Order[]>([]);
   private readonly _loading = signal(false);
+  private readonly _loaded  = signal(false);
 
   readonly orders  = this._orders.asReadonly();
   readonly loading = this._loading.asReadonly();
+  /** true una vez que terminó el primer intento de carga (para gates de F5). */
+  readonly loaded  = this._loaded.asReadonly();
 
   constructor() { this.load(); }
 
   async load(): Promise<void> {
     await this.auth.whenReady();
-    if (!this.auth.currentUser()) { this._orders.set([]); return; }
+    if (!this.auth.currentUser()) { this._orders.set([]); this._loaded.set(true); return; }
     this._loading.set(true);
     try {
       const list = await firstValueFrom(
@@ -36,6 +39,7 @@ export class UserOrdersService {
       this._orders.set(list.map(mapApiOrder));
     } finally {
       this._loading.set(false);
+      this._loaded.set(true);
     }
   }
 
