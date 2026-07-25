@@ -12,8 +12,14 @@ import { getPrimaryImage } from '../../../administration/models/product.model';
     <div class="group bg-white rounded-lg overflow-hidden flex flex-col shadow-card
                 hover:shadow-[0px_20px_40px_rgba(76,29,149,0.1)] transition-all cursor-pointer"
          (click)="open.emit(owned())">
-      <!-- Thumbnail (gradiente placeholder) -->
-      <div class="relative aspect-video overflow-hidden bg-gradient-to-br {{ imageGradient() }}">
+      <!-- Thumbnail: foto real si existe, gradiente como fallback -->
+      <div class="relative aspect-video overflow-hidden">
+        @if (imageUrl(); as url) {
+          <img [src]="url" [alt]="owned().product.name"
+               class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+        } @else {
+          <div class="absolute inset-0 bg-gradient-to-br {{ imageGradient() }}"></div>
+        }
         <div class="absolute inset-0 bg-black/5 group-hover:bg-black/0 transition-colors"></div>
         <span class="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-1 rounded-full
                      font-bold text-[10px] uppercase tracking-tighter"
@@ -48,6 +54,7 @@ export class OwnedProductCardComponent {
   readonly owned = input.required<OwnedProduct>();
   readonly open  = output<OwnedProduct>();
 
+  readonly imageUrl = computed(() => getPrimaryImage(this.owned().product)?.url ?? null);
   readonly imageGradient = computed(
     () => getPrimaryImage(this.owned().product)?.gradient ?? 'from-violet-400 to-purple-600'
   );

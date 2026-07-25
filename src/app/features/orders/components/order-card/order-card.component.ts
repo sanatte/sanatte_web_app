@@ -27,7 +27,13 @@ const TONE_TEXT: Record<DeliveryTone, string> = {
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <!-- Producto + nº orden -->
         <div class="flex items-center gap-4 min-w-0">
-          <div class="w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0 bg-gradient-to-br {{ thumbnail() }}"></div>
+          <div class="w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0">
+            @if (thumbnailUrl(); as url) {
+              <img [src]="url" alt="" class="w-full h-full object-cover">
+            } @else {
+              <div class="w-full h-full bg-gradient-to-br {{ thumbnail() }}"></div>
+            }
+          </div>
           <div class="min-w-0">
             <h3 class="font-heading font-bold text-on-surface text-lg truncate">
               Pedido {{ order().orderNumber }}
@@ -75,10 +81,18 @@ export class OrderCardComponent {
   readonly meta      = computed(() => DELIVERY_STATUS_META[this.order().deliveryStatus]);
   readonly toneClass = computed(() => TONE_TEXT[this.meta().tone]);
 
-  readonly thumbnail = computed(() => {
+  private readonly firstProduct = computed(() => {
     const first = this.order().products[0];
-    const product = first ? this.products.getById(first.id) : undefined;
-    return (product && getPrimaryImage(product)?.gradient) || 'from-violet-400 to-purple-600';
+    return first ? this.products.getById(first.id) : undefined;
+  });
+
+  readonly thumbnailUrl = computed(() => {
+    const p = this.firstProduct();
+    return p ? getPrimaryImage(p)?.url ?? null : null;
+  });
+  readonly thumbnail = computed(() => {
+    const p = this.firstProduct();
+    return (p && getPrimaryImage(p)?.gradient) || 'from-violet-400 to-purple-600';
   });
 
   readonly productSummary = computed(() => {

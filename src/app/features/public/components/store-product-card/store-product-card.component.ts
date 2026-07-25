@@ -19,8 +19,13 @@ const TYPE_LABEL: Record<string, string> = {
     <div class="group bg-surface-container-lowest rounded-lg overflow-hidden shadow-card
                 hover:shadow-[0px_20px_40px_rgba(76,29,149,0.1)] transition-all flex flex-col">
       <!-- Imagen -->
-      <a [routerLink]="ctx.productLink(product().id)" class="block relative aspect-[4/3] overflow-hidden
-             bg-gradient-to-br {{ gradient() }}">
+      <a [routerLink]="ctx.productLink(product().id)" class="block relative aspect-[4/3] overflow-hidden">
+        @if (imageUrl(); as url) {
+          <img [src]="url" [alt]="product().name"
+               class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+        } @else {
+          <div class="absolute inset-0 bg-gradient-to-br {{ gradient() }}"></div>
+        }
         <div class="absolute inset-0 bg-black/5 group-hover:bg-black/0 transition-colors"></div>
         <span class="absolute top-3 left-3 bg-white/90 backdrop-blur px-2.5 py-1 rounded-full
                      text-[10px] font-heading font-bold uppercase tracking-wider text-primary">
@@ -63,6 +68,7 @@ export class StoreProductCardComponent {
   readonly product = input.required<Product>();
   readonly add     = output<Product>();
 
+  readonly imageUrl  = computed(() => getPrimaryImage(this.product())?.url ?? null);
   readonly gradient  = computed(() => getPrimaryImage(this.product())?.gradient ?? 'from-violet-400 to-purple-600');
   readonly typeLabel = computed(() => TYPE_LABEL[this.product().type] ?? this.product().type);
 }

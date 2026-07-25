@@ -12,7 +12,13 @@
         @for (line of lines(); track line.product.id) {
           <div class="bg-surface-container-lowest rounded-lg p-5 shadow-card flex items-center gap-4">
             <a [routerLink]="ctx.productLink(line.product.id)"
-               class="w-20 h-20 rounded-2xl bg-gradient-to-br {{ line.gradient }} flex-shrink-0"></a>
+               class="w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 block">
+              @if (line.imageUrl) {
+                <img [src]="line.imageUrl" [alt]="line.product.name" class="w-full h-full object-cover">
+              } @else {
+                <div class="w-full h-full bg-gradient-to-br {{ line.gradient }}"></div>
+              }
+            </a>
             <div class="flex-1 min-w-0">
               <a [routerLink]="ctx.productLink(line.product.id)"
                  class="font-heading font-bold text-on-surface hover:text-primary transition-colors truncate block">

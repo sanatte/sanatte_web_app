@@ -10,6 +10,7 @@ export interface CartItem {
 export interface CartLine {
   product: Product;
   quantity: number;
+  imageUrl: string | null;
   gradient: string;
   lineTotal: number;
 }
@@ -38,6 +39,7 @@ export class CartService {
         return {
           product,
           quantity: i.quantity,
+          imageUrl: getPrimaryImage(product)?.url ?? null,
           gradient: getPrimaryImage(product)?.gradient ?? 'from-violet-400 to-purple-600',
           lineTotal: product.price * i.quantity,
         };

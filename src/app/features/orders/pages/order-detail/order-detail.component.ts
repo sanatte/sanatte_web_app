@@ -142,6 +142,11 @@ export class OrderDetailComponent {
 
   readonly isCancelled = computed(() => this.order()?.deliveryStatus === 'cancelled');
 
+  imageUrlFor(productId: string): string | null {
+    const p = this.products.getById(productId);
+    return p ? getPrimaryImage(p)?.url ?? null : null;
+  }
+
   gradientFor(productId: string): string {
     const p = this.products.getById(productId);
     return (p && getPrimaryImage(p)?.gradient) || 'from-violet-400 to-purple-600';

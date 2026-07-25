@@ -15,15 +15,24 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
       <!-- Galería -->
       <div class="space-y-3">
-        <div class="aspect-square rounded-lg overflow-hidden bg-gradient-to-br
-                    {{ displayImage()?.gradient ?? 'from-violet-400 to-purple-600' }}"></div>
+        <div class="aspect-square rounded-lg overflow-hidden">
+          @if (displayImage()?.url) {
+            <img [src]="displayImage()!.url!" [alt]="p.name" class="w-full h-full object-cover">
+          } @else {
+            <div class="w-full h-full bg-gradient-to-br {{ displayImage()?.gradient ?? 'from-violet-400 to-purple-600' }}"></div>
+          }
+        </div>
         @if (p.images.length > 1) {
           <div class="grid grid-cols-4 gap-3">
             @for (img of p.images; track img.id) {
               <button (click)="selectImage(img)"
-                      class="aspect-square rounded-lg overflow-hidden bg-gradient-to-br transition-all
-                             {{ img.gradient }}"
+                      class="aspect-square rounded-lg overflow-hidden transition-all"
                       [class]="displayImage()?.id === img.id ? 'ring-2 ring-primary ring-offset-2' : 'opacity-80 hover:opacity-100'">
+                @if (img.url) {
+                  <img [src]="img.url" [alt]="p.name" class="w-full h-full object-cover">
+                } @else {
+                  <div class="w-full h-full bg-gradient-to-br {{ img.gradient }}"></div>
+                }
               </button>
             }
           </div>

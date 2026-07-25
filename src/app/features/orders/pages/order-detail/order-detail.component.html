@@ -100,7 +100,13 @@
             <!-- Productos comprados -->
             @for (p of o.products; track p.id) {
               <div class="py-5 first:pt-0 flex items-center gap-5">
-                <div class="w-20 h-20 rounded-lg bg-gradient-to-br {{ gradientFor(p.id) }} flex-shrink-0"></div>
+                <div class="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                  @if (imageUrlFor(p.id); as url) {
+                    <img [src]="url" [alt]="p.name" class="w-full h-full object-cover">
+                  } @else {
+                    <div class="w-full h-full bg-gradient-to-br {{ gradientFor(p.id) }}"></div>
+                  }
+                </div>
                 <div class="flex-1 min-w-0">
                   <div class="flex justify-between items-start gap-3 mb-1">
                     <h4 class="font-heading font-bold text-on-surface truncate">{{ p.name }}</h4>
