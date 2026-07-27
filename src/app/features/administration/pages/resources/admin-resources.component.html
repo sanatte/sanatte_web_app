@@ -102,7 +102,7 @@
 <app-resource-form-dialog
   [isOpen]="isModalOpen()"
   [resource]="editingResource()"
-  (save)="onSave($event)"
+  (saved)="closeModal()"
   (cancel)="closeModal()" />
 
 <app-confirm-dialog

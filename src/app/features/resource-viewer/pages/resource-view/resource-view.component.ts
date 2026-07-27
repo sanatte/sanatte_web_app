@@ -1,8 +1,10 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
+import { MediaPlayerComponent } from '../../../../shared/components/resource-viewers/media-player.component';
+import { ArticleReaderComponent } from '../../../../shared/components/resource-viewers/article-reader.component';
 
 type ViewState = 'loading' | 'ok' | 'no_access' | 'not_found' | 'error';
 
@@ -13,6 +15,9 @@ interface MyResource {
   description: string;
   type: number; // 0 audio · 1 video · 2 pdf · 3 article
   duration?: string;
+  readTime?: string | null;
+  content?: string | null;
+  thumbnailUrl?: string | null;
   thumbnailGradient: string;
 }
 
@@ -26,13 +31,16 @@ const TYPE_META: Record<number, { icon: string; label: string }> = {
 /**
  * ResourceView — destino del QR de un recurso (`/app/r/:slug`).
  *
- * Valida contra `GET /api/me/resources/{slug}`: 200 → muestra el recurso
- * (reproductor próximamente), 403 → pide activar Plena, 404 → no encontrado.
+ * 1) Valida acceso con `GET /api/me/resources/{slug}` (200 ok · 403 sin acceso ·
+ *    404 no existe).
+ * 2) Si hay acceso y el recurso tiene archivo, pide una URL firmada temporal con
+ *    `GET /api/me/resources/{slug}/stream` y reproduce con player nativo
+ *    (audio/video) o incrusta el PDF. R2 sirve Range/206 → seek y arranque directo.
  * La sesión ya la garantiza el guard del shell privado.
  */
 @Component({
   selector: 'app-resource-view',
-  imports: [RouterLink],
+  imports: [RouterLink, MediaPlayerComponent, ArticleReaderComponent],
   template: `
     <div class="max-w-2xl mx-auto py-10 px-4">
       @switch (state()) {
@@ -43,26 +51,33 @@ const TYPE_META: Record<number, { icon: string; label: string }> = {
           </div>
         }
         @case ('ok') {
-          <div class="glass-card rounded-lg overflow-hidden">
-            <div class="h-40 bg-gradient-to-br {{ resource()!.thumbnailGradient }} flex items-center justify-center">
-              <span class="material-symbols-outlined text-white text-[56px]">{{ meta().icon }}</span>
-            </div>
-            <div class="p-6 md:p-8">
-              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-fixed
-                           text-on-primary-fixed-variant text-label-sm font-heading font-semibold mb-3">
-                {{ meta().label }}@if (resource()!.duration) { · {{ resource()!.duration }} }
-              </span>
-              <h1 class="font-heading text-headline-md text-on-surface mb-2">{{ resource()!.title }}</h1>
-              <p class="text-body-md text-on-surface-variant">{{ resource()!.description }}</p>
-
-              <!-- Reproductor: llega en el siguiente paso (streaming) -->
-              <div class="mt-6 p-4 rounded-xl bg-surface-container-low border border-outline-variant/30
-                          flex items-center gap-3 text-on-surface-variant">
-                <span class="material-symbols-outlined">play_circle</span>
-                <span class="text-label-md font-heading">El reproductor estará disponible muy pronto.</span>
+          @if (mediaKind(); as kind) {
+            <div class="glass-card rounded-lg overflow-hidden">
+              <div class="h-40 bg-gradient-to-br {{ resource()!.thumbnailGradient }} flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-[56px]">{{ meta().icon }}</span>
+              </div>
+              <div class="p-6 md:p-8">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-fixed
+                             text-on-primary-fixed-variant text-label-sm font-heading font-semibold mb-3">
+                  {{ meta().label }}@if (resource()!.duration) { · {{ resource()!.duration }} }
+                </span>
+                <h1 class="font-heading text-headline-md text-on-surface mb-2">{{ resource()!.title }}</h1>
+                <p class="text-body-md text-on-surface-variant">{{ resource()!.description }}</p>
+                <div class="mt-6">
+                  <app-media-player [slug]="resource()!.slug" [kind]="kind"
+                                    [coverUrl]="resource()!.thumbnailUrl ?? null"
+                                    [coverGradient]="resource()!.thumbnailGradient" />
+                </div>
               </div>
             </div>
-          </div>
+          } @else {
+            <!-- Artículo: lector a página completa -->
+            <app-article-reader [title]="resource()!.title"
+                                [readTime]="resource()!.readTime ?? null"
+                                [content]="resource()!.content ?? null"
+                                [coverUrl]="resource()!.thumbnailUrl ?? null"
+                                [coverGradient]="resource()!.thumbnailGradient" />
+          }
         }
         @case ('no_access') {
           <div class="glass-card rounded-lg p-8 text-center">
@@ -105,6 +120,16 @@ export class ResourceViewComponent {
   readonly state    = signal<ViewState>('loading');
   readonly resource = signal<MyResource | null>(null);
   readonly meta     = signal({ icon: 'headphones', label: 'Audio' });
+
+  /** Tipo de media para el player (los artículos no tienen archivo). */
+  readonly mediaKind = computed<'audio' | 'video' | 'pdf' | null>(() => {
+    switch (this.resource()?.type) {
+      case 0:  return 'audio';
+      case 1:  return 'video';
+      case 2:  return 'pdf';
+      default: return null;
+    }
+  });
 
   constructor() {
     const slug = this.route.snapshot.paramMap.get('slug') ?? '';

@@ -30,7 +30,11 @@ export interface Resource {
   duration?: string;
   fileSize?: string;
   readTime?: string;
+  content?: string | null;   // article: cuerpo HTML del editor
   thumbnailUrl?: string | null;  // URL real en Firebase Storage
   thumbnailGradient: string;     // fallback CSS gradient
   createdAt: string;
+  /** No-null ⇒ el recurso ya tiene su archivo (audio/video/pdf) subido a R2. */
+  mediaContentType?: string | null;
+  mediaSizeBytes?: number | null;
 }

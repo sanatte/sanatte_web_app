@@ -23,9 +23,12 @@ function mapApiResource(raw: any): Resource {
     duration:          raw.duration ?? undefined,
     fileSize:          raw.fileSize ?? undefined,
     readTime:          raw.readTime ?? undefined,
+    content:           raw.content ?? null,
     thumbnailUrl:      raw.thumbnailUrl ?? null,
     thumbnailGradient: raw.thumbnailGradient ?? 'from-violet-400 to-purple-600',
     createdAt:         raw.createdAt?.split('T')[0] ?? '',
+    mediaContentType:  raw.mediaContentType ?? null,
+    mediaSizeBytes:    raw.mediaSizeBytes ?? null,
   };
 }
 
@@ -41,6 +44,7 @@ function toApiBody(r: Partial<Resource>): any {
     duration: r.duration ?? null,
     fileSize: r.fileSize ?? null,
     readTime: r.readTime ?? null,
+    content: r.content ?? null,
     thumbnailGradient: r.thumbnailGradient ?? null,
   };
 }
@@ -73,18 +77,21 @@ export class ResourceService {
     return this._resources().find((r) => r.id === id);
   }
 
-  async create(resource: Omit<Resource, 'id' | 'createdAt'>): Promise<void> {
+  async create(resource: Omit<Resource, 'id' | 'createdAt'>): Promise<Resource> {
     const raw = await firstValueFrom(this.http.post<unknown>(this.base, toApiBody(resource)));
-    this._resources.update((list) => [mapApiResource(raw), ...list]);
+    const created = mapApiResource(raw);
+    this._resources.update((list) => [created, ...list]);
+    return created;
   }
 
-  async update(id: string, changes: Partial<Resource>): Promise<void> {
+  async update(id: string, changes: Partial<Resource>): Promise<Resource> {
     // El PUT reemplaza el recurso completo → combinamos con el estado actual
     const current = this.getById(id);
     const merged = { ...current, ...changes } as Resource;
     const raw = await firstValueFrom(this.http.put<unknown>(`${this.base}/${id}`, toApiBody(merged)));
     const updated = mapApiResource(raw);
     this._resources.update((list) => list.map((r) => r.id === id ? updated : r));
+    return updated;
   }
 
   async delete(id: string): Promise<void> {
@@ -101,5 +108,57 @@ export class ResourceService {
     );
     const updated = mapApiResource(raw);
     this._resources.update((list) => list.map((r) => r.id === id ? updated : r));
+  }
+
+  /**
+   * Sube el archivo de media (audio/video/pdf) de un recurso en 3 pasos:
+   * 1) pide una URL firmada al backend, 2) sube el archivo DIRECTO a R2 (no pasa
+   * por la API → soporta archivos grandes), 3) confirma la metadata.
+   */
+  async uploadMedia(
+    id: string,
+    file: File,
+    opts?: { duration?: string; onProgress?: (pct: number) => void },
+  ): Promise<Resource> {
+    // 1) URL firmada de subida (PUT)
+    const signed = await firstValueFrom(
+      this.http.post<{ uploadUrl: string; storagePath: string; expiresAt: string }>(
+        `${this.base}/${id}/media/upload-url`, { contentType: file.type },
+      ),
+    );
+
+    // 2) PUT directo a R2 vía XHR: progreso real y sin el interceptor de auth
+    await this.putToR2(signed.uploadUrl, file, opts?.onProgress);
+
+    // 3) Confirmar: el backend persiste path/tipo/tamaño (y duración si viene)
+    const raw = await firstValueFrom(
+      this.http.put<unknown>(`${this.base}/${id}/media`, {
+        storagePath: signed.storagePath,
+        contentType: file.type,
+        sizeBytes: file.size,
+        duration: opts?.duration ?? null,
+      }),
+    );
+    const updated = mapApiResource(raw);
+    this._resources.update((list) => list.map((r) => r.id === id ? updated : r));
+    return updated;
+  }
+
+  /** PUT a R2 con la URL firmada. El Content-Type DEBE coincidir con el firmado. */
+  private putToR2(url: string, file: File, onProgress?: (pct: number) => void): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('PUT', url, true);
+      xhr.setRequestHeader('Content-Type', file.type);
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable && onProgress) onProgress(Math.round((e.loaded / e.total) * 100));
+      };
+      xhr.onload = () =>
+        xhr.status >= 200 && xhr.status < 300
+          ? resolve()
+          : reject(new Error(`Fallo la subida a R2 (HTTP ${xhr.status}).`));
+      xhr.onerror = () => reject(new Error('Error de red subiendo a R2.'));
+      xhr.send(file);
+    });
   }
 }

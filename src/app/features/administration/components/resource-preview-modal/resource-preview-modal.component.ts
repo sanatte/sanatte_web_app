@@ -1,13 +1,11 @@
 import { Component, input, output, computed } from '@angular/core';
 import { Resource } from '../../models/resource.model';
-import { VideoPlayerComponent } from '../../../../shared/components/resource-viewers/video-player.component';
-import { AudioPlayerComponent } from '../../../../shared/components/resource-viewers/audio-player.component';
-import { PdfViewerComponent } from '../../../../shared/components/resource-viewers/pdf-viewer.component';
+import { MediaPlayerComponent } from '../../../../shared/components/resource-viewers/media-player.component';
 import { ArticleReaderComponent } from '../../../../shared/components/resource-viewers/article-reader.component';
 
 @Component({
   selector: 'app-resource-preview-modal',
-  imports: [VideoPlayerComponent, AudioPlayerComponent, PdfViewerComponent, ArticleReaderComponent],
+  imports: [MediaPlayerComponent, ArticleReaderComponent],
   templateUrl: './resource-preview-modal.component.html',
 })
 export class ResourcePreviewModalComponent {

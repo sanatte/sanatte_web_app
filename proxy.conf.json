@@ -3,8 +3,8 @@
   "//local": "  API local .NET   → \"target\": \"http://localhost:5129\"",
   "//dev":   "  API publicada    → \"target\": \"https://api-dev.sanatte.com\"",
   "/api": {
-    "target": "https://api-dev.sanatte.com",
-    "secure": true,
+    "target": "http://localhost:5129",
+    "secure": false,
     "changeOrigin": true,
     "logLevel": "debug"
   }

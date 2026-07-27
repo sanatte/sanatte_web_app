@@ -5,18 +5,14 @@ import { map } from 'rxjs';
 import { ProductService } from '../../../administration/services/product.service';
 import { EntitlementService } from '../../../administration/services/entitlement.service';
 import { Resource, ResourceType, RESOURCE_TYPE_META } from '../../../administration/models/resource.model';
-import { VideoPlayerComponent } from '../../../../shared/components/resource-viewers/video-player.component';
-import { AudioPlayerComponent } from '../../../../shared/components/resource-viewers/audio-player.component';
-import { PdfViewerComponent } from '../../../../shared/components/resource-viewers/pdf-viewer.component';
+import { MediaPlayerComponent } from '../../../../shared/components/resource-viewers/media-player.component';
 import { ArticleReaderComponent } from '../../../../shared/components/resource-viewers/article-reader.component';
 
 @Component({
   selector: 'app-resource-viewer',
   imports: [
     RouterLink,
-    VideoPlayerComponent,
-    AudioPlayerComponent,
-    PdfViewerComponent,
+    MediaPlayerComponent,
     ArticleReaderComponent,
   ],
   templateUrl: './resource-viewer.component.html',

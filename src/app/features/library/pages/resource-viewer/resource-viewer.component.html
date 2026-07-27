@@ -18,10 +18,17 @@
       <section class="flex-1 min-w-0 space-y-6">
         <!-- Player según tipo -->
         @switch (r.type) {
-          @case ('video')   { <app-video-player  [resource]="r" [collection]="p.name" /> }
-          @case ('audio')   { <app-audio-player  [resource]="r" [collection]="p.name" /> }
-          @case ('pdf')     { <app-pdf-viewer    [resource]="r" /> }
-          @case ('article') { <app-article-reader [resource]="r" /> }
+          @case ('video')   { <app-media-player [slug]="r.slug" kind="video" /> }
+          @case ('audio')   {
+            <app-media-player [slug]="r.slug" kind="audio"
+                              [coverUrl]="r.thumbnailUrl ?? null" [coverGradient]="r.thumbnailGradient" />
+          }
+          @case ('pdf')     { <app-media-player [slug]="r.slug" kind="pdf" /> }
+          @case ('article') {
+            <app-article-reader [title]="r.title" [readTime]="r.readTime ?? null"
+                                [content]="r.content ?? null"
+                                [coverUrl]="r.thumbnailUrl ?? null" [coverGradient]="r.thumbnailGradient" />
+          }
         }
 
         <!-- Header del recurso -->
