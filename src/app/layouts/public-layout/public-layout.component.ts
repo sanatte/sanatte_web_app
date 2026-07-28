@@ -20,6 +20,10 @@ import { AuthService } from '../../core/services/auth.service';
              class="text-label-md font-heading text-on-surface-variant hover:text-primary transition-colors">
             Productos
           </a>
+          <a routerLink="/" fragment="aliados"
+             class="text-label-md font-heading text-on-surface-variant hover:text-primary transition-colors">
+            Aliados
+          </a>
           <a routerLink="/blog" routerLinkActive="!text-primary"
              class="text-label-md font-heading text-on-surface-variant hover:text-primary transition-colors">Blog</a>
           <a routerLink="/faq" routerLinkActive="!text-primary"

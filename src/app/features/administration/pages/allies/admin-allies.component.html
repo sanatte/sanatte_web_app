@@ -1,0 +1,222 @@
+<div class="p-6 md:p-8">
+  <!-- Header -->
+  <div class="flex flex-wrap items-start justify-between gap-4 mb-8">
+    <div>
+      <h1 class="font-heading text-headline-lg font-bold text-on-background">Aliados</h1>
+      <p class="text-label-md font-heading text-on-surface-variant mt-1">
+        Especialistas aliados en los pilares de bienestar. Su convenio se muestra a usuarios con producto activo.
+      </p>
+    </div>
+    <button (click)="openCreate()"
+            class="flex items-center gap-2 px-6 py-3 gradient-primary text-white rounded-full
+                   text-label-md font-heading font-bold hover:opacity-90 active:scale-95 transition-all"
+            style="box-shadow: 0 4px 14px 0 rgba(107,56,212,0.39)">
+      <span class="material-symbols-outlined text-[20px]">add</span>
+      Nuevo aliado
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="flex justify-center py-24">
+      <span class="material-symbols-outlined animate-spin text-primary text-[32px]">progress_activity</span>
+    </div>
+  } @else if (allies().length === 0) {
+    <div class="glass-card rounded-lg p-12 text-center max-w-lg mx-auto">
+      <span class="material-symbols-outlined text-primary-light text-[48px] mb-3">handshake</span>
+      <h3 class="font-heading text-headline-md text-on-surface mb-1">Aún no hay aliados</h3>
+      <p class="text-body-md text-on-surface-variant">Crea el primero para empezar a ofrecer convenios.</p>
+    </div>
+  } @else {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      @for (a of allies(); track a.id) {
+        <div class="bg-white rounded-2xl border border-outline-variant/20 overflow-hidden flex flex-col"
+             [class.opacity-60]="!a.isActive">
+          <!-- Cabecera con color/logo -->
+          <div class="h-24 relative flex items-center justify-center"
+               [style.background-color]="a.brandColor">
+            @if (a.logoUrl) {
+              <img [src]="a.logoUrl" alt="" class="h-16 w-16 rounded-xl object-cover bg-white/20"/>
+            } @else {
+              <span class="material-symbols-outlined text-white/90 text-[40px]">storefront</span>
+            }
+            <span class="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-white/85 text-[10px]
+                         font-heading font-bold uppercase tracking-wider text-on-surface">
+              {{ a.pillar }}
+            </span>
+            <span class="absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-heading font-bold
+                         uppercase tracking-wider"
+                  [class]="a.isActive ? 'bg-green-100 text-green-700' : 'bg-surface-variant text-on-surface-variant'">
+              {{ a.isActive ? 'Activo' : 'Inactivo' }}
+            </span>
+          </div>
+
+          <div class="p-4 flex-1 flex flex-col">
+            <h3 class="font-heading text-headline-sm font-bold text-on-surface truncate">{{ a.name }}</h3>
+            <p class="text-label-md font-heading text-primary mt-0.5 truncate">🎁 {{ a.benefitTitle }}</p>
+            @if (a.description) {
+              <p class="text-label-sm text-on-surface-variant mt-2 line-clamp-2">{{ a.description }}</p>
+            }
+
+            <!-- Acciones -->
+            <div class="flex items-center gap-1 mt-4 pt-3 border-t border-outline-variant/20">
+              <button (click)="openEdit(a)" title="Editar"
+                      class="p-2 rounded-lg hover:bg-surface-container-low transition-colors text-on-surface-variant">
+                <span class="material-symbols-outlined text-[20px]">edit</span>
+              </button>
+              <button (click)="toggleActive(a)" [title]="a.isActive ? 'Desactivar' : 'Activar'"
+                      class="p-2 rounded-lg hover:bg-surface-container-low transition-colors text-on-surface-variant">
+                <span class="material-symbols-outlined text-[20px]">{{ a.isActive ? 'visibility_off' : 'visibility' }}</span>
+              </button>
+              @if (a.whatsApp) {
+                <a [href]="'https://wa.me/' + a.whatsApp.replace(/[^0-9]/g, '')" target="_blank" rel="noopener"
+                   title="WhatsApp"
+                   class="p-2 rounded-lg hover:bg-surface-container-low transition-colors text-on-surface-variant">
+                  <span class="material-symbols-outlined text-[20px]">chat</span>
+                </a>
+              }
+              <button (click)="onDelete(a)" title="Eliminar"
+                      class="p-2 rounded-lg hover:bg-error-container/40 transition-colors text-error ml-auto">
+                <span class="material-symbols-outlined text-[20px]">delete</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- ══ Modal formulario ══════════════════════════════════════════════════════ -->
+@if (isModalOpen()) {
+  <div class="fixed inset-0 z-[60] bg-on-background/40 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-xl max-h-[92dvh] rounded-lg shadow-2xl flex flex-col overflow-hidden">
+      <!-- Header -->
+      <div class="px-8 py-6 border-b border-outline-variant/20 flex justify-between items-start">
+        <div>
+          <h2 class="font-heading text-headline-md font-bold text-on-surface">
+            {{ isEditMode() ? 'Editar aliado' : 'Nuevo aliado' }}
+          </h2>
+          <p class="text-label-md font-heading text-on-surface-variant mt-0.5">
+            Marca y convenio del aliado.
+          </p>
+        </div>
+        <button (click)="closeModal()"
+                class="p-2 rounded-full hover:bg-surface-container-low transition-colors">
+          <span class="material-symbols-outlined text-outline">close</span>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex-1 overflow-y-auto p-8 space-y-5">
+        <!-- Logo -->
+        <div class="space-y-2">
+          <label class="text-label-md font-heading font-semibold text-on-surface">Logo / marca</label>
+          <input #logoInput type="file" class="hidden"
+                 accept="image/jpeg,image/png,image/webp" (change)="onLogoSelected($event)"/>
+          <button type="button" (click)="logoInput.click()"
+                  class="relative w-28 h-28 rounded-2xl overflow-hidden border border-outline-variant/40 group"
+                  [style.background-color]="form.controls.brandColor.value">
+            @if (logoPreview()) {
+              <img [src]="logoPreview()" alt="" class="absolute inset-0 w-full h-full object-cover"/>
+            } @else if (editing()?.logoUrl) {
+              <img [src]="editing()!.logoUrl" alt="" class="absolute inset-0 w-full h-full object-cover"/>
+            } @else {
+              <span class="material-symbols-outlined text-white/90 text-[32px] absolute inset-0 flex items-center justify-center">add_photo_alternate</span>
+            }
+            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors"></div>
+          </button>
+        </div>
+
+        <!-- Nombre + Pilar -->
+        <div class="grid grid-cols-2 gap-5">
+          <div class="col-span-2 space-y-2">
+            <label class="text-label-md font-heading font-semibold text-on-surface">Nombre / marca <span class="text-error">*</span></label>
+            <input formControlName="name" type="text" placeholder="ej. Dra. Ana · Nutrición"
+                   class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary/50 outline-none text-label-md font-heading"/>
+            @if (form.controls.name.touched && form.controls.name.errors) {
+              <p class="text-label-sm text-error">Campo requerido</p>
+            }
+          </div>
+          <div class="space-y-2">
+            <label class="text-label-md font-heading font-semibold text-on-surface">Pilar <span class="text-error">*</span></label>
+            <select formControlName="pillar"
+                    class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary/50 outline-none text-label-md font-heading cursor-pointer">
+              @for (p of pillars; track p) { <option [value]="p">{{ p }}</option> }
+            </select>
+          </div>
+          <div class="space-y-2">
+            <label class="text-label-md font-heading font-semibold text-on-surface">Color de marca</label>
+            <input formControlName="brandColor" type="color"
+                   class="w-full h-[46px] bg-surface-container-low border-none rounded-lg px-2 cursor-pointer"/>
+          </div>
+        </div>
+
+        <!-- Descripción -->
+        <div class="space-y-2">
+          <label class="text-label-md font-heading font-semibold text-on-surface">Descripción</label>
+          <textarea formControlName="description" rows="2" placeholder="Qué hace el aliado…"
+                    class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary/50 outline-none text-label-md font-heading resize-none"></textarea>
+        </div>
+
+        <!-- Convenio -->
+        <div class="space-y-2">
+          <label class="text-label-md font-heading font-semibold text-on-surface">Convenio / beneficio <span class="text-error">*</span></label>
+          <input formControlName="benefitTitle" type="text" placeholder="ej. 20% en tu primera consulta"
+                 class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary/50 outline-none text-label-md font-heading"/>
+          @if (form.controls.benefitTitle.touched && form.controls.benefitTitle.errors) {
+            <p class="text-label-sm text-error">Campo requerido</p>
+          }
+          <textarea formControlName="benefitDescription" rows="2" placeholder="Detalle del convenio (opcional)"
+                    class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary/50 outline-none text-label-md font-heading resize-none"></textarea>
+        </div>
+
+        <!-- Contacto -->
+        <div class="grid grid-cols-2 gap-5">
+          <div class="space-y-2">
+            <label class="text-label-md font-heading font-semibold text-on-surface">WhatsApp <span class="text-error">*</span></label>
+            <input formControlName="whatsApp" type="text" placeholder="+57 300 123 4567"
+                   class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary/50 outline-none text-label-md font-heading"/>
+            @if (form.controls.whatsApp.touched && form.controls.whatsApp.errors) {
+              <p class="text-label-sm text-error">Campo requerido</p>
+            }
+          </div>
+          <div class="space-y-2">
+            <label class="text-label-md font-heading font-semibold text-on-surface">Sitio web</label>
+            <input formControlName="website" type="text" placeholder="https://…"
+                   class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary/50 outline-none text-label-md font-heading"/>
+          </div>
+        </div>
+
+        <!-- Activo -->
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input formControlName="isActive" type="checkbox" class="w-5 h-5 accent-[color:var(--tw-prose-links)] rounded"/>
+          <span class="text-label-md font-heading text-on-surface">Activo (visible en app y landing)</span>
+        </label>
+
+        @if (errorMsg(); as msg) {
+          <div class="bg-error-container/40 border border-error/30 rounded-lg px-4 py-3 flex items-start gap-2">
+            <span class="material-symbols-outlined text-error text-base">error</span>
+            <p class="text-label-sm font-heading text-error">{{ msg }}</p>
+          </div>
+        }
+      </form>
+
+      <!-- Footer -->
+      <div class="px-8 py-5 border-t border-outline-variant/20 flex justify-end gap-3 bg-white">
+        <button type="button" (click)="closeModal()" [disabled]="isSaving()"
+                class="px-6 py-3 rounded-full text-label-md font-heading font-bold text-on-surface-variant hover:bg-surface-container-low transition-colors disabled:opacity-40">
+          Cancelar
+        </button>
+        <button type="button" (click)="onSubmit()" [disabled]="isSaving()"
+                class="px-8 py-3 gradient-primary text-white rounded-full text-label-md font-heading font-bold hover:opacity-90 active:scale-95 transition-all disabled:opacity-60 flex items-center gap-2"
+                style="box-shadow: 0 4px 14px 0 rgba(107,56,212,0.39)">
+          @if (isSaving()) {
+            <span class="material-symbols-outlined animate-spin text-lg">progress_activity</span> Guardando…
+          } @else {
+            {{ isEditMode() ? 'Guardar cambios' : 'Crear aliado' }}
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}

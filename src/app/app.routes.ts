@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { mockAuthGuard } from './core/guards/mock-auth.guard';
 import { adminGuard } from './core/guards/admin.guard';
+import { clientShellGuard } from './core/guards/client-shell.guard';
 
 export const routes: Routes = [
   // ── Auth (login, registro, recuperar) ──────────────────────────────────
@@ -20,10 +21,10 @@ export const routes: Routes = [
       import('./features/administration/administration.routes').then((m) => m.administrationRoutes),
   },
 
-  // ── App usuario autenticado ─────────────────────────────────────────────
+  // ── App usuario autenticado (admins → panel; se prueba el cliente con un usuario aparte) ──
   {
     path: 'app',
-    canActivate: [mockAuthGuard],
+    canActivate: [mockAuthGuard, clientShellGuard],
     loadComponent: () =>
       import('./layouts/app-layout/app-layout.component').then((m) => m.AppLayoutComponent),
     children: [
@@ -79,6 +80,11 @@ export const routes: Routes = [
           import('./features/activation/pages/activate/activate.component').then((m) => m.ActivateComponent),
       },
       {
+        path: 'allies',
+        loadComponent: () =>
+          import('./features/allies/allies-page.component').then((m) => m.AlliesPageComponent),
+      },
+      {
         path: 'r/:slug',
         loadComponent: () =>
           import('./features/resource-viewer/pages/resource-view/resource-view.component').then((m) => m.ResourceViewComponent),
@@ -121,6 +127,11 @@ export const routes: Routes = [
         path: 'products/:id',
         loadComponent: () =>
           import('./features/public/pages/product-detail/product-detail.component').then((m) => m.ProductDetailComponent),
+      },
+      {
+        path: 'aliados/:id',
+        loadComponent: () =>
+          import('./features/public/pages/ally-detail/ally-detail.component').then((m) => m.AllyDetailComponent),
       },
       {
         path: 'cart',

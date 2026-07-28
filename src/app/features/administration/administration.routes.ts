@@ -26,6 +26,12 @@ export const administrationRoutes: Routes = [
       import('./pages/resources/admin-resources.component').then((m) => m.AdminResourcesComponent),
   },
   {
+    path: 'allies',
+    data: { title: 'Aliados' },
+    loadComponent: () =>
+      import('./pages/allies/admin-allies.component').then((m) => m.AdminAlliesComponent),
+  },
+  {
     path: 'users',
     data: { title: 'Usuarios' },
     loadComponent: () =>

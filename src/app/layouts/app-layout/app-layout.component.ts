@@ -67,6 +67,7 @@ export class AppLayoutComponent {
     { label: 'Biblioteca',      route: '/app/library',       icon: 'subscriptions' },
     { label: 'Activar producto', route: '/app/activate',      icon: 'qr_code_scanner' },
     { label: 'Tienda',          route: '/app/products',      icon: 'storefront' },
+    { label: 'Aliados',         route: '/app/allies',        icon: 'handshake' },
     { label: 'Mis pedidos',     route: '/app/orders',        icon: 'receipt_long' },
     { label: 'Suscripciones',   route: '/app/subscriptions', icon: 'workspace_premium' },
     { label: 'Perfil',          route: '/app/profile',       icon: 'person' },

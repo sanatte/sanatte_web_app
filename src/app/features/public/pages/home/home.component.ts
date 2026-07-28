@@ -5,6 +5,7 @@ import { EntitlementService } from '../../../administration/services/entitlement
 import { CartService } from '../../services/cart.service';
 import { StoreContextService } from '../../services/store-context.service';
 import { StoreProductCardComponent } from '../../components/store-product-card/store-product-card.component';
+import { AlliesSectionComponent } from '../../components/allies-section/allies-section.component';
 import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
 import { Product, getPrimaryImage } from '../../../administration/models/product.model';
 import { Resource, RESOURCE_TYPE_META } from '../../../administration/models/resource.model';
@@ -13,7 +14,7 @@ const PLENA_SKU = 'WLN-001'; // clave de negocio estable (mock y API)
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, StoreProductCardComponent, MoneyPipe],
+  imports: [RouterLink, StoreProductCardComponent, AlliesSectionComponent, MoneyPipe],
   template: `
     <!-- ══ HERO: spotlight Plena ══════════════════════════════════════════ -->
     @if (plena(); as p) {
@@ -145,6 +146,9 @@ const PLENA_SKU = 'WLN-001'; // clave de negocio estable (mock y API)
         </div>
       </section>
     }
+
+    <!-- ══ Aliados ════════════════════════════════════════════════════════ -->
+    <app-public-allies-section />
 
     <!-- ══ CTA registro ═══════════════════════════════════════════════════ -->
     <section class="max-w-6xl mx-auto py-12">
