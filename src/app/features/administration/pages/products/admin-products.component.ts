@@ -1,7 +1,7 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { ProductService } from '../../services/product.service';
 import { ProductTableComponent } from '../../components/product-table/product-table.component';
-import { ProductFormDialogComponent } from '../../components/product-form-dialog/product-form-dialog.component';
+import { ProductFormDialogComponent, ProductFormSaveEvent } from '../../components/product-form-dialog/product-form-dialog.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { AdminPageHeaderComponent } from '../../../../shared/components/admin-page-header/admin-page-header.component';
 import { SearchInputComponent } from '../../../../shared/components/search-input/search-input.component';
@@ -54,13 +54,19 @@ export class AdminProductsComponent {
   openEdit(product: Product): void { this.editingProduct.set(product); this.saveError.set(''); this.isModalOpen.set(true); }
   closeModal(): void { this.isModalOpen.set(false); this.editingProduct.set(null); this.saveError.set(''); }
 
-  async onSave(data: Partial<Product>): Promise<void> {
+  async onSave({ data, coverFile }: ProductFormSaveEvent): Promise<void> {
     const editing = this.editingProduct();
     this.saving.set(true);
     this.saveError.set('');
     try {
-      if (editing) await this.productService.update(editing.id, data);
-      else await this.productService.create(data as any);
+      const saved = editing
+        ? await this.productService.update(editing.id, data)
+        : await this.productService.create(data as any);
+
+      if (coverFile) {
+        try { await this.productService.uploadImage(saved.id, coverFile, '', true); }
+        catch { /* portada opcional: el admin puede subirla desde el detalle */ }
+      }
       this.closeModal();
     } catch (e: unknown) {
       this.saveError.set(

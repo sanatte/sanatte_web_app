@@ -52,7 +52,6 @@ export class AdminResourcesComponent {
     { key: 'audio',    label: 'Audio'      },
     { key: 'video',    label: 'Video'      },
     { key: 'pdf',      label: 'PDF'        },
-    { key: 'article',  label: 'Artículos'  },
     { key: 'exercise', label: 'Ejercicios' },
   ];
 

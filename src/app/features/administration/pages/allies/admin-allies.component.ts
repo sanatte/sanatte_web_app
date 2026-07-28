@@ -33,7 +33,6 @@ export class AdminAlliesComponent {
     website:            [''],
     benefitTitle:       ['', Validators.required],
     benefitDescription: [''],
-    brandColor:         ['#7C4DFF'],
     isActive:           [true],
   });
 
@@ -41,7 +40,7 @@ export class AdminAlliesComponent {
     this.editing.set(null);
     this.form.reset({
       name: '', pillar: WELLNESS_PILLARS[0], description: '', whatsApp: '',
-      website: '', benefitTitle: '', benefitDescription: '', brandColor: '#7C4DFF', isActive: true,
+      website: '', benefitTitle: '', benefitDescription: '', isActive: true,
     });
     this.resetLogo();
     this.errorMsg.set(null);
@@ -53,7 +52,7 @@ export class AdminAlliesComponent {
     this.form.reset({
       name: a.name, pillar: a.pillar, description: a.description ?? '', whatsApp: a.whatsApp,
       website: a.website ?? '', benefitTitle: a.benefitTitle, benefitDescription: a.benefitDescription ?? '',
-      brandColor: a.brandColor, isActive: a.isActive,
+      isActive: a.isActive,
     });
     this.resetLogo();
     this.errorMsg.set(null);

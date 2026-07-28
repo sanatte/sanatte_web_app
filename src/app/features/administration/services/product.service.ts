@@ -74,21 +74,23 @@ export class ProductService {
     return this._products().find((p) => p.sku === sku);
   }
 
-  async create(product: Omit<Product, 'id' | 'createdAt' | 'salesCount'>): Promise<void> {
+  async create(product: Omit<Product, 'id' | 'createdAt' | 'salesCount'>): Promise<Product> {
     const raw = await firstValueFrom(this.http.post<unknown>(this.base, toApiProductBody(product)));
     const created = mapApiProduct(raw);
     this._products.update((list) => [created, ...list]);
     this._total.update((t) => t + 1);
+    return created;
   }
 
   /** Edita un producto: mezcla los cambios con el actual y persiste (PUT). */
-  async update(id: string, changes: Partial<Product>): Promise<void> {
+  async update(id: string, changes: Partial<Product>): Promise<Product> {
     const current = this._products().find((p) => p.id === id);
-    if (!current) return;
+    if (!current) throw new Error(`Producto ${id} no encontrado en caché.`);
     const merged = { ...current, ...changes };
     const raw = await firstValueFrom(this.http.put<unknown>(`${this.base}/${id}`, toApiProductBody(merged)));
     const updated = mapApiProduct(raw);
     this._products.update((list) => list.map((p) => (p.id === id ? updated : p)));
+    return updated;
   }
 
   async delete(id: string): Promise<void> {

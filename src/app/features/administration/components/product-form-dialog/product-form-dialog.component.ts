@@ -1,9 +1,14 @@
 import { Component, input, output, effect, inject, signal, computed } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { Product, ProductType } from '../../models/product.model';
+import { Product, ProductType, getPrimaryImage } from '../../models/product.model';
 import { Resource, ResourceType, RESOURCE_TYPE_META } from '../../models/resource.model';
 import { ResourceService } from '../../services/resource.service';
 import { ThousandsSeparatorDirective } from '../../../../shared/directives/thousands-separator.directive';
+
+export interface ProductFormSaveEvent {
+  data: Partial<Product>;
+  coverFile: File | null;
+}
 
 @Component({
   selector: 'app-product-form-dialog',
@@ -19,8 +24,11 @@ export class ProductFormDialogComponent {
   readonly saving       = input(false);
   readonly errorMessage = input('');
 
-  readonly save   = output<Partial<Product>>();
+  readonly save   = output<ProductFormSaveEvent>();
   readonly cancel = output<void>();
+
+  readonly selectedCoverFile = signal<File | null>(null);
+  readonly coverPreview      = signal<string | null>(null);
 
   readonly form = this.fb.nonNullable.group({
     name:               ['', Validators.required],
@@ -71,6 +79,8 @@ export class ProductFormDialogComponent {
         this.selectedType.set('physical');
         this.selectedResourceIds.set(new Set());
       }
+      this.selectedCoverFile.set(null);
+      this.coverPreview.set(null);
     });
   }
 
@@ -85,6 +95,15 @@ export class ProductFormDialogComponent {
   isResourceSelected(id: string): boolean {
     return this.selectedResourceIds().has(id);
   }
+
+  onCoverSelected(e: Event): void {
+    const file = (e.target as HTMLInputElement).files?.[0] ?? null;
+    if (!file) return;
+    this.selectedCoverFile.set(file);
+    this.coverPreview.set(URL.createObjectURL(file));
+  }
+
+  existingCoverUrl = computed(() => getPrimaryImage(this.product() ?? { images: [] } as any)?.url ?? null);
 
   onTypeChange(event: Event): void {
     const type = (event.target as HTMLSelectElement).value as ProductType;
@@ -108,26 +127,29 @@ export class ProductFormDialogComponent {
     // producto (endpoints dedicados de Firebase Storage). Este form solo maneja
     // los datos; así editar nunca pisa las fotos ya subidas.
     this.save.emit({
-      name: raw.name, sku: raw.sku, type,
-      price: Number(raw.price),
-      billingPeriod: type === 'subscription' ? (raw.billingPeriod as any) : undefined,
-      stock: raw.stock ?? undefined,
-      requiresActivation: raw.requiresActivation,
-      status: raw.status as any,
-      description: raw.description,
-      tags: raw.tags ? raw.tags.split(',').map((t) => t.trim()).filter(Boolean) : [],
-      accessType: type === 'physical' ? 'qr_activation'
-                : type === 'subscription' ? 'subscription'
-                : 'direct_purchase',
-      entitlements: this.allResources()
-        .filter((r) => this.selectedResourceIds().has(r.id))
-        .map((r) => ({
-          id: `ent-${r.id}`,
-          type: 'content_item' as const,
-          referenceId: r.id,
-          label: r.title,
-        })),
-      specs: this.product()?.specs ?? [],
+      data: {
+        name: raw.name, sku: raw.sku, type,
+        price: Number(raw.price),
+        billingPeriod: type === 'subscription' ? (raw.billingPeriod as any) : undefined,
+        stock: raw.stock ?? undefined,
+        requiresActivation: raw.requiresActivation,
+        status: raw.status as any,
+        description: raw.description,
+        tags: raw.tags ? raw.tags.split(',').map((t) => t.trim()).filter(Boolean) : [],
+        accessType: type === 'physical' ? 'qr_activation'
+                  : type === 'subscription' ? 'subscription'
+                  : 'direct_purchase',
+        entitlements: this.allResources()
+          .filter((r) => this.selectedResourceIds().has(r.id))
+          .map((r) => ({
+            id: `ent-${r.id}`,
+            type: 'content_item' as const,
+            referenceId: r.id,
+            label: r.title,
+          })),
+        specs: this.product()?.specs ?? [],
+      },
+      coverFile: this.selectedCoverFile(),
     });
   }
 }

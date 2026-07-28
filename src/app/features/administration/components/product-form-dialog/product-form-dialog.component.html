@@ -264,20 +264,34 @@
                         font-heading transition-all"/>
         </div>
 
-        <!-- Imágenes: se gestionan en el detalle del producto -->
-        <div class="flex items-start gap-2 p-4 bg-surface-container-low rounded-lg">
-          <span class="material-symbols-outlined text-primary text-[20px] mt-0.5">image</span>
-          <div>
-            <p class="text-label-md font-heading font-semibold text-on-surface">Imágenes del producto</p>
-            <p class="text-label-sm font-heading text-on-surface-variant mt-0.5">
-              @if (isEditMode()) {
-                Las fotos se suben y organizan desde el <b>detalle del producto</b>
-                (clic en el nombre del producto en la lista).
+        <!-- Imagen de portada -->
+        <div class="space-y-2">
+          <label class="text-label-md font-heading font-semibold text-on-surface">Imagen de portada</label>
+          <input #coverInput type="file" class="hidden"
+                 accept="image/jpeg,image/png,image/webp" (change)="onCoverSelected($event)"/>
+          <button type="button" (click)="coverInput.click()"
+                  class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl border-2 border-dashed
+                         border-outline-variant/50 hover:border-primary/60 hover:bg-primary/[0.03]
+                         transition-all group text-left">
+            <div class="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center gradient-primary">
+              @if (coverPreview()) {
+                <img [src]="coverPreview()" alt="" class="w-full h-full object-cover"/>
+              } @else if (existingCoverUrl()) {
+                <img [src]="existingCoverUrl()" alt="" class="w-full h-full object-cover"/>
               } @else {
-                Podrás subir las fotos reales desde el <b>detalle del producto</b>, una vez creado.
+                <span class="material-symbols-outlined text-white/90 text-[26px]">add_photo_alternate</span>
               }
-            </p>
-          </div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-label-md font-heading font-semibold text-on-surface group-hover:text-primary transition-colors">
+                {{ (coverPreview() || existingCoverUrl()) ? 'Cambiar imagen' : 'Subir portada' }}
+              </p>
+              <p class="text-label-sm font-heading text-on-surface-variant mt-0.5">
+                JPEG, PNG o WebP · más fotos en el detalle del producto
+              </p>
+            </div>
+            <span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors text-[20px] flex-shrink-0">upload</span>
+          </button>
         </div>
 
       </form>
