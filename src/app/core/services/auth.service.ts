@@ -9,6 +9,7 @@ import {
   signInWithPopup, GoogleAuthProvider, OAuthProvider,
   sendPasswordResetEmail, confirmPasswordReset, signOut,
   applyActionCode, verifyPasswordResetCode,
+  ActionCodeSettings,
   User as FbUser,
 } from 'firebase/auth';
 import { environment } from '../../../environments/environment';
@@ -16,6 +17,10 @@ import { User } from '../models/user.model';
 import { UserRole } from '../models/role.model';
 
 const PENDING_KEY = 'sanatte_pending_email';
+const ACTION_CODE_SETTINGS: ActionCodeSettings = {
+  url: `${environment.publicBaseUrl}/auth/action`,
+  handleCodeInApp: false,
+};
 
 interface ApiUser { id: string; email: string; displayName: string; role: number; emailVerified: boolean; }
 
@@ -91,7 +96,7 @@ export class AuthService {
     try {
       const cred = await createUserWithEmailAndPassword(this.auth, email, password);
       if (name?.trim()) await updateProfile(cred.user, { displayName: name.trim() });
-      await fbSendEmailVerification(cred.user);
+      await fbSendEmailVerification(cred.user, ACTION_CODE_SETTINGS);
       localStorage.setItem(PENDING_KEY, email);
       // No se cierra sesión: se mantiene la sesión de Firebase (sin verificar) para
       // poder reenviar el correo; currentUser sigue null hasta que verifique.
@@ -128,7 +133,7 @@ export class AuthService {
 
   /** Reenvía el correo de verificación al usuario en sesión (aún sin verificar). */
   async sendEmailVerification(): Promise<void> {
-    if (this.auth.currentUser) await fbSendEmailVerification(this.auth.currentUser);
+    if (this.auth.currentUser) await fbSendEmailVerification(this.auth.currentUser, ACTION_CODE_SETTINGS);
   }
 
   /** Comprueba si el correo ya fue verificado (tras hacer clic en el enlace). */
@@ -145,7 +150,7 @@ export class AuthService {
   }
 
   async sendPasswordReset(email: string): Promise<void> {
-    await sendPasswordResetEmail(this.auth, email);
+    await sendPasswordResetEmail(this.auth, email, ACTION_CODE_SETTINGS);
   }
 
   async resetPassword(oobCode: string, newPassword: string): Promise<void> {
