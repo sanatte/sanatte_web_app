@@ -17,8 +17,15 @@ import { User } from '../models/user.model';
 import { UserRole } from '../models/role.model';
 
 const PENDING_KEY = 'sanatte_pending_email';
-const ACTION_CODE_SETTINGS: ActionCodeSettings = {
-  url: `${environment.publicBaseUrl}/auth/action`,
+
+// Firebase procesa el oobCode en su propia página (sanatte-d819d.firebaseapp.com/__/auth/action)
+// y redirige a estas URLs después. El continueUrl no recibe el oobCode — Firebase ya lo consumió.
+const VERIFY_EMAIL_SETTINGS: ActionCodeSettings = {
+  url: `${environment.publicBaseUrl}/auth/login?emailVerified=true`,
+  handleCodeInApp: false,
+};
+const RESET_PASSWORD_SETTINGS: ActionCodeSettings = {
+  url: `${environment.publicBaseUrl}/auth/login`,
   handleCodeInApp: false,
 };
 
@@ -96,7 +103,7 @@ export class AuthService {
     try {
       const cred = await createUserWithEmailAndPassword(this.auth, email, password);
       if (name?.trim()) await updateProfile(cred.user, { displayName: name.trim() });
-      await fbSendEmailVerification(cred.user, ACTION_CODE_SETTINGS);
+      await fbSendEmailVerification(cred.user, VERIFY_EMAIL_SETTINGS);
       localStorage.setItem(PENDING_KEY, email);
       // No se cierra sesión: se mantiene la sesión de Firebase (sin verificar) para
       // poder reenviar el correo; currentUser sigue null hasta que verifique.
@@ -133,7 +140,7 @@ export class AuthService {
 
   /** Reenvía el correo de verificación al usuario en sesión (aún sin verificar). */
   async sendEmailVerification(): Promise<void> {
-    if (this.auth.currentUser) await fbSendEmailVerification(this.auth.currentUser, ACTION_CODE_SETTINGS);
+    if (this.auth.currentUser) await fbSendEmailVerification(this.auth.currentUser, VERIFY_EMAIL_SETTINGS);
   }
 
   /** Comprueba si el correo ya fue verificado (tras hacer clic en el enlace). */
@@ -150,7 +157,7 @@ export class AuthService {
   }
 
   async sendPasswordReset(email: string): Promise<void> {
-    await sendPasswordResetEmail(this.auth, email, ACTION_CODE_SETTINGS);
+    await sendPasswordResetEmail(this.auth, email, RESET_PASSWORD_SETTINGS);
   }
 
   async resetPassword(oobCode: string, newPassword: string): Promise<void> {

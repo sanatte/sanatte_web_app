@@ -15,6 +15,14 @@ import { AuthShellComponent } from '../components/auth-shell/auth-shell.componen
         Bienvenido de nuevo a tu espacio de bienestar.
       </p>
 
+      @if (emailVerified()) {
+        <div class="mb-4 p-3 rounded-xl bg-green-50 border border-green-200 text-green-700
+                    text-label-md font-heading flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1">check_circle</span>
+          Correo verificado. Ya puedes iniciar sesión.
+        </div>
+      }
+
       @if (errorMessage()) {
         <div class="mb-4 p-3 rounded-xl bg-error-container/50 border border-error/20 text-error
                     text-label-md font-heading">
@@ -113,6 +121,7 @@ export class LoginComponent {
   readonly errorMessage = signal('');
   readonly showPassword = signal(false);
   readonly returnUrl = signal(this.route.snapshot.queryParamMap.get('returnUrl') ?? '');
+  readonly emailVerified = signal(this.route.snapshot.queryParamMap.get('emailVerified') === 'true');
   readonly isCredentialError = computed(() => this.errorMessage() === 'Credenciales inválidas. Intenta de nuevo.');
 
   async onSubmit(): Promise<void> {
