@@ -157,7 +157,11 @@ export class AuthService {
   }
 
   async sendPasswordReset(email: string): Promise<void> {
-    await sendPasswordResetEmail(this.auth, email, RESET_PASSWORD_SETTINGS);
+    // El backend genera el oobCode via Admin SDK y envía el email con link directo
+    // a Angular (/auth/action?mode=resetPassword&oobCode=...) por SMTP propio.
+    await firstValueFrom(
+      this.http.post(`${environment.apiUrl}/auth/send-password-reset`, { email })
+    );
   }
 
   async resetPassword(oobCode: string, newPassword: string): Promise<void> {
