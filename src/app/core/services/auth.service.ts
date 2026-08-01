@@ -5,7 +5,6 @@ import { initializeApp, getApps } from 'firebase/app';
 import {
   getAuth, Auth, onAuthStateChanged,
   signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile,
-  sendEmailVerification as fbSendEmailVerification,
   signInWithPopup, GoogleAuthProvider, OAuthProvider,
   sendPasswordResetEmail, confirmPasswordReset, signOut,
   applyActionCode, verifyPasswordResetCode,
@@ -18,12 +17,6 @@ import { UserRole } from '../models/role.model';
 
 const PENDING_KEY = 'sanatte_pending_email';
 
-// Firebase procesa el oobCode en su propia página (sanatte-d819d.firebaseapp.com/__/auth/action)
-// y redirige a estas URLs después. El continueUrl no recibe el oobCode — Firebase ya lo consumió.
-const VERIFY_EMAIL_SETTINGS: ActionCodeSettings = {
-  url: `${environment.publicBaseUrl}/auth/login?emailVerified=true`,
-  handleCodeInApp: false,
-};
 const RESET_PASSWORD_SETTINGS: ActionCodeSettings = {
   url: `${environment.publicBaseUrl}/auth/login`,
   handleCodeInApp: false,
@@ -103,7 +96,7 @@ export class AuthService {
     try {
       const cred = await createUserWithEmailAndPassword(this.auth, email, password);
       if (name?.trim()) await updateProfile(cred.user, { displayName: name.trim() });
-      await fbSendEmailVerification(cred.user, VERIFY_EMAIL_SETTINGS);
+      await this.sendVerificationEmail(email);
       localStorage.setItem(PENDING_KEY, email);
       // No se cierra sesión: se mantiene la sesión de Firebase (sin verificar) para
       // poder reenviar el correo; currentUser sigue null hasta que verifique.
@@ -140,7 +133,14 @@ export class AuthService {
 
   /** Reenvía el correo de verificación al usuario en sesión (aún sin verificar). */
   async sendEmailVerification(): Promise<void> {
-    if (this.auth.currentUser) await fbSendEmailVerification(this.auth.currentUser, VERIFY_EMAIL_SETTINGS);
+    const email = this.auth.currentUser?.email ?? localStorage.getItem(PENDING_KEY);
+    if (email) await this.sendVerificationEmail(email);
+  }
+
+  private sendVerificationEmail(email: string): Promise<void> {
+    return firstValueFrom(
+      this.http.post<void>(`${environment.apiUrl}/auth/send-email-verification`, { email })
+    );
   }
 
   /** Comprueba si el correo ya fue verificado (tras hacer clic en el enlace). */
