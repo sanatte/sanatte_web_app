@@ -48,22 +48,39 @@ interface PublicAlly {
           @for (a of allies(); track a.id) {
             <a [routerLink]="variant() === 'landing' ? ['/aliados', a.id] : null"
                [class.cursor-pointer]="variant() === 'landing'"
-               class="bg-white rounded-2xl border border-outline-variant/20 overflow-hidden flex flex-col
-                      hover:shadow-[0px_20px_40px_rgba(76,29,149,0.1)] transition-all">
-              <div class="h-24 relative flex items-center justify-center" [style.background-color]="a.brandColor">
+               class="group bg-white rounded-2xl border border-transparent hover:border-primary/20
+                      overflow-hidden flex flex-col transition-all"
+               style="box-shadow: 0px 10px 30px rgba(76,29,149,0.05)">
+              <!-- Cover -->
+              <div class="relative aspect-video overflow-hidden" [style.background-color]="a.brandColor">
                 @if (a.logoUrl) {
-                  <img [src]="a.logoUrl" [alt]="a.name" class="h-16 w-16 rounded-xl object-cover bg-white/20"/>
+                  <img [src]="a.logoUrl" [alt]="a.name"
+                       class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+                  <div class="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors"></div>
                 } @else {
-                  <span class="material-symbols-outlined text-white/90 text-[40px]">storefront</span>
+                  <div class="w-full h-full flex items-center justify-center
+                              group-hover:scale-105 transition-transform duration-500">
+                    <span class="material-symbols-outlined text-white/70 text-[52px]">storefront</span>
+                  </div>
                 }
-                <span class="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-white/85 text-[10px]
-                             font-heading font-bold uppercase tracking-wider text-on-surface">{{ a.pillar }}</span>
+                <span class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded
+                             text-[10px] font-heading font-bold uppercase tracking-widest text-on-surface">
+                  {{ a.pillar }}
+                </span>
               </div>
+
               <div class="p-5 flex-1 flex flex-col">
-                <h3 class="font-heading text-headline-sm font-bold text-on-surface">{{ a.name }}</h3>
-                <p class="font-heading text-label-md text-primary mt-1">🎁 {{ a.benefitTitle }}</p>
+                <h3 class="font-heading text-headline-sm font-bold text-on-surface truncate">{{ a.name }}</h3>
+                <p class="font-heading text-label-md text-primary mt-0.5 truncate">🎁 {{ a.benefitTitle }}</p>
                 @if (a.description) {
                   <p class="text-label-sm text-on-surface-variant mt-2 line-clamp-2 flex-1">{{ a.description }}</p>
+                }
+                @if (variant() === 'landing') {
+                  <span class="mt-4 pt-3 border-t border-outline-variant/20 inline-flex items-center gap-1
+                               text-label-md font-heading font-bold text-primary group-hover:gap-2 transition-all">
+                    Ver convenio
+                    <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                  </span>
                 }
               </div>
             </a>
