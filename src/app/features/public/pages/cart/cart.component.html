@@ -69,14 +69,18 @@
               <span>Subtotal</span>
               <span>{{ subtotal() | money }}</span>
             </div>
-            <div class="flex justify-between text-on-surface-variant">
-              <span>Envío {{ hasPhysical() ? '(estimado)' : '' }}</span>
-              <span>{{ hasPhysical() ? (shipping() | money) : 'No aplica' }}</span>
-            </div>
-            <div class="flex justify-between text-on-surface-variant">
-              <span>Impuestos</span>
-              <span>{{ taxes() | money }}</span>
-            </div>
+            @if (hasPhysical()) {
+              <div class="flex justify-between text-on-surface-variant">
+                <span>Envío</span>
+                <span>Gratis</span>
+              </div>
+            }
+            @if (taxes() > 0) {
+              <div class="flex justify-between text-on-surface-variant">
+                <span>IVA incluido</span>
+                <span>{{ taxes() | money }}</span>
+              </div>
+            }
             <div class="h-px bg-outline-variant/30 my-1"></div>
             <div class="flex justify-between font-heading text-headline-md text-on-surface">
               <span>Total</span>

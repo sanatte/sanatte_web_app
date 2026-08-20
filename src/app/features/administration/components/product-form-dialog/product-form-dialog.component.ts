@@ -35,6 +35,7 @@ export class ProductFormDialogComponent {
     sku:                ['', Validators.required],
     type:               ['physical' as ProductType, Validators.required],
     price:              [0, [Validators.required, Validators.min(0.01)]],
+    taxRate:            [19, [Validators.required, Validators.min(0), Validators.max(100)]],
     billingPeriod:      ['monthly'],
     stock:              [null as number | null],
     requiresActivation: [true],
@@ -58,7 +59,7 @@ export class ProductFormDialogComponent {
       const p = this.product();
       if (p) {
         this.form.patchValue({
-          name: p.name, sku: p.sku, type: p.type, price: p.price,
+          name: p.name, sku: p.sku, type: p.type, price: p.price, taxRate: p.taxRate ?? 19,
           billingPeriod: p.billingPeriod ?? 'monthly', stock: p.stock ?? null,
           requiresActivation: p.requiresActivation, status: p.status,
           description: p.description, tags: p.tags?.join(', ') ?? '',
@@ -72,7 +73,7 @@ export class ProductFormDialogComponent {
         this.selectedResourceIds.set(ids);
       } else {
         this.form.reset({
-          name: '', sku: '', type: 'physical', price: 0,
+          name: '', sku: '', type: 'physical', price: 0, taxRate: 19,
           billingPeriod: 'monthly', stock: null,
           requiresActivation: true, status: 'active', description: '', tags: '',
         });
@@ -130,6 +131,7 @@ export class ProductFormDialogComponent {
       data: {
         name: raw.name, sku: raw.sku, type,
         price: Number(raw.price),
+        taxRate: Number(raw.taxRate),
         billingPeriod: type === 'subscription' ? (raw.billingPeriod as any) : undefined,
         stock: raw.stock ?? undefined,
         requiresActivation: raw.requiresActivation,

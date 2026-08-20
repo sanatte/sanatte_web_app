@@ -109,6 +109,24 @@
           </div>
         </div>
 
+        <!-- IVA -->
+        <div class="space-y-2">
+          <label class="text-label-md font-heading font-semibold text-on-surface">
+            IVA <span class="text-error">*</span>
+          </label>
+          <select formControlName="taxRate"
+                  class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3
+                         focus:ring-2 focus:ring-primary/50 outline-none text-label-md
+                         font-heading transition-all cursor-pointer">
+            <option [ngValue]="19">Gravado 19% (general)</option>
+            <option [ngValue]="5">Gravado 5% (reducido)</option>
+            <option [ngValue]="0">Exento / Excluido (0%)</option>
+          </select>
+          <p class="text-label-sm text-on-surface-variant">
+            El IVA va <span class="font-semibold">incluido</span> en el precio; en el carrito se muestra discriminado.
+          </p>
+        </div>
+
         <!-- Stock / Límite licencias -->
         @if (selectedType() !== 'subscription') {
           <div class="space-y-2">

@@ -22,9 +22,16 @@ export class CheckoutComponent {
   readonly subtotal = this.cart.subtotal;
 
   readonly hasPhysical = computed(() => this.lines().some((l) => l.product.type === 'physical'));
-  readonly shipping    = computed(() => (this.hasPhysical() && this.subtotal() > 0 ? 12.5 : 0));
-  readonly taxes       = computed(() => +(this.subtotal() * 0.08).toFixed(2));
-  readonly total       = computed(() => this.subtotal() + this.shipping() + this.taxes());
+  // Envío aún no se cobra en el backend → 0 ("Gratis"). Pendiente: cálculo real.
+  readonly shipping    = computed(() => 0);
+  // IVA discriminado (informativo): ya incluido en el precio, no se suma al total.
+  readonly taxes       = computed(() =>
+    +this.lines().reduce((sum, l) => {
+      const r = l.product.taxRate ?? 0;
+      return sum + (l.lineTotal * r) / (100 + r);
+    }, 0).toFixed(2)
+  );
+  readonly total       = computed(() => this.subtotal() + this.shipping());
 
   readonly userName  = computed(() => this.auth.currentUser()?.displayName ?? '');
   readonly userEmail = computed(() => this.auth.currentUser()?.email ?? '');

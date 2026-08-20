@@ -21,6 +21,8 @@ export interface Product {
   description: string;
   type: ProductType;
   price: number;
+  /** % de IVA incluido en `price` (0 = exento/excluido, 19 general, 5 reducido). */
+  taxRate: number;
   billingPeriod?: BillingPeriod;
   status: ProductStatus;
   accessType: AccessType;
