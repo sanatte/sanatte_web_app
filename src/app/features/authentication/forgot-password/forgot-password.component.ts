@@ -74,17 +74,31 @@ export class ForgotPasswordComponent {
   readonly form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
   });
-  readonly loading = this.auth.loading;
+  // Estado local del envío: bloquea el botón y evita doble clic mientras la
+  // petición está en curso (sendPasswordReset no toca el loading global del auth).
+  readonly loading = signal(false);
   readonly sent = signal(false);
 
   async onSubmit(): Promise<void> {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
-    await this.auth.sendPasswordReset(this.form.getRawValue().email);
-    this.sent.set(true);
+    if (this.loading()) return; // ya hay un envío en curso
+    this.loading.set(true);
+    try {
+      await this.auth.sendPasswordReset(this.form.getRawValue().email);
+      this.sent.set(true);
+    } finally {
+      this.loading.set(false);
+    }
   }
 
   /** Reenvía el correo (el backend responde igual exista o no la cuenta). */
   async resend(): Promise<void> {
-    await this.auth.sendPasswordReset(this.form.getRawValue().email);
+    if (this.loading()) return;
+    this.loading.set(true);
+    try {
+      await this.auth.sendPasswordReset(this.form.getRawValue().email);
+    } finally {
+      this.loading.set(false);
+    }
   }
 }
