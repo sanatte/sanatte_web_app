@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { AuthShellComponent } from '../components/auth-shell/auth-shell.component';
 
@@ -10,8 +10,8 @@ import { AuthShellComponent } from '../components/auth-shell/auth-shell.componen
   template: `
     <app-auth-shell icon="lock_reset">
       @if (!sent()) {
-        <h1 class="font-heading text-headline-md text-on-surface mb-1">Recuperar contraseña</h1>
-        <p class="font-sans text-label-md text-on-surface-variant mb-6">
+        <h1 class="font-heading text-headline-md text-on-surface mb-1 text-center">Recuperar contraseña</h1>
+        <p class="font-sans text-label-md text-on-surface-variant mb-6 text-center">
           Ingresa tu correo para recibir un enlace de recuperación.
         </p>
 
@@ -27,12 +27,15 @@ import { AuthShellComponent } from '../components/auth-shell/auth-shell.componen
             </div>
           </div>
           <button type="submit" [disabled]="loading() || form.invalid"
-                  class="w-full py-3.5 rounded-full gradient-primary text-white font-heading font-bold
-                         shadow-primary hover:opacity-90 active:scale-95 transition-all
-                         flex items-center justify-center gap-2 disabled:opacity-50">
+                  class="w-full py-4 rounded-full gradient-primary text-white font-heading font-bold text-label-lg
+                         shadow-primary hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]
+                         transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:shadow-none
+                         disabled:hover:translate-y-0">
             @if (loading()) {
               <span class="material-symbols-outlined animate-spin text-[20px]">progress_activity</span> Enviando…
-            } @else { Enviar enlace <span class="material-symbols-outlined text-[20px]">arrow_forward</span> }
+            } @else {
+              <span class="material-symbols-outlined text-[20px]">send</span> Enviar enlace
+            }
           </button>
         </form>
       } @else {
@@ -43,14 +46,15 @@ import { AuthShellComponent } from '../components/auth-shell/auth-shell.componen
           <h1 class="font-heading text-headline-md text-on-surface mb-2">Revisa tu correo</h1>
           <p class="font-sans text-body-md text-on-surface-variant mb-6">
             Si <span class="font-bold text-on-surface">{{ form.value.email }}</span> tiene una cuenta,
-            recibirás un enlace para restablecer tu contraseña.
+            recibirás un enlace para restablecer tu contraseña. Revisa también la carpeta de spam.
           </p>
-          <!-- Simula el clic en el enlace del correo (Firebase lo envía por email) -->
-          <button (click)="openResetLink()"
-                  class="w-full py-3.5 rounded-full gradient-primary text-white font-heading font-bold
-                         hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2">
-            <span class="material-symbols-outlined text-[20px]">open_in_new</span>
-            Abrir enlace de recuperación
+          <button (click)="resend()" [disabled]="loading()"
+                  class="text-primary font-heading font-bold text-label-md hover:underline inline-flex items-center gap-1 disabled:opacity-50">
+            @if (loading()) {
+              <span class="material-symbols-outlined animate-spin text-[16px]">progress_activity</span> Reenviando…
+            } @else {
+              <span class="material-symbols-outlined text-[16px]">refresh</span> ¿No te llegó? Reenviar
+            }
           </button>
         </div>
       }
@@ -66,7 +70,6 @@ import { AuthShellComponent } from '../components/auth-shell/auth-shell.componen
 export class ForgotPasswordComponent {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
-  private readonly router = inject(Router);
 
   readonly form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -80,7 +83,8 @@ export class ForgotPasswordComponent {
     this.sent.set(true);
   }
 
-  openResetLink(): void {
-    this.router.navigate(['/auth/reset'], { queryParams: { oobCode: 'mock-code' } });
+  /** Reenvía el correo (el backend responde igual exista o no la cuenta). */
+  async resend(): Promise<void> {
+    await this.auth.sendPasswordReset(this.form.getRawValue().email);
   }
 }
