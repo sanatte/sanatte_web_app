@@ -21,8 +21,9 @@ export class ResourceFormDialogComponent {
   private readonly fb = inject(FormBuilder);
   private readonly resourceService = inject(ResourceService);
 
-  readonly isOpen   = input.required<boolean>();
-  readonly resource = input<Resource | null>(null);
+  readonly isOpen            = input.required<boolean>();
+  readonly resource          = input<Resource | null>(null);
+  readonly linkedProductCount = input(0);
 
   /** Se emite cuando el recurso (y su archivo, si hay) quedó guardado. */
   readonly saved  = output<void>();

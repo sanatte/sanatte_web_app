@@ -92,6 +92,20 @@
           </div>
         </div>
 
+        <!-- Advertencia: despublicar recurso vinculado a productos -->
+        @if (isEditMode() && linkedProductCount() > 0 && form.controls.status.value === 'draft') {
+          <div class="flex items-start gap-3 bg-warning-container/40 border border-warning/30
+                      rounded-xl px-4 py-3">
+            <span class="material-symbols-outlined text-warning text-[20px] shrink-0 mt-0.5">warning</span>
+            <p class="text-label-sm font-heading text-on-surface">
+              Este recurso está vinculado a
+              <span class="font-semibold">{{ linkedProductCount() }} producto{{ linkedProductCount() !== 1 ? 's' : '' }}</span>.
+              Al guardarlo como borrador dejará de estar disponible para los usuarios.
+              Considera desvincularlo del producto antes de despublicarlo.
+            </p>
+          </div>
+        }
+
         <!-- Portada -->
         <div class="space-y-2">
           <label class="text-label-md font-heading font-semibold text-on-surface">Portada</label>

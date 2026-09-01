@@ -102,6 +102,7 @@
 <app-resource-form-dialog
   [isOpen]="isModalOpen()"
   [resource]="editingResource()"
+  [linkedProductCount]="editingResource() ? (linkedCountMap()[editingResource()!.id] ?? 0) : 0"
   (saved)="closeModal()"
   (cancel)="closeModal()" />
 
