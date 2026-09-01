@@ -2,7 +2,7 @@ import { Product } from '../models/product.model';
 
 export const MOCK_PRODUCTS: Product[] = [
   {
-    id: 'p1', sku: 'WLN-001', name: 'Plena', type: 'physical', price: 89900,
+    id: 'p1', sku: 'WLN-001', name: 'Plena', type: 'physical', price: 89900, taxRate: 0,
     status: 'active', accessType: 'qr_activation', requiresActivation: true,
     description: 'Un planeador emocional en papel diseñado para acompañarte a escucharte, organizarte y cuidarte con amor. A través de un ciclo de 4 fases —Me Recojo, Me Reconozco, Me Expreso y Me Cuido— y códigos QR que desbloquean meditaciones y recursos digitales, Plena transforma la prisa en presencia y la culpa en poder. Tu mejor amiga en papel.',
     images: [
@@ -29,7 +29,7 @@ export const MOCK_PRODUCTS: Product[] = [
     createdAt: '2024-11-01',
   },
   {
-    id: 'p2', sku: 'DIG-082', name: 'Guided Flow Pro', type: 'subscription', price: 39900,
+    id: 'p2', sku: 'DIG-082', name: 'Guided Flow Pro', type: 'subscription', price: 39900, taxRate: 0,
     billingPeriod: 'monthly', status: 'active', accessType: 'subscription', requiresActivation: false,
     description: 'Suscripción premium a la biblioteca completa de recursos de bienestar.',
     images: [
@@ -52,7 +52,7 @@ export const MOCK_PRODUCTS: Product[] = [
     createdAt: '2024-09-15',
   },
   {
-    id: 'p3', sku: 'DIG-115', name: 'The Silent Mind (eBook)', type: 'digital', price: 34900,
+    id: 'p3', sku: 'DIG-115', name: 'The Silent Mind (eBook)', type: 'digital', price: 34900, taxRate: 0,
     status: 'inactive', accessType: 'direct_purchase', requiresActivation: false,
     description: 'Guía completa para reducir la ansiedad. 200 páginas en PDF.',
     images: [
@@ -70,7 +70,7 @@ export const MOCK_PRODUCTS: Product[] = [
     createdAt: '2024-10-20',
   },
   {
-    id: 'p4', sku: 'WLN-002', name: 'Serenity Kit', type: 'physical', price: 149900,
+    id: 'p4', sku: 'WLN-002', name: 'Serenity Kit', type: 'physical', price: 149900, taxRate: 0,
     status: 'active', accessType: 'qr_activation', requiresActivation: true,
     description: 'Kit físico de bienestar con vela aromática, difusor y tarjeta de activación.',
     images: [
@@ -90,7 +90,7 @@ export const MOCK_PRODUCTS: Product[] = [
     createdAt: '2025-01-10',
   },
   {
-    id: 'p5', sku: 'DIG-200', name: 'Guided Flow Basic', type: 'subscription', price: 19900,
+    id: 'p5', sku: 'DIG-200', name: 'Guided Flow Basic', type: 'subscription', price: 19900, taxRate: 0,
     billingPeriod: 'monthly', status: 'active', accessType: 'subscription', requiresActivation: false,
     description: 'Plan de suscripción básico con acceso a 10 recursos curados.',
     images: [
@@ -106,7 +106,7 @@ export const MOCK_PRODUCTS: Product[] = [
     createdAt: '2025-02-01',
   },
   {
-    id: 'p6', sku: 'DIG-310', name: 'Curso: Mindfulness 30 días', type: 'digital', price: 129900,
+    id: 'p6', sku: 'DIG-310', name: 'Curso: Mindfulness 30 días', type: 'digital', price: 129900, taxRate: 0,
     status: 'active', accessType: 'direct_purchase', requiresActivation: false,
     description: 'Programa digital de 30 días con videos, audios y guía PDF.',
     images: [
