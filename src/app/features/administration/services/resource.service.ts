@@ -107,6 +107,11 @@ export class ResourceService {
       this.http.post<unknown>(`${this.base}/${id}/thumbnail`, fd)
     );
     const updated = mapApiResource(raw);
+    // Cache-busting: el backend siempre genera la misma ruta (.webp), así que
+    // el browser reutilizaría la imagen cacheada aunque el contenido cambió.
+    if (updated.thumbnailUrl) {
+      updated.thumbnailUrl = `${updated.thumbnailUrl}?t=${Date.now()}`;
+    }
     this._resources.update((list) => list.map((r) => r.id === id ? updated : r));
   }
 

@@ -221,11 +221,11 @@ export class ResourceFormDialogComponent {
         }
       }
 
-      // Portada (opcional): best-effort — si falla, el recurso queda igual válido.
+      // Portada (opcional): best-effort — el recurso ya quedó guardado.
       const cover = this.selectedCover();
       if (cover) {
         try { await this.resourceService.uploadThumbnail(saved.id, cover); }
-        catch { /* se puede reintentar desde la card */ }
+        catch { this.errorMsg.set('El recurso se guardó, pero no se pudo subir la portada. Inténtalo desde la tarjeta.'); }
       }
 
       this.saved.emit();
