@@ -34,8 +34,8 @@ export class ResourceFormDialogComponent {
     type:        ['audio' as ResourceType, Validators.required],
     description: [''],
     status:      ['draft'],
-    duration:    [''],
-    fileSize:    [''],
+    duration:    [{ value: '', disabled: true }],
+    fileSize:    [{ value: '', disabled: true }],
     readTime:    [''],
     tags:        [''],
   });

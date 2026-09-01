@@ -54,7 +54,13 @@ export class PdfViewerComponent implements AfterViewInit, OnDestroy {
       const width = host.clientWidth - 24; // menos el padding
       const dpr = window.devicePixelRatio || 1;
 
-      this.task = pdfjsLib.getDocument({ url: this.url() });
+      // disableRange/Stream: R2 no expone Content-Range en CORS; descargamos
+      // el PDF completo en una sola petición para evitar el fallo del preflight.
+      this.task = pdfjsLib.getDocument({
+        url: this.url(),
+        disableRange: true,
+        disableStream: true,
+      });
       const pdf = await this.task.promise;
       this.state.set('ready');
 

@@ -7,7 +7,7 @@ import { Resource, RESOURCE_TYPE_META } from '../../models/resource.model';
   imports: [StatusBadgeComponent],
   template: `
     <div class="group bg-white rounded-lg overflow-hidden border border-transparent
-                hover:border-primary/20 transition-all flex flex-col"
+                hover:border-primary/20 transition-all flex flex-col h-full"
          style="box-shadow: 0px 10px 30px rgba(76,29,149,0.05)">
 
       <!-- Thumbnail -->
@@ -68,10 +68,10 @@ import { Resource, RESOURCE_TYPE_META } from '../../models/resource.model';
       <!-- Body -->
       <div class="p-5 flex-1 flex flex-col justify-between">
         <div class="space-y-1">
-          <h3 class="font-heading font-semibold text-on-surface line-clamp-1">
+          <h3 class="font-heading font-semibold text-on-surface truncate">
             {{ resource().title }}
           </h3>
-          <p class="text-on-surface-variant text-label-md line-clamp-2">
+          <p class="text-on-surface-variant text-label-md line-clamp-2 min-h-[2.5rem]">
             {{ resource().description }}
           </p>
         </div>
