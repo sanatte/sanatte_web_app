@@ -77,6 +77,8 @@ export class AdminResourcesComponent {
     return r ? `¿Eliminar "${r.title}"? Esta acción no se puede deshacer.` : '';
   });
 
+  readonly deleteBlockedMessage = signal<string | null>(null);
+
   onTabChange(tab: TabFilter): void { this.activeTab.set(tab); this.currentPage.set(1); }
   onSearch(term: string): void { this.searchTerm.set(term); this.currentPage.set(1); }
 
@@ -106,7 +108,18 @@ export class AdminResourcesComponent {
   }
   closeModal(): void { this.isModalOpen.set(false); this.editingResource.set(null); }
 
-  requestDelete(r: Resource): void { this.resourceToDelete.set(r); this.isConfirmOpen.set(true); }
+  requestDelete(r: Resource): void {
+    const linked = this.linkedCountMap()[r.id] ?? 0;
+    if (linked > 0) {
+      this.deleteBlockedMessage.set(
+        `"${r.title}" está vinculado a ${linked} producto${linked !== 1 ? 's' : ''}. Desvincula el recurso antes de eliminarlo.`
+      );
+      return;
+    }
+    this.deleteBlockedMessage.set(null);
+    this.resourceToDelete.set(r);
+    this.isConfirmOpen.set(true);
+  }
 
   confirmDelete(): void {
     const r = this.resourceToDelete();

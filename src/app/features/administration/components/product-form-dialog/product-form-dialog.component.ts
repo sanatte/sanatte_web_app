@@ -50,6 +50,11 @@ export class ProductFormDialogComponent {
   readonly allResources        = this.resourceService.resources;
   readonly resourceIcon        = (type: ResourceType) => RESOURCE_TYPE_META[type].icon;
 
+  /** Solo recursos publicados pueden asociarse a un producto. */
+  readonly publishedResources = computed(() =>
+    this.allResources().filter((r) => r.status === 'published')
+  );
+
   readonly selectedResources = computed(() =>
     this.allResources().filter((r) => this.selectedResourceIds().has(r.id))
   );

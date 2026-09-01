@@ -113,3 +113,17 @@
   variant="danger"
   (confirm)="confirmDelete()"
   (cancel)="cancelDelete()" />
+
+@if (deleteBlockedMessage()) {
+  <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 max-w-md w-full px-4">
+    <div class="bg-error-container border border-error/30 rounded-xl px-5 py-4
+                flex items-start gap-3 shadow-lg">
+      <span class="material-symbols-outlined text-error text-[20px] shrink-0 mt-0.5">link</span>
+      <p class="text-label-md font-heading text-error flex-1">{{ deleteBlockedMessage() }}</p>
+      <button (click)="deleteBlockedMessage.set(null)"
+              class="text-error/60 hover:text-error transition-colors shrink-0">
+        <span class="material-symbols-outlined text-[18px]">close</span>
+      </button>
+    </div>
+  </div>
+}
