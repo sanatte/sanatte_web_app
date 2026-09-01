@@ -44,17 +44,25 @@
           <!-- Slug (código del QR) -->
           <div class="col-span-2 space-y-2">
             <label class="text-label-md font-heading font-semibold text-on-surface">
-              Código del QR (slug)
+              Slug del QR
             </label>
-            <div class="flex items-center bg-surface-container-low rounded-lg px-4
-                        focus-within:ring-2 focus-within:ring-primary/50 transition-all">
-              <span class="text-label-md font-heading text-on-surface-variant whitespace-nowrap">sanatte.com/r/</span>
-              <input formControlName="slug" type="text"
-                     placeholder="se genera del título si lo dejas vacío"
-                     class="flex-1 bg-transparent border-none py-3 outline-none text-label-md font-heading"/>
+            <input formControlName="slug" type="text"
+                   placeholder="se genera del título si lo dejas vacío"
+                   class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3
+                          focus:ring-2 focus:ring-primary/50 outline-none text-label-md
+                          font-heading transition-all"/>
+            <!-- URL resultante del QR impreso (siempre apunta a producción) -->
+            <div class="flex items-center gap-2 px-1">
+              <span class="material-symbols-outlined text-[15px] text-primary shrink-0">qr_code_2</span>
+              <p class="text-label-sm font-heading text-on-surface-variant truncate">
+                URL del QR impreso:
+                <span class="text-on-surface font-semibold">
+                  sanatte.com/r/{{ form.controls.slug.value || '(se genera del título)' }}
+                </span>
+              </p>
             </div>
-            <p class="text-label-sm text-on-surface-variant">
-              Es el enlace del QR impreso. Si renombras el recurso, el slug NO cambia solo — edítalo aquí si lo necesitas.
+            <p class="text-label-sm text-on-surface-variant px-1">
+              El slug no cambia al renombrar el recurso — edítalo aquí si necesitas actualizarlo.
             </p>
           </div>
 
@@ -245,10 +253,13 @@
                 </div>
               </button>
               @if (hasExistingMedia() && !selectedFile()) {
-                <p class="text-label-sm font-heading text-on-surface-variant flex items-center gap-1">
-                  <span class="material-symbols-outlined text-base text-primary">check_circle</span>
-                  Ya hay un archivo cargado. Selecciona uno nuevo solo si quieres reemplazarlo.
-                </p>
+                <div class="flex items-center gap-2 px-1">
+                  <span class="material-symbols-outlined text-base text-primary shrink-0">check_circle</span>
+                  <p class="text-label-sm font-heading text-on-surface-variant">
+                    Archivo actual: <span class="font-semibold text-on-surface">{{ existingFileLabel() }}</span>
+                    — Selecciona uno nuevo solo si quieres reemplazarlo.
+                  </p>
+                </div>
               }
             }
 

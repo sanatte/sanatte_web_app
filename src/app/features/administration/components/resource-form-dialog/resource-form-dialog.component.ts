@@ -63,6 +63,19 @@ export class ResourceFormDialogComponent {
   /** El recurso en edición ya tiene un archivo cargado. */
   readonly hasExistingMedia = computed(() => !!this.resource()?.mediaContentType);
 
+  /** Etiqueta legible del archivo ya subido, ej. "MP3 · 7.8 MB". */
+  readonly existingFileLabel = computed(() => {
+    const r = this.resource();
+    if (!r?.mediaContentType) return '';
+    const typeMap: Record<string, string> = {
+      'audio/mpeg': 'MP3', 'audio/mp4': 'M4A', 'audio/aac': 'AAC', 'audio/wav': 'WAV',
+      'video/mp4': 'MP4', 'video/webm': 'WebM', 'application/pdf': 'PDF',
+    };
+    const label = typeMap[r.mediaContentType] ?? r.mediaContentType;
+    const size  = r.mediaSizeBytes ? ` · ${this.formatBytes(r.mediaSizeBytes)}` : '';
+    return `${label}${size}`;
+  });
+
   constructor() {
     effect(() => {
       const r = this.resource();
@@ -161,6 +174,12 @@ export class ResourceFormDialogComponent {
   async onSubmit(): Promise<void> {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     if (this.isSaving()) return;
+
+    const rawStatus = this.form.getRawValue().status;
+    if (rawStatus === 'published' && this.needsFile() && !this.hasExistingMedia() && !this.selectedFile()) {
+      this.errorMsg.set('Para publicar un recurso debe tener un archivo cargado.');
+      return;
+    }
 
     const raw = this.form.getRawValue();
     const type = raw.type as ResourceType;
