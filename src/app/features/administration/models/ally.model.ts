@@ -5,17 +5,28 @@
  */
 export interface Ally {
   id: string;
-  name: string;                    // marca del aliado
+  name: string;
   description?: string | null;
-  pillar: string;                  // pilar de bienestar
+  pillar: string;
   logoUrl?: string | null;
-  brandColor: string;              // color de la card
-  whatsApp: string;                // obligatorio → link wa.me
+  brandColor: string;
+  whatsApp: string;
   website?: string | null;
-  benefitTitle: string;            // convenio/beneficio
+  benefitTitle: string;
   benefitDescription?: string | null;
-  isActive: boolean;               // controla visibilidad de la card
+  isActive: boolean;
+  discountCode?: string | null;
+  discountPercentage?: number | null;
+  discountExpiresAt?: string | null;
+  discountUsageCount: number;
   createdAt: string;
+}
+
+export interface DiscountCodeValidation {
+  isValid: boolean;
+  allyName?: string | null;
+  discountPercentage?: number | null;
+  errorMessage?: string | null;
 }
 
 /** Pilares de bienestar (lista inicial, ampliable). */

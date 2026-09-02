@@ -34,6 +34,9 @@ export class AdminAlliesComponent {
     benefitTitle:       ['', Validators.required],
     benefitDescription: [''],
     isActive:           [true],
+    discountCode:       [''],
+    discountPercentage: [null as number | null, [Validators.min(1), Validators.max(100)]],
+    discountExpiresAt:  [''],
   });
 
   openCreate(): void {
@@ -41,6 +44,7 @@ export class AdminAlliesComponent {
     this.form.reset({
       name: '', pillar: WELLNESS_PILLARS[0], description: '', whatsApp: '',
       website: '', benefitTitle: '', benefitDescription: '', isActive: true,
+      discountCode: '', discountPercentage: null, discountExpiresAt: '',
     });
     this.resetLogo();
     this.errorMsg.set(null);
@@ -53,6 +57,9 @@ export class AdminAlliesComponent {
       name: a.name, pillar: a.pillar, description: a.description ?? '', whatsApp: a.whatsApp,
       website: a.website ?? '', benefitTitle: a.benefitTitle, benefitDescription: a.benefitDescription ?? '',
       isActive: a.isActive,
+      discountCode: a.discountCode ?? '',
+      discountPercentage: a.discountPercentage ?? null,
+      discountExpiresAt: a.discountExpiresAt ? a.discountExpiresAt.split('T')[0] : '',
     });
     this.resetLogo();
     this.errorMsg.set(null);

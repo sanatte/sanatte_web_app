@@ -7,33 +7,40 @@ import { environment } from '../../../../environments/environment';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function mapApi(raw: any): Ally {
   return {
-    id:                 raw.id,
-    name:               raw.name,
-    description:        raw.description ?? null,
-    pillar:             raw.pillar,
-    logoUrl:            raw.logoUrl ?? null,
-    brandColor:         raw.brandColor ?? '#7C4DFF',
-    whatsApp:           raw.whatsApp ?? '',
-    website:            raw.website ?? null,
-    benefitTitle:       raw.benefitTitle,
-    benefitDescription: raw.benefitDescription ?? null,
-    isActive:           raw.isActive ?? true,
-    createdAt:          raw.createdAt?.split('T')[0] ?? '',
+    id:                  raw.id,
+    name:                raw.name,
+    description:         raw.description ?? null,
+    pillar:              raw.pillar,
+    logoUrl:             raw.logoUrl ?? null,
+    brandColor:          raw.brandColor ?? '#7C4DFF',
+    whatsApp:            raw.whatsApp ?? '',
+    website:             raw.website ?? null,
+    benefitTitle:        raw.benefitTitle,
+    benefitDescription:  raw.benefitDescription ?? null,
+    isActive:            raw.isActive ?? true,
+    discountCode:        raw.discountCode ?? null,
+    discountPercentage:  raw.discountPercentage ?? null,
+    discountExpiresAt:   raw.discountExpiresAt ?? null,
+    discountUsageCount:  raw.discountUsageCount ?? 0,
+    createdAt:           raw.createdAt?.split('T')[0] ?? '',
   };
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function toBody(a: Partial<Ally>): any {
   return {
-    name: a.name,
-    description: a.description ?? null,
-    pillar: a.pillar,
-    brandColor: a.brandColor ?? null,
-    whatsApp: a.whatsApp,
-    website: a.website ?? null,
-    benefitTitle: a.benefitTitle,
+    name:               a.name,
+    description:        a.description ?? null,
+    pillar:             a.pillar,
+    brandColor:         a.brandColor ?? null,
+    whatsApp:           a.whatsApp,
+    website:            a.website ?? null,
+    benefitTitle:       a.benefitTitle,
     benefitDescription: a.benefitDescription ?? null,
-    isActive: a.isActive ?? true,
+    isActive:           a.isActive ?? true,
+    discountCode:       a.discountCode?.trim().toUpperCase() || null,
+    discountPercentage: a.discountPercentage ?? null,
+    discountExpiresAt:  a.discountExpiresAt ?? null,
   };
 }
 

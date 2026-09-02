@@ -199,6 +199,42 @@
           </div>
         </div>
 
+        <!-- Código de descuento -->
+        <div class="space-y-3 border border-outline-variant/30 rounded-xl p-4">
+          <p class="text-label-md font-heading font-semibold text-on-surface flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-[18px]">sell</span>
+            Código de descuento (referidos)
+          </p>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-1">
+              <label class="text-label-sm font-heading text-on-surface-variant">Código</label>
+              <input formControlName="discountCode" type="text" placeholder="ej. KAYLA"
+                     class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3
+                            focus:ring-2 focus:ring-primary/50 outline-none text-label-md font-heading uppercase"/>
+              <p class="text-label-sm text-on-surface-variant">El cliente lo escribe en el checkout.</p>
+            </div>
+            <div class="space-y-1">
+              <label class="text-label-sm font-heading text-on-surface-variant">Descuento (%)</label>
+              <input formControlName="discountPercentage" type="number" min="1" max="100"
+                     placeholder="ej. 15"
+                     class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3
+                            focus:ring-2 focus:ring-primary/50 outline-none text-label-md font-heading"/>
+            </div>
+          </div>
+          <div class="space-y-1">
+            <label class="text-label-sm font-heading text-on-surface-variant">Vencimiento (opcional)</label>
+            <input formControlName="discountExpiresAt" type="date"
+                   class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3
+                          focus:ring-2 focus:ring-primary/50 outline-none text-label-md font-heading"/>
+          </div>
+          @if (editing()?.discountUsageCount) {
+            <p class="text-label-sm font-heading text-on-surface-variant flex items-center gap-1">
+              <span class="material-symbols-outlined text-primary text-[15px]">bar_chart</span>
+              Usos registrados: <span class="font-semibold text-on-surface">{{ editing()!.discountUsageCount }}</span>
+            </p>
+          }
+        </div>
+
         <!-- Activo -->
         <label class="flex items-center gap-3 cursor-pointer">
           <input formControlName="isActive" type="checkbox" class="w-5 h-5 accent-[color:var(--tw-prose-links)] rounded"/>
