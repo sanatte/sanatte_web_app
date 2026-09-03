@@ -1,6 +1,6 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { UserActivationService, ActivationResult } from '../../services/user-activation.service';
@@ -12,6 +12,7 @@ import { UserActivationService, ActivationResult } from '../../services/user-act
 })
 export class ActivateComponent {
   private readonly route      = inject(ActivatedRoute);
+  private readonly router     = inject(Router);
   private readonly activation = inject(UserActivationService);
 
   private readonly codeParam = toSignal(
@@ -46,6 +47,10 @@ export class ActivateComponent {
     try {
       const res = await this.activation.activate(code);
       this.result.set(res);
+      if (res.status === 'success' && res.welcomeResourceSlug) {
+        // Pequeña pausa para que el usuario vea el check de éxito antes de redirigir.
+        setTimeout(() => this.router.navigate(['/app/welcome', res.welcomeResourceSlug]), 1200);
+      }
     } finally {
       this.verifying.set(false);
     }

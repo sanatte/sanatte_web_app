@@ -42,6 +42,7 @@ export class ProductFormDialogComponent {
     status:             ['active'],
     description:        ['', Validators.required],
     tags:               [''],
+    welcomeResourceId:  [''],
   });
 
   readonly isEditMode          = computed(() => this.product() !== null);
@@ -68,6 +69,7 @@ export class ProductFormDialogComponent {
           billingPeriod: p.billingPeriod ?? 'monthly', stock: p.stock ?? null,
           requiresActivation: p.requiresActivation, status: p.status,
           description: p.description, tags: p.tags?.join(', ') ?? '',
+          welcomeResourceId: p.welcomeResourceId ?? '',
         });
         this.selectedType.set(p.type);
         const ids = new Set(
@@ -81,6 +83,7 @@ export class ProductFormDialogComponent {
           name: '', sku: '', type: 'physical', price: 0, taxRate: 19,
           billingPeriod: 'monthly', stock: null,
           requiresActivation: true, status: 'active', description: '', tags: '',
+          welcomeResourceId: '',
         });
         this.selectedType.set('physical');
         this.selectedResourceIds.set(new Set());
@@ -154,6 +157,7 @@ export class ProductFormDialogComponent {
             referenceId: r.id,
             label: r.title,
           })),
+        welcomeResourceId: raw.welcomeResourceId || null,
         specs: this.product()?.specs ?? [],
       },
       coverFile: this.selectedCoverFile(),

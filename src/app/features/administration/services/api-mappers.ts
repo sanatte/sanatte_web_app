@@ -56,6 +56,8 @@ export function mapApiProduct(raw: any): Product {
     tags:                raw.tags ?? [],
     specs:               (raw.specs ?? []).map((s: { label: string; value: string }) => ({ label: s.label, value: s.value })),
     createdAt:           raw.createdAt ?? new Date().toISOString().split('T')[0],
+    welcomeResourceId:   raw.welcomeResourceId ?? null,
+    welcomeResourceSlug: raw.welcomeResourceSlug ?? null,
   };
 }
 
@@ -81,5 +83,6 @@ export function toApiProductBody(p: Partial<Product>) {
                         })),
     specs:              (p.specs ?? []).map((s) => ({ label: s.label, value: s.value })),
     tags:               p.tags ?? [],
+    welcomeResourceId:  p.welcomeResourceId ?? null,
   };
 }

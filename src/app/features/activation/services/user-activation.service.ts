@@ -8,7 +8,7 @@ import { Product } from '../../administration/models/product.model';
 import { environment } from '../../../../environments/environment';
 
 export type ActivationResult =
-  | { status: 'success'; product: Product; resourcesUnlocked: number }
+  | { status: 'success'; product: Product; resourcesUnlocked: number; welcomeResourceSlug: string | null }
   | { status: 'not_found' | 'revoked' | 'already_active' | 'not_activatable'; message: string };
 
 // Espejo de ActivationResultStatus del backend.
@@ -26,6 +26,7 @@ interface ApiActivationResult {
   productId: string | null;
   productName: string | null;
   resourcesUnlocked: number;
+  welcomeResourceSlug: string | null;
 }
 
 /**
@@ -64,6 +65,7 @@ export class UserActivationService {
     this.library.registerActivated(product.id);
     this.activations.refresh();
 
-    return { status: 'success', product, resourcesUnlocked: res.resourcesUnlocked };
+    return { status: 'success', product, resourcesUnlocked: res.resourcesUnlocked,
+             welcomeResourceSlug: res.welcomeResourceSlug ?? null };
   }
 }

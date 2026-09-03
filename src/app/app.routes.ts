@@ -89,6 +89,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/resource-viewer/pages/resource-view/resource-view.component').then((m) => m.ResourceViewComponent),
       },
+      {
+        path: 'welcome/:slug',
+        loadComponent: () =>
+          import('./features/welcome/welcome-page.component').then((m) => m.WelcomePageComponent),
+      },
       { path: '', redirectTo: 'library', pathMatch: 'full' },
     ],
   },

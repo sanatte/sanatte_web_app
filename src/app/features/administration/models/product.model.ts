@@ -38,6 +38,8 @@ export interface Product {
   tags: string[];
   specs: { label: string; value: string }[];
   createdAt: string;
+  welcomeResourceId?: string | null;
+  welcomeResourceSlug?: string | null;
 }
 
 export function getPrimaryImage(product: Product): ProductImage | undefined {
