@@ -240,7 +240,7 @@ const DEFAULT_TABS: CardTab[] = [
       gap: 5px;
     }
 
-    .footer-icon { width: 18px; height: 18px; opacity: 0.85; }
+    .footer-icon { width: 26px; height: 26px; opacity: 0.90; }
 
     .footer-label {
       font-size: 9.5px;
