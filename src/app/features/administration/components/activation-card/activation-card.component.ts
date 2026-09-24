@@ -90,7 +90,7 @@ const DEFAULT_TABS: CardTab[] = [
       width: 560px;
       height: 469px;
       background: #faf7f2;
-      border-radius: 14px;
+      border-radius: 0;
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -228,7 +228,7 @@ const DEFAULT_TABS: CardTab[] = [
       justify-content: space-around;
       align-items: center;
       flex-shrink: 0;
-      border-radius: 0 0 14px 14px;
+      border-radius: 0;
     }
 
     .footer-tab {

@@ -6,15 +6,16 @@ import { License } from '../models/license.model';
 import { QrService } from '../../../shared/services/qr.service';
 import { environment } from '../../../../environments/environment';
 
-// Oficio portrait: 216mm × 356mm — 2 columnas × 4 filas = 8 tarjetas por hoja
-const PAGE_W  = 216;
-const PAGE_H  = 356;
-const MARGIN  = 8;
-const GAP     = 4;
-const COLS    = 2;
-const ROWS    = 4;
-const CARD_W  = (PAGE_W - MARGIN * 2 - GAP * (COLS - 1)) / COLS;
-const CARD_H  = (PAGE_H - MARGIN * 2 - GAP * (ROWS - 1)) / ROWS;
+// Carta portrait: 216mm × 279mm — 2 columnas × 3 filas = 6 tarjetas de 98×82mm
+const PAGE_W    = 216;
+const PAGE_H    = 279;
+const MARGIN_X  = 8;
+const MARGIN_Y  = 12.5;   // centra verticalmente: (279 - 3*82 - 2*4) / 2
+const GAP       = 4;
+const COLS      = 2;
+const ROWS      = 3;
+const CARD_W    = (PAGE_W - MARGIN_X * 2 - GAP * (COLS - 1)) / COLS;  // 98mm
+const CARD_H    = (PAGE_H - MARGIN_Y * 2 - GAP * (ROWS - 1)) / ROWS;  // 82mm
 const CARDS_PER_PAGE = COLS * ROWS;
 
 function cardPosition(index: number): { x: number; y: number } {
@@ -22,8 +23,8 @@ function cardPosition(index: number): { x: number; y: number } {
   const col = posInPage % COLS;
   const row = Math.floor(posInPage / COLS);
   return {
-    x: MARGIN + col * (CARD_W + GAP),
-    y: MARGIN + row * (CARD_H + GAP),
+    x: MARGIN_X + col * (CARD_W + GAP),
+    y: MARGIN_Y + row * (CARD_H + GAP),
   };
 }
 
