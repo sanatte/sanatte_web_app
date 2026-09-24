@@ -1,234 +1,278 @@
 import { Component, input } from '@angular/core';
+import { NgFor } from '@angular/common';
 import { License } from '../../models/license.model';
+
+export interface CardTab {
+  label: string;
+  /** SVG path(s) dentro de viewBox "0 0 24 24" */
+  svgPath: string;
+}
+
+const DEFAULT_TABS: CardTab[] = [
+  {
+    label: 'Me Recojo',
+    svgPath: 'M12 2C12 2 7.5 5.5 7.5 10C7.5 12.76 9.53 14.63 12 15C14.47 14.63 16.5 12.76 16.5 10C16.5 5.5 12 2 12 2Z M4.5 9C4.5 9 2 12 3 15C3.79 17.24 6.48 18.5 9 17.5C8.1 14.9 8 12 9.5 9.5C7 8.5 4.5 9 4.5 9Z M19.5 9C19.5 9 17 8.5 14.5 9.5C16 12 15.9 14.9 15 17.5C17.52 18.5 20.21 17.24 21 15C22 12 19.5 9 19.5 9Z',
+  },
+  {
+    label: 'Me Reconozco',
+    svgPath: 'M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z',
+  },
+  {
+    label: 'Me Cuido',
+    svgPath: 'M12 2L13.09 8.26L19 7L14.74 11.26L17 17L12 14L7 17L9.26 11.26L5 7L10.91 8.26L12 2Z',
+  },
+  {
+    label: 'Me Celebro',
+    svgPath: 'M18 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V4C20 2.9 19.1 2 18 2ZM17 13H7V11H17V13ZM17 9H7V7H17V9Z',
+  },
+];
 
 @Component({
   selector: 'app-activation-card',
   standalone: true,
+  imports: [NgFor],
   template: `
-    <div class="activation-card-root">
+    <div class="card-root">
 
-      <!-- Decorative botanical shape (left) -->
-      <div class="leaf-decoration" aria-hidden="true">
-        <svg width="140" height="180" viewBox="0 0 140 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M70 170 C70 170 5 125 5 60 C5 25 35 3 70 3 C105 3 135 25 135 60 C135 125 70 170 70 170Z"
-                fill="#6b38d4" opacity="0.04"/>
-          <path d="M15 140 C15 140 2 85 25 48 C40 25 62 20 70 42"
-                stroke="#6b38d4" stroke-width="1.2" fill="none" opacity="0.10" stroke-dasharray="4 3"/>
-        </svg>
-      </div>
-
-      <!-- Logo Sanatte — esquina superior derecha -->
-      <img src="/images/sanatte_wellness.png"
-           alt="Sanatte Wellness Ecosystem"
-           class="brand-logo"
-           crossorigin="anonymous" />
-
-      <!-- Card body -->
-      <div class="card-body">
-
-        <!-- Headline -->
-        <div class="headline-section">
-          <h1 class="headline-title">¡Bienvenido a<br>{{ license().productName }}!</h1>
-          <p class="headline-sub">Activa tu producto para acceder a todos tus recursos digitales.</p>
+      <!-- ───── HEADER ───── -->
+      <header class="card-header">
+        <div class="header-text">
+          <h1 class="product-title">¡Bienvenida a<br>{{ license().productName }}!</h1>
+          <p class="product-sub">Tu viaje comienza aquí.</p>
         </div>
+        <img src="/images/sanatte_wellness.png"
+             alt="Sanatte Wellness Ecosystem"
+             class="header-logo"
+             crossorigin="anonymous" />
+      </header>
 
-        <!-- CTA + QR row -->
-        <div class="cta-row">
-          <div class="cta-box">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <path d="M3 3h7v7H3V3zm1 1v5h5V4H4zm1 1h3v3H5V5zm10-2h7v7h-7V3zm1 1v5h5V4h-5zm1 1h3v3h-3V5zM3 14h7v7H3v-7zm1 1v5h5v-5H4zm1 1h3v3H5v-3zm9.5-1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm2 0a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm2 0a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm-4 2a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm2 0a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm2 0a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm-4 2a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm2 0a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm2 0a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"
-                    fill="#6b38d4" opacity="0.7"/>
+      <div class="header-rule"></div>
+
+      <!-- ───── BODY ───── -->
+      <main class="card-body">
+
+        <!-- Left: botanical illustration + mantra -->
+        <div class="body-left">
+          <div class="botanical-wrap" aria-hidden="true">
+            <!-- Elegant lotus line-art illustration -->
+            <svg viewBox="0 0 120 170" fill="none" xmlns="http://www.w3.org/2000/svg" class="botanical-svg">
+              <!-- Stem -->
+              <path d="M60 152 C59 138 58 124 60 110" stroke="#1e1b2e" stroke-width="1.1" stroke-linecap="round"/>
+              <!-- Left stem leaf -->
+              <path d="M60 140 C52 134 40 136 36 146 C46 147 54 143 60 140Z" stroke="#1e1b2e" stroke-width="1.0" stroke-linecap="round" fill="none"/>
+              <!-- Right stem leaf -->
+              <path d="M60 148 C68 142 80 144 84 154 C74 155 66 151 60 148Z" stroke="#1e1b2e" stroke-width="1.0" stroke-linecap="round" fill="none"/>
+              <!-- Center petal -->
+              <path d="M60 110 C54 92 53 70 60 50 C67 70 67 92 60 110Z" stroke="#1e1b2e" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+              <!-- Left inner petal -->
+              <path d="M60 110 C51 95 50 74 58 56 C56 74 55 96 58 112Z" stroke="#1e1b2e" stroke-width="1.0" stroke-linecap="round" fill="none"/>
+              <!-- Right inner petal -->
+              <path d="M60 110 C69 95 70 74 62 56 C64 74 65 96 62 112Z" stroke="#1e1b2e" stroke-width="1.0" stroke-linecap="round" fill="none"/>
+              <!-- Left outer petal -->
+              <path d="M40 106 C33 88 37 66 50 54 C47 72 45 94 48 110Z" stroke="#1e1b2e" stroke-width="1.1" stroke-linecap="round" fill="none"/>
+              <!-- Right outer petal -->
+              <path d="M80 106 C87 88 83 66 70 54 C73 72 75 94 72 110Z" stroke="#1e1b2e" stroke-width="1.1" stroke-linecap="round" fill="none"/>
+              <!-- Left side bud -->
+              <path d="M22 88 C18 78 22 68 28 66 C26 75 24 84 26 92Z" stroke="#1e1b2e" stroke-width="0.9" stroke-linecap="round" fill="none"/>
+              <path d="M30 92 C24 84 22 72 28 66 C30 76 30 86 30 93Z" stroke="#1e1b2e" stroke-width="0.9" stroke-linecap="round" fill="none"/>
+              <path d="M26 92 C33 103 44 108 60 110" stroke="#1e1b2e" stroke-width="0.9" stroke-linecap="round"/>
+              <!-- Right side bud -->
+              <path d="M98 88 C102 78 98 68 92 66 C94 75 96 84 94 92Z" stroke="#1e1b2e" stroke-width="0.9" stroke-linecap="round" fill="none"/>
+              <path d="M90 92 C96 84 98 72 92 66 C90 76 90 86 90 93Z" stroke="#1e1b2e" stroke-width="0.9" stroke-linecap="round" fill="none"/>
+              <path d="M94 92 C87 103 76 108 60 110" stroke="#1e1b2e" stroke-width="0.9" stroke-linecap="round"/>
+              <!-- Small accent dots -->
+              <circle cx="18" cy="61" r="2" stroke="#1e1b2e" stroke-width="0.9" fill="none"/>
+              <circle cx="102" cy="61" r="2" stroke="#1e1b2e" stroke-width="0.9" fill="none"/>
+              <!-- Water/ground line -->
+              <path d="M8 162 Q60 155 112 162" stroke="#1e1b2e" stroke-width="0.7" fill="none" opacity="0.35"/>
             </svg>
-            <p class="cta-text">Escanea el código QR<br>para comenzar.</p>
           </div>
-
-          <div class="qr-wrapper">
-            <img [src]="qrDataUrl()" alt="QR de activación" class="qr-image" crossorigin="anonymous"/>
-            <p class="qr-code-label">{{ license().code }}</p>
-          </div>
+          <blockquote class="mantra">{{ fraseInspiracional() }}</blockquote>
         </div>
 
-      </div>
+        <!-- Divider -->
+        <div class="body-divider"></div>
 
-      <!-- Bottom band -->
-      <div class="bottom-band">
-        <div class="benefit-item">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 3C7.03 3 3 7.03 3 12s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zm0 16c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7zm-1-11v5l4 2.4-.8 1.4L10 13V8h1z" opacity="0.9"/>
-          </svg>
-          <span>Audios guiados</span>
+        <!-- Right: QR limpio -->
+        <div class="body-right">
+          <img [src]="qrDataUrl()" alt="QR de activación" class="qr-img" crossorigin="anonymous"/>
+          <p class="serial">{{ license().code }}</p>
         </div>
-        <div class="benefit-item">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
-            <path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1-4.9-1-.4 2 7 1.4z" opacity="0.9"/>
+
+      </main>
+
+      <!-- ───── FOOTER ───── -->
+      <footer class="card-footer">
+        <div *ngFor="let tab of tabs()" class="footer-tab">
+          <svg viewBox="0 0 24 24" class="footer-icon" fill="white" xmlns="http://www.w3.org/2000/svg">
+            <path [attr.d]="tab.svgPath"/>
           </svg>
-          <span>Ejercicios</span>
+          <span class="footer-label">{{ tab.label }}</span>
         </div>
-        <div class="benefit-item">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
-            <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z" opacity="0.9"/>
-          </svg>
-          <span>Recursos</span>
-        </div>
-        <div class="benefit-item">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" opacity="0.9"/>
-          </svg>
-          <span>Bienestar diario</span>
-        </div>
-      </div>
+      </footer>
 
     </div>
   `,
   styles: [`
-    :host {
-      display: block;
-      font-family: 'Manrope', 'Be Vietnam Pro', system-ui, sans-serif;
-    }
+    :host { display: block; font-family: 'Manrope', 'Be Vietnam Pro', system-ui, sans-serif; }
 
-    .activation-card-root {
+    .card-root {
       width: 560px;
       height: 469px;
       background: #faf7f2;
-      border-radius: 16px;
+      border-radius: 14px;
       display: flex;
       flex-direction: column;
-      position: relative;
       overflow: hidden;
-      box-shadow: 0 4px 24px rgba(107, 56, 212, 0.12);
+      box-shadow: 0 6px 28px rgba(30,27,46,0.13);
     }
 
-    .leaf-decoration {
-      position: absolute;
-      left: -25px;
-      top: -10px;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .brand-logo {
-      position: absolute;
-      top: 14px;
-      right: 16px;
-      width: 96px;
-      height: auto;
-      z-index: 2;
-      mix-blend-mode: multiply;
-    }
-
-    .card-body {
-      flex: 1;
+    /* ── Header ── */
+    .card-header {
       display: flex;
-      flex-direction: column;
-      padding: 24px 28px 18px;
-      gap: 14px;
-      position: relative;
-      z-index: 1;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 20px 22px 12px;
+      flex-shrink: 0;
     }
 
-    .headline-section {
-      padding-right: 100px;
-    }
+    .header-text { flex: 1; padding-right: 8px; }
 
-    .headline-title {
-      font-size: 22px;
+    .product-title {
+      font-size: 19px;
       font-weight: 800;
       color: #1e1b2e;
       margin: 0;
       line-height: 1.2;
+      letter-spacing: -0.02em;
     }
 
-    .headline-sub {
-      font-size: 11.5px;
-      color: #5a556a;
-      margin: 7px 0 0;
-      line-height: 1.5;
-    }
-
-    .cta-row {
-      display: flex;
-      align-items: stretch;
-      gap: 16px;
-      flex: 1;
-    }
-
-    .cta-box {
-      flex: 1;
-      background: #ede8df;
-      border-radius: 12px;
-      padding: 16px 18px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      justify-content: center;
-    }
-
-    .cta-text {
-      font-size: 12.5px;
-      color: #1e1b2e;
+    .product-sub {
+      font-size: 10.5px;
+      color: #6b38d4;
+      margin: 5px 0 0;
       font-weight: 600;
-      margin: 0;
-      text-align: center;
-      line-height: 1.5;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
     }
 
-    .qr-wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      justify-content: center;
+    .header-logo {
+      width: 88px;
+      height: auto;
+      flex-shrink: 0;
+      mix-blend-mode: multiply;
     }
 
-    .qr-image {
-      width: 158px;
-      height: 158px;
-      border-radius: 10px;
-      background: white;
-      padding: 6px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.10);
-      object-fit: contain;
-      display: block;
-    }
-
-    .qr-code-label {
-      font-size: 9.5px;
-      color: #5a556a;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      margin: 0;
-      font-family: monospace;
-    }
-
-    .bottom-band {
-      background: #1e1b2e;
-      padding: 12px 28px;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      border-radius: 0 0 16px 16px;
+    .header-rule {
+      height: 1px;
+      background: linear-gradient(to right, transparent, #d8d0e8 30%, #d8d0e8 70%, transparent);
+      margin: 0 22px;
       flex-shrink: 0;
     }
 
-    .benefit-item {
+    /* ── Body ── */
+    .card-body {
+      flex: 1;
+      display: flex;
+      align-items: stretch;
+      padding: 14px 22px;
+      gap: 0;
+      min-height: 0;
+    }
+
+    .body-left {
+      flex: 0 0 200px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
-      color: white;
+      justify-content: space-between;
+      padding-right: 14px;
     }
 
-    .benefit-item span {
-      font-size: 9px;
-      opacity: 0.75;
-      letter-spacing: 0.03em;
+    .botanical-wrap { flex: 1; display: flex; align-items: center; justify-content: center; }
+
+    .botanical-svg { width: 110px; height: auto; }
+
+    .mantra {
+      font-size: 10.5px;
+      font-style: italic;
+      color: #4a4560;
+      text-align: center;
+      margin: 10px 0 0;
+      line-height: 1.6;
+      letter-spacing: 0.01em;
+      font-weight: 500;
+      border: none;
+      padding: 0;
+    }
+
+    .body-divider {
+      width: 1px;
+      background: linear-gradient(to bottom, transparent, #d8d0e8 20%, #d8d0e8 80%, transparent);
+      flex-shrink: 0;
+      align-self: stretch;
+    }
+
+    .body-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding-left: 14px;
+    }
+
+    .qr-img {
+      width: 170px;
+      height: 170px;
+      object-fit: contain;
+      display: block;
+      border-radius: 8px;
+      filter: drop-shadow(0 2px 8px rgba(30,27,46,0.15));
+    }
+
+    .serial {
+      font-size: 9.5px;
+      font-family: 'Courier New', monospace;
+      color: #6b6785;
+      letter-spacing: 0.1em;
+      margin: 0;
+      font-weight: 700;
+    }
+
+    /* ── Footer ── */
+    .card-footer {
+      background: #1a1a3a;
+      padding: 10px 24px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      flex-shrink: 0;
+      border-radius: 0 0 14px 14px;
+    }
+
+    .footer-tab {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .footer-icon { width: 18px; height: 18px; opacity: 0.85; }
+
+    .footer-label {
+      font-size: 8px;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 0.04em;
       text-align: center;
       font-weight: 500;
     }
   `],
 })
 export class ActivationCardComponent {
-  readonly license   = input.required<License>();
-  readonly qrDataUrl = input.required<string>();
+  readonly license            = input.required<License>();
+  readonly qrDataUrl          = input.required<string>();
+  readonly fraseInspiracional = input<string>('Cada paso hacia\ntu bienestar\ncuenta.');
+  readonly tabs               = input<CardTab[]>(DEFAULT_TABS);
 }
