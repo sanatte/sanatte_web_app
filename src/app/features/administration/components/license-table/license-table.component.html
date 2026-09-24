@@ -4,8 +4,28 @@
   <!-- Table header -->
   <div class="px-6 py-5 border-b border-outline-variant/30 flex flex-col sm:flex-row
               sm:items-center justify-between gap-3 bg-white/50">
-    <h4 class="font-heading text-headline-md text-on-surface">Ciclo de vida de licencias</h4>
-    <div class="flex gap-2">
+
+    <div class="flex items-center gap-3">
+      <h4 class="font-heading text-headline-md text-on-surface">Ciclo de vida de licencias</h4>
+      @if (selectedCount() > 0) {
+        <span class="px-3 py-1 rounded-full text-label-sm font-heading bg-primary/10 text-primary">
+          {{ selectedCount() }} seleccionadas
+        </span>
+      }
+    </div>
+
+    <div class="flex items-center gap-2 flex-wrap">
+
+      @if (selectedCount() > 0) {
+        <button (click)="downloadCards.emit(selectedLicenses())"
+                class="flex items-center gap-2 px-4 py-2 rounded-full bg-primary text-white
+                       text-label-md font-heading hover:bg-primary-container transition-colors
+                       shadow-sm">
+          <span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
+          Descargar tarjetas ({{ selectedCount() }})
+        </button>
+      }
+
       <select class="bg-surface-container-low border-none rounded-full text-label-md font-heading
                      px-4 py-2 focus:ring-primary/20 outline-none cursor-pointer">
         <option>Todos los estados</option>
@@ -26,6 +46,15 @@
     <table class="w-full text-left border-collapse">
       <thead class="bg-surface-container-low/50">
         <tr>
+          <!-- Checkbox -->
+          <th class="px-4 py-4 w-10">
+            <input type="checkbox"
+                   [checked]="allSelected()"
+                   (change)="toggleAll()"
+                   [disabled]="selectableLicenses().length === 0"
+                   class="w-4 h-4 rounded border-outline cursor-pointer accent-primary"
+                   title="Seleccionar todos" />
+          </th>
           <!-- Siempre -->
           <th class="px-4 md:px-6 py-4 text-label-md font-heading text-on-surface-variant">
             Código QR
@@ -59,7 +88,18 @@
 
       <tbody class="divide-y divide-outline-variant/30">
         @for (license of licenses(); track license.id) {
-          <tr class="hover:bg-primary/5 transition-colors group">
+          <tr class="hover:bg-primary/5 transition-colors group"
+              [class.bg-primary/5]="isSelected(license.id)">
+
+            <!-- Checkbox -->
+            <td class="px-4 py-5">
+              @if (license.status !== 'revoked') {
+                <input type="checkbox"
+                       [checked]="isSelected(license.id)"
+                       (change)="toggleOne(license)"
+                       class="w-4 h-4 rounded border-outline cursor-pointer accent-primary" />
+              }
+            </td>
 
             <!-- Código QR — siempre -->
             <td class="px-4 md:px-6 py-5">
@@ -157,8 +197,14 @@
                   <button (click)="downloadQr.emit(license)"
                           class="p-2 text-outline hover:text-primary hover:bg-primary/5
                                  rounded-full transition-colors"
-                          title="Descargar QR de activación">
+                          title="Descargar QR PNG">
                     <span class="material-symbols-outlined text-[18px]">qr_code_2</span>
+                  </button>
+                  <button (click)="downloadCard.emit(license)"
+                          class="p-2 text-outline hover:text-primary hover:bg-primary/5
+                                 rounded-full transition-colors"
+                          title="Descargar tarjeta de activación PDF">
+                    <span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
                   </button>
                 }
                 @if (license.orderId) {
@@ -193,7 +239,7 @@
 
         @if (licenses().length === 0) {
           <tr>
-            <td colspan="7" class="px-6 py-16 text-center">
+            <td colspan="8" class="px-6 py-16 text-center">
               <span class="material-symbols-outlined text-[48px] text-outline-variant block mb-3">
                 qr_code_2
               </span>
@@ -214,7 +260,7 @@
       [pageSize]="pageSize()"
       [total]="totalItems()"
       label="licencias"
-      (pageChange)="pageChange.emit($event)" />
+      (pageChange)="onPageChange($event)" />
   </div>
 
 </div>

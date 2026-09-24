@@ -69,17 +69,35 @@
   </div>
 
   <!-- Table -->
-  <app-license-table
-    [licenses]="paginated()"
-    [totalItems]="filtered().length"
-    [currentPage]="currentPage()"
-    [pageSize]="10"
-    (revoke)="onRevoke($event)"
-    (copyCode)="onCopyCode($event)"
-    (viewOrder)="onViewOrder($event)"
-    (downloadQr)="onDownloadQr($event)"
-    (releaseBatch)="onReleaseBatch($event)"
-    (pageChange)="onPageChange($event)" />
+  <div class="relative">
+    <app-license-table
+      [licenses]="paginated()"
+      [totalItems]="filtered().length"
+      [currentPage]="currentPage()"
+      [pageSize]="10"
+      (revoke)="onRevoke($event)"
+      (copyCode)="onCopyCode($event)"
+      (viewOrder)="onViewOrder($event)"
+      (downloadQr)="onDownloadQr($event)"
+      (downloadCard)="onDownloadCards([$event])"
+      (releaseBatch)="onReleaseBatch($event)"
+      (downloadCards)="onDownloadCards($event)"
+      (pageChange)="onPageChange($event)" />
+
+    <!-- PDF generation overlay -->
+    @if (isGeneratingPdf()) {
+      <div class="absolute inset-0 bg-white/80 backdrop-blur-sm rounded-lg
+                  flex flex-col items-center justify-center gap-4 z-10">
+        <div class="w-10 h-10 rounded-full border-4 border-primary/20 border-t-primary animate-spin"></div>
+        <p class="font-heading font-semibold text-on-surface text-label-md">
+          Generando tarjetas de activación…
+        </p>
+        <p class="text-label-sm font-heading text-on-surface-variant">
+          Esto puede tomar unos segundos
+        </p>
+      </div>
+    }
+  </div>
 
   <!-- Bottom: Activity Feed + Trends -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">

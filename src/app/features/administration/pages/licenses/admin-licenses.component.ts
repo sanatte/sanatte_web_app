@@ -1,5 +1,6 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { LicenseService } from '../../services/license.service';
+import { CardPdfService } from '../../services/card-pdf.service';
 import { LicenseTableComponent } from '../../components/license-table/license-table.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { AdminPageHeaderComponent } from '../../../../shared/components/admin-page-header/admin-page-header.component';
@@ -20,12 +21,14 @@ const PAGE_SIZE = 10;
 export class AdminLicensesComponent {
   private readonly licenseService = inject(LicenseService);
   private readonly qr             = inject(QrService);
+  private readonly cardPdf        = inject(CardPdfService);
 
   readonly searchTerm    = signal('');
   readonly currentPage   = signal(1);
   readonly isConfirmOpen    = signal(false);
   readonly licenseToRevoke  = signal<License | null>(null);
   readonly isBatchDialogOpen = signal(false);
+  readonly isGeneratingPdf   = signal(false);
 
   readonly stats    = this.licenseService.stats;
   readonly activity = this.licenseService.activity;
@@ -60,17 +63,25 @@ export class AdminLicensesComponent {
 
   onCopyCode(license: License): void {
     navigator.clipboard?.writeText(license.code).catch(() => {});
-    // Toast feedback - placeholder
   }
 
   onViewOrder(license: License): void {
     // Navigate to order - placeholder
   }
 
-  /** Descarga la tarjeta QR de activación: {publicBaseUrl}/activate?code=CODE. */
   onDownloadQr(license: License): void {
     const url = `${environment.publicBaseUrl}/activate?code=${encodeURIComponent(license.code)}`;
     this.qr.downloadPng(url, `qr-activacion-${license.code}`);
+  }
+
+  async onDownloadCards(licenses: License[]): Promise<void> {
+    if (this.isGeneratingPdf() || licenses.length === 0) return;
+    this.isGeneratingPdf.set(true);
+    try {
+      await this.cardPdf.generate(licenses);
+    } finally {
+      this.isGeneratingPdf.set(false);
+    }
   }
 
   onReleaseBatch(batchId: string): void {
