@@ -51,41 +51,13 @@ const DEFAULT_TABS: CardTab[] = [
       <!-- ───── BODY ───── -->
       <main class="card-body">
 
-        <!-- Left: botanical illustration + mantra -->
+        <!-- Left: isotipo + mantra -->
         <div class="body-left">
-          <div class="botanical-wrap" aria-hidden="true">
-            <!-- Elegant lotus line-art illustration -->
-            <svg viewBox="0 0 120 170" fill="none" xmlns="http://www.w3.org/2000/svg" class="botanical-svg">
-              <!-- Stem -->
-              <path d="M60 152 C59 138 58 124 60 110" stroke="#1e1b2e" stroke-width="1.1" stroke-linecap="round"/>
-              <!-- Left stem leaf -->
-              <path d="M60 140 C52 134 40 136 36 146 C46 147 54 143 60 140Z" stroke="#1e1b2e" stroke-width="1.0" stroke-linecap="round" fill="none"/>
-              <!-- Right stem leaf -->
-              <path d="M60 148 C68 142 80 144 84 154 C74 155 66 151 60 148Z" stroke="#1e1b2e" stroke-width="1.0" stroke-linecap="round" fill="none"/>
-              <!-- Center petal -->
-              <path d="M60 110 C54 92 53 70 60 50 C67 70 67 92 60 110Z" stroke="#1e1b2e" stroke-width="1.2" stroke-linecap="round" fill="none"/>
-              <!-- Left inner petal -->
-              <path d="M60 110 C51 95 50 74 58 56 C56 74 55 96 58 112Z" stroke="#1e1b2e" stroke-width="1.0" stroke-linecap="round" fill="none"/>
-              <!-- Right inner petal -->
-              <path d="M60 110 C69 95 70 74 62 56 C64 74 65 96 62 112Z" stroke="#1e1b2e" stroke-width="1.0" stroke-linecap="round" fill="none"/>
-              <!-- Left outer petal -->
-              <path d="M40 106 C33 88 37 66 50 54 C47 72 45 94 48 110Z" stroke="#1e1b2e" stroke-width="1.1" stroke-linecap="round" fill="none"/>
-              <!-- Right outer petal -->
-              <path d="M80 106 C87 88 83 66 70 54 C73 72 75 94 72 110Z" stroke="#1e1b2e" stroke-width="1.1" stroke-linecap="round" fill="none"/>
-              <!-- Left side bud -->
-              <path d="M22 88 C18 78 22 68 28 66 C26 75 24 84 26 92Z" stroke="#1e1b2e" stroke-width="0.9" stroke-linecap="round" fill="none"/>
-              <path d="M30 92 C24 84 22 72 28 66 C30 76 30 86 30 93Z" stroke="#1e1b2e" stroke-width="0.9" stroke-linecap="round" fill="none"/>
-              <path d="M26 92 C33 103 44 108 60 110" stroke="#1e1b2e" stroke-width="0.9" stroke-linecap="round"/>
-              <!-- Right side bud -->
-              <path d="M98 88 C102 78 98 68 92 66 C94 75 96 84 94 92Z" stroke="#1e1b2e" stroke-width="0.9" stroke-linecap="round" fill="none"/>
-              <path d="M90 92 C96 84 98 72 92 66 C90 76 90 86 90 93Z" stroke="#1e1b2e" stroke-width="0.9" stroke-linecap="round" fill="none"/>
-              <path d="M94 92 C87 103 76 108 60 110" stroke="#1e1b2e" stroke-width="0.9" stroke-linecap="round"/>
-              <!-- Small accent dots -->
-              <circle cx="18" cy="61" r="2" stroke="#1e1b2e" stroke-width="0.9" fill="none"/>
-              <circle cx="102" cy="61" r="2" stroke="#1e1b2e" stroke-width="0.9" fill="none"/>
-              <!-- Water/ground line -->
-              <path d="M8 162 Q60 155 112 162" stroke="#1e1b2e" stroke-width="0.7" fill="none" opacity="0.35"/>
-            </svg>
+          <div class="isotipo-wrap">
+            <img src="/images/flor_isotipo.png"
+                 alt="Flor Sanatte"
+                 class="isotipo-img"
+                 crossorigin="anonymous" />
           </div>
           <blockquote class="mantra">{{ fraseInspiracional() }}</blockquote>
         </div>
@@ -139,7 +111,7 @@ const DEFAULT_TABS: CardTab[] = [
     .header-text { flex: 1; padding-right: 8px; }
 
     .product-title {
-      font-size: 19px;
+      font-size: 22px;
       font-weight: 800;
       color: #1e1b2e;
       margin: 0;
@@ -148,11 +120,11 @@ const DEFAULT_TABS: CardTab[] = [
     }
 
     .product-sub {
-      font-size: 10.5px;
+      font-size: 12px;
       color: #6b38d4;
-      margin: 5px 0 0;
-      font-weight: 600;
-      letter-spacing: 0.04em;
+      margin: 6px 0 0;
+      font-weight: 700;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
     }
 
@@ -189,19 +161,28 @@ const DEFAULT_TABS: CardTab[] = [
       padding-right: 14px;
     }
 
-    .botanical-wrap { flex: 1; display: flex; align-items: center; justify-content: center; }
+    .isotipo-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-    .botanical-svg { width: 110px; height: auto; }
+    .isotipo-img {
+      width: 130px;
+      height: auto;
+      mix-blend-mode: multiply;
+    }
 
     .mantra {
-      font-size: 10.5px;
+      font-size: 13px;
       font-style: italic;
-      color: #4a4560;
+      color: #2e2a45;
       text-align: center;
-      margin: 10px 0 0;
-      line-height: 1.6;
+      margin: 12px 0 0;
+      line-height: 1.65;
       letter-spacing: 0.01em;
-      font-weight: 500;
+      font-weight: 600;
       border: none;
       padding: 0;
     }
@@ -233,10 +214,10 @@ const DEFAULT_TABS: CardTab[] = [
     }
 
     .serial {
-      font-size: 9.5px;
+      font-size: 11px;
       font-family: 'Courier New', monospace;
-      color: #6b6785;
-      letter-spacing: 0.1em;
+      color: #3a3660;
+      letter-spacing: 0.12em;
       margin: 0;
       font-weight: 700;
     }
@@ -262,11 +243,11 @@ const DEFAULT_TABS: CardTab[] = [
     .footer-icon { width: 18px; height: 18px; opacity: 0.85; }
 
     .footer-label {
-      font-size: 8px;
-      color: rgba(255,255,255,0.7);
-      letter-spacing: 0.04em;
+      font-size: 9.5px;
+      color: rgba(255,255,255,0.85);
+      letter-spacing: 0.03em;
       text-align: center;
-      font-weight: 500;
+      font-weight: 600;
     }
   `],
 })
