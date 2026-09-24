@@ -13,8 +13,8 @@ const MARGIN  = 8;
 const GAP     = 4;
 const COLS    = 2;
 const ROWS    = 4;
-const CARD_W  = (PAGE_W - MARGIN * 2 - GAP * (COLS - 1)) / COLS;   // 98mm
-const CARD_H  = (PAGE_H - MARGIN * 2 - GAP * (ROWS - 1)) / ROWS;   // 82mm
+const CARD_W  = (PAGE_W - MARGIN * 2 - GAP * (COLS - 1)) / COLS;
+const CARD_H  = (PAGE_H - MARGIN * 2 - GAP * (ROWS - 1)) / ROWS;
 const CARDS_PER_PAGE = COLS * ROWS;
 
 function cardPosition(index: number): { x: number; y: number } {
@@ -25,6 +25,22 @@ function cardPosition(index: number): { x: number; y: number } {
     x: MARGIN + col * (CARD_W + GAP),
     y: MARGIN + row * (CARD_H + GAP),
   };
+}
+
+function imgToDataUrl(src: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width  = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      canvas.getContext('2d')!.drawImage(img, 0, 0);
+      resolve(canvas.toDataURL('image/png'));
+    };
+    img.onerror = reject;
+    img.src = src;
+  });
 }
 
 @Injectable({ providedIn: 'root' })
@@ -40,6 +56,12 @@ export class CardPdfService {
       format: [PAGE_W, PAGE_H],
     });
 
+    // Pre-cargar imágenes como base64 para que html2canvas las encuentre
+    const [logoDataUrl, isotipoDataUrl] = await Promise.all([
+      imgToDataUrl('/images/sanatte_wellness.png'),
+      imgToDataUrl('/images/flor_isotipo.png'),
+    ]);
+
     for (let i = 0; i < licenses.length; i++) {
       const license = licenses[i];
 
@@ -47,7 +69,7 @@ export class CardPdfService {
 
       const qrUrl     = `${environment.publicBaseUrl}/activate?code=${encodeURIComponent(license.code)}`;
       const qrDataUrl = await this.qr.toDataUrl(qrUrl);
-      const imgDataUrl = await this.renderCard(license, qrDataUrl);
+      const imgDataUrl = await this.renderCard(license, qrDataUrl, logoDataUrl, isotipoDataUrl);
 
       const { x, y } = cardPosition(i);
       pdf.addImage(imgDataUrl, 'PNG', x, y, CARD_W, CARD_H);
@@ -57,7 +79,12 @@ export class CardPdfService {
     pdf.save(`tarjetas-activacion-${ts}.pdf`);
   }
 
-  private async renderCard(license: License, qrDataUrl: string): Promise<string> {
+  private async renderCard(
+    license: License,
+    qrDataUrl: string,
+    logoDataUrl: string,
+    isotipoDataUrl: string,
+  ): Promise<string> {
     const host = document.createElement('div');
     host.style.cssText = 'position:fixed;left:-9999px;top:0;z-index:-1;';
     document.body.appendChild(host);
@@ -68,6 +95,8 @@ export class CardPdfService {
     });
     ref.setInput('license', license);
     ref.setInput('qrDataUrl', qrDataUrl);
+    ref.setInput('logoDataUrl', logoDataUrl);
+    ref.setInput('isotipoDataUrl', isotipoDataUrl);
     this.appRef.attachView(ref.hostView);
     ref.changeDetectorRef.detectChanges();
 
@@ -77,6 +106,7 @@ export class CardPdfService {
     const canvas = await html2canvas(card, {
       scale: 2,
       useCORS: true,
+      allowTaint: true,
       backgroundColor: null,
       logging: false,
     });
@@ -87,5 +117,4 @@ export class CardPdfService {
 
     return canvas.toDataURL('image/png');
   }
-
 }

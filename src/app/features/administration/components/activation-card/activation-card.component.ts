@@ -40,10 +40,9 @@ const DEFAULT_TABS: CardTab[] = [
           <h1 class="product-title">¡Bienvenida a {{ license().productName }}!</h1>
           <p class="product-sub">Tu viaje comienza aquí.</p>
         </div>
-        <img src="/images/sanatte_wellness.png"
+        <img [src]="logoDataUrl()"
              alt="Sanatte Wellness Ecosystem"
-             class="header-logo"
-             crossorigin="anonymous" />
+             class="header-logo" />
       </header>
 
       <div class="header-rule"></div>
@@ -54,10 +53,9 @@ const DEFAULT_TABS: CardTab[] = [
         <!-- Left: isotipo + mantra -->
         <div class="body-left">
           <div class="isotipo-wrap">
-            <img src="/images/flor_isotipo.png"
+            <img [src]="isotipoDataUrl()"
                  alt="Flor Sanatte"
-                 class="isotipo-img"
-                 crossorigin="anonymous" />
+                 class="isotipo-img" />
           </div>
           <blockquote class="mantra">{{ fraseInspiracional() }}</blockquote>
         </div>
@@ -254,6 +252,8 @@ const DEFAULT_TABS: CardTab[] = [
 export class ActivationCardComponent {
   readonly license            = input.required<License>();
   readonly qrDataUrl          = input.required<string>();
+  readonly logoDataUrl        = input<string>('/images/sanatte_wellness.png');
+  readonly isotipoDataUrl     = input<string>('/images/flor_isotipo.png');
   readonly fraseInspiracional = input<string>('Cada paso hacia\ntu bienestar\ncuenta.');
   readonly tabs               = input<CardTab[]>(DEFAULT_TABS);
 }
