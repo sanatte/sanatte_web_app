@@ -37,7 +37,7 @@ const DEFAULT_TABS: CardTab[] = [
       <!-- ───── HEADER ───── -->
       <header class="card-header">
         <div class="header-text">
-          <h1 class="product-title">¡Bienvenida a<br>{{ license().productName }}!</h1>
+          <h1 class="product-title">¡Bienvenida a {{ license().productName }}!</h1>
           <p class="product-sub">Tu viaje comienza aquí.</p>
         </div>
         <img src="/images/sanatte_wellness.png"
@@ -111,12 +111,15 @@ const DEFAULT_TABS: CardTab[] = [
     .header-text { flex: 1; padding-right: 8px; text-align: center; }
 
     .product-title {
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 800;
       color: #1e1b2e;
       margin: 0;
       line-height: 1.2;
       letter-spacing: -0.02em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .product-sub {
