@@ -108,7 +108,7 @@ const DEFAULT_TABS: CardTab[] = [
       flex-shrink: 0;
     }
 
-    .header-text { flex: 1; padding-right: 8px; text-align: center; }
+    .header-text { flex: 1; padding-right: 8px; }
 
     .product-title {
       font-size: 20px;
@@ -117,9 +117,6 @@ const DEFAULT_TABS: CardTab[] = [
       margin: 0;
       line-height: 1.2;
       letter-spacing: -0.02em;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     .product-sub {
