@@ -6,14 +6,26 @@ import { License } from '../models/license.model';
 import { QrService } from '../../../shared/services/qr.service';
 import { environment } from '../../../../environments/environment';
 
-// A4 landscape: 297mm × 210mm — two A6 cards (148mm × 105mm) side by side
-const PDF_W  = 297;
-const PDF_H  = 210;
-const CARD_W = 148;
-const CARD_H = 105;
-const MARGIN = 3;
-const COL_X  = [MARGIN, MARGIN + CARD_W + MARGIN * 2] as const;
-const ROW_Y  = (PDF_H - CARD_H) / 2; // vertically centered
+// Oficio portrait: 216mm × 356mm — 2 columnas × 4 filas = 8 tarjetas por hoja
+const PAGE_W  = 216;
+const PAGE_H  = 356;
+const MARGIN  = 8;
+const GAP     = 4;
+const COLS    = 2;
+const ROWS    = 4;
+const CARD_W  = (PAGE_W - MARGIN * 2 - GAP * (COLS - 1)) / COLS;   // 98mm
+const CARD_H  = (PAGE_H - MARGIN * 2 - GAP * (ROWS - 1)) / ROWS;   // 82mm
+const CARDS_PER_PAGE = COLS * ROWS;
+
+function cardPosition(index: number): { x: number; y: number } {
+  const posInPage = index % CARDS_PER_PAGE;
+  const col = posInPage % COLS;
+  const row = Math.floor(posInPage / COLS);
+  return {
+    x: MARGIN + col * (CARD_W + GAP),
+    y: MARGIN + row * (CARD_H + GAP),
+  };
+}
 
 @Injectable({ providedIn: 'root' })
 export class CardPdfService {
@@ -22,25 +34,24 @@ export class CardPdfService {
   private readonly envInj  = inject(EnvironmentInjector);
 
   async generate(licenses: License[]): Promise<void> {
-    const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-    let firstPage = true;
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: [PAGE_W, PAGE_H],
+    });
 
     for (let i = 0; i < licenses.length; i++) {
       const license = licenses[i];
-      const col = i % 2;
 
-      if (col === 0 && !firstPage) pdf.addPage();
-      firstPage = false;
+      if (i > 0 && i % CARDS_PER_PAGE === 0) pdf.addPage();
 
-      const qrUrl    = `${environment.publicBaseUrl}/activate?code=${encodeURIComponent(license.code)}`;
+      const qrUrl     = `${environment.publicBaseUrl}/activate?code=${encodeURIComponent(license.code)}`;
       const qrDataUrl = await this.qr.toDataUrl(qrUrl);
-
       const imgDataUrl = await this.renderCard(license, qrDataUrl);
 
-      const x = COL_X[col];
-      pdf.addImage(imgDataUrl, 'PNG', x, ROW_Y, CARD_W, CARD_H);
-
-      this.addCropMarks(pdf, x, ROW_Y, CARD_W, CARD_H);
+      const { x, y } = cardPosition(i);
+      pdf.addImage(imgDataUrl, 'PNG', x, y, CARD_W, CARD_H);
+      this.addCropMarks(pdf, x, y, CARD_W, CARD_H);
     }
 
     const ts = new Date().toISOString().slice(0, 10);
@@ -61,7 +72,6 @@ export class CardPdfService {
     this.appRef.attachView(ref.hostView);
     ref.changeDetectorRef.detectChanges();
 
-    // Small delay to allow font rendering
     await new Promise(r => setTimeout(r, 80));
 
     const card = host.querySelector('.activation-card-root') as HTMLElement;
@@ -80,10 +90,10 @@ export class CardPdfService {
   }
 
   private addCropMarks(pdf: jsPDF, x: number, y: number, w: number, h: number): void {
-    const len = 3;
-    const gap = 1;
+    const len = 2.5;
+    const gap = 0.8;
     pdf.setDrawColor(180, 180, 180);
-    pdf.setLineWidth(0.2);
+    pdf.setLineWidth(0.15);
 
     const corners: [number, number][] = [
       [x, y], [x + w, y], [x, y + h], [x + w, y + h],

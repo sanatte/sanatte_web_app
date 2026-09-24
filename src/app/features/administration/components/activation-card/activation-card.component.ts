@@ -107,7 +107,7 @@ import { License } from '../../models/license.model';
 
     .activation-card-root {
       width: 560px;
-      height: 396px;
+      height: 469px;
       background: #faf7f2;
       border-radius: 16px;
       display: flex;
@@ -129,8 +129,8 @@ import { License } from '../../models/license.model';
       flex: 1;
       display: flex;
       flex-direction: column;
-      padding: 22px 28px 16px;
-      gap: 10px;
+      padding: 22px 28px 18px;
+      gap: 12px;
       position: relative;
       z-index: 1;
     }
@@ -222,8 +222,8 @@ import { License } from '../../models/license.model';
     }
 
     .qr-image {
-      width: 136px;
-      height: 136px;
+      width: 152px;
+      height: 152px;
       border-radius: 10px;
       background: white;
       padding: 6px;
@@ -243,7 +243,7 @@ import { License } from '../../models/license.model';
 
     .bottom-band {
       background: #1e1b2e;
-      padding: 10px 28px;
+      padding: 12px 28px;
       display: flex;
       justify-content: space-around;
       align-items: center;
