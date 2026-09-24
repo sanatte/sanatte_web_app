@@ -98,11 +98,11 @@ export const routes: Routes = [
     ],
   },
 
-  // ── Activación por QR (entrada pública que reenvía al shell privado) ──────
+  // ── Activación por QR (landing pública de bienvenida) ───────────────────
   {
     path: 'activate',
     loadComponent: () =>
-      import('./features/activation/pages/activate-redirect/activate-redirect.component').then((m) => m.ActivateRedirectComponent),
+      import('./features/activation/pages/activate-landing/activate-landing.component').then((m) => m.ActivateLandingComponent),
   },
 
   // ── Recurso por QR (entrada pública corta: sanatte.com/r/:slug) ───────────
