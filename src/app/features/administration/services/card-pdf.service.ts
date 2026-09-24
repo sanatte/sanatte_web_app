@@ -51,7 +51,6 @@ export class CardPdfService {
 
       const { x, y } = cardPosition(i);
       pdf.addImage(imgDataUrl, 'PNG', x, y, CARD_W, CARD_H);
-      this.addCropMarks(pdf, x, y, CARD_W, CARD_H);
     }
 
     const ts = new Date().toISOString().slice(0, 10);
@@ -89,21 +88,4 @@ export class CardPdfService {
     return canvas.toDataURL('image/png');
   }
 
-  private addCropMarks(pdf: jsPDF, x: number, y: number, w: number, h: number): void {
-    const len = 2.5;
-    const gap = 0.8;
-    pdf.setDrawColor(180, 180, 180);
-    pdf.setLineWidth(0.15);
-
-    const corners: [number, number][] = [
-      [x, y], [x + w, y], [x, y + h], [x + w, y + h],
-    ];
-
-    corners.forEach(([cx, cy]) => {
-      const dx = cx === x ? -1 : 1;
-      const dy = cy === y ? -1 : 1;
-      pdf.line(cx + dx * gap, cy, cx + dx * (gap + len), cy);
-      pdf.line(cx, cy + dy * gap, cx, cy + dy * (gap + len));
-    });
-  }
 }
