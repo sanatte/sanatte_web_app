@@ -73,7 +73,7 @@ export class CardPdfService {
 
     await new Promise(r => setTimeout(r, 80));
 
-    const card = host.querySelector('.activation-card-root') as HTMLElement;
+    const card = host.querySelector('.card-root') as HTMLElement;
     const canvas = await html2canvas(card, {
       scale: 2,
       useCORS: true,
