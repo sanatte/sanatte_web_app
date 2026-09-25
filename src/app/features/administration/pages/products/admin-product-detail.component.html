@@ -24,7 +24,7 @@
         </span>
         {{ p.status === 'active' ? 'Desactivar' : 'Activar' }}
       </button>
-      <a [routerLink]="['/admin/products']"
+      <a [routerLink]="['/admin/products']" [queryParams]="{ edit: p.id }"
          class="flex items-center gap-1.5 px-4 py-2 rounded-full gradient-primary text-white
                 text-label-sm font-heading font-semibold hover:opacity-90 transition-opacity"
          style="box-shadow: 0 4px 14px rgba(107,56,212,0.3)">

@@ -91,18 +91,18 @@ export class AdminProductDetailComponent implements OnInit {
     this.product.set(this.service.getById(p.id) ?? null);
   }
 
-  addResource(resource: Resource): void {
+  async addResource(resource: Resource): Promise<void> {
     const p = this.product();
     if (!p) return;
-    this.service.addResourceEntitlement(p.id, resource);
+    await this.service.addResourceEntitlement(p.id, resource);
     this.product.set(this.service.getById(p.id) ?? null);
     this.isPickerOpen.set(false);
   }
 
-  removeResource(resourceId: string): void {
+  async removeResource(resourceId: string): Promise<void> {
     const p = this.product();
     if (!p) return;
-    this.service.removeResourceEntitlement(p.id, resourceId);
+    await this.service.removeResourceEntitlement(p.id, resourceId);
     this.product.set(this.service.getById(p.id) ?? null);
   }
 

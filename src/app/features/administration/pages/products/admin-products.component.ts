@@ -1,4 +1,5 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { ProductTableComponent } from '../../components/product-table/product-table.component';
 import { ProductFormDialogComponent, ProductFormSaveEvent } from '../../components/product-form-dialog/product-form-dialog.component';
@@ -17,8 +18,9 @@ const PAGE_SIZE = 8;
   ],
   templateUrl: './admin-products.component.html',
 })
-export class AdminProductsComponent {
+export class AdminProductsComponent implements OnInit {
   private readonly productService = inject(ProductService);
+  private readonly route          = inject(ActivatedRoute);
 
   readonly searchTerm      = signal('');
   readonly currentPage     = signal(1);
@@ -49,6 +51,15 @@ export class AdminProductsComponent {
   });
 
   onSearch(term: string): void { this.searchTerm.set(term); this.currentPage.set(1); }
+
+  ngOnInit(): void {
+    // Abre el dialog de edición cuando se llega desde /admin/products/:id con ?edit=id
+    const editId = this.route.snapshot.queryParamMap.get('edit');
+    if (editId) {
+      const p = this.productService.getById(editId);
+      if (p) this.openEdit(p);
+    }
+  }
 
   openCreate(): void { this.editingProduct.set(null); this.saveError.set(''); this.isModalOpen.set(true); }
   openEdit(product: Product): void { this.editingProduct.set(product); this.saveError.set(''); this.isModalOpen.set(true); }
