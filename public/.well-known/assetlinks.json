@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.example.sanatte_app",
+      "sha256_cert_fingerprints": [
+        "69FC82C215F8F9BFD9AC6FD98DE3A7D1034805E84A3513239744F0C89D4AE393"
+      ]
+    }
+  }
+]
