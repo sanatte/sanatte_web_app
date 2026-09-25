@@ -25,8 +25,10 @@ export class LicenseTableComponent {
 
   readonly selectedIds = signal<Set<string>>(new Set());
 
+  // Solo licencias aún no usadas pueden imprimirse como tarjeta de activación.
+  // 'active', 'sold', 'assigned' ya fueron entregadas — reimprimir sería un duplicado.
   readonly selectableLicenses = computed(() =>
-    this.licenses().filter(l => l.status !== 'revoked')
+    this.licenses().filter(l => l.status === 'preparing' || l.status === 'available')
   );
 
   readonly selectedCount = computed(() => this.selectedIds().size);

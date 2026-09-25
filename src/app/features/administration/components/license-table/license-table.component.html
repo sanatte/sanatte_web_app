@@ -91,13 +91,14 @@
           <tr class="hover:bg-primary/5 transition-colors group"
               [class.bg-primary/5]="isSelected(license.id)">
 
-            <!-- Checkbox -->
+            <!-- Checkbox — solo en preparing/available (aún no entregadas) -->
             <td class="px-4 py-5">
-              @if (license.status !== 'revoked') {
+              @if (license.status === 'preparing' || license.status === 'available') {
                 <input type="checkbox"
                        [checked]="isSelected(license.id)"
                        (change)="toggleOne(license)"
-                       class="w-4 h-4 rounded border-outline cursor-pointer accent-primary" />
+                       class="w-4 h-4 rounded border-outline cursor-pointer accent-primary"
+                       title="Seleccionar para descargar tarjeta" />
               }
             </td>
 
