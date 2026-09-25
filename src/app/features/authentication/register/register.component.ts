@@ -76,8 +76,8 @@ import { AuthShellComponent } from '../components/auth-shell/auth-shell.componen
         <label class="flex items-start gap-2 cursor-pointer">
           <input formControlName="terms" type="checkbox" class="mt-0.5 accent-primary w-4 h-4" />
           <span class="text-label-sm font-heading text-on-surface-variant">
-            Acepto los <a href="#" class="text-primary hover:underline">Términos</a> y la
-            <a href="#" class="text-primary hover:underline">Política de privacidad</a>.
+            Acepto la
+            <a routerLink="/legal/privacidad" target="_blank" class="text-primary hover:underline">Política de Privacidad</a>.
           </span>
         </label>
 

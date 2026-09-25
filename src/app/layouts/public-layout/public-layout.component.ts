@@ -120,8 +120,8 @@ import { AuthService } from '../../core/services/auth.service';
           <div>
             <h4 class="font-heading font-bold text-on-surface text-label-md uppercase tracking-wider mb-3">Legal</h4>
             <ul class="space-y-2 text-label-md font-heading text-on-surface-variant">
-              <li><a href="#" class="hover:text-primary transition-colors">Privacidad</a></li>
-              <li><a href="#" class="hover:text-primary transition-colors">Términos</a></li>
+              <li><a routerLink="/legal/privacidad" class="hover:text-primary transition-colors">Privacidad</a></li>
+              <li><a routerLink="/legal/eliminar-cuenta" class="hover:text-primary transition-colors">Eliminar cuenta</a></li>
             </ul>
           </div>
         </div>

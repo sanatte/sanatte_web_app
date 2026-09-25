@@ -112,6 +112,18 @@ export const routes: Routes = [
       import('./features/resource-viewer/pages/resource-redirect/resource-redirect.component').then((m) => m.ResourceRedirectComponent),
   },
 
+  // ── Legal (URLs públicas requeridas por App Store / Play Store) ───────────
+  {
+    path: 'legal/privacidad',
+    loadComponent: () =>
+      import('./features/legal/pages/privacy/privacy.component').then((m) => m.PrivacyComponent),
+  },
+  {
+    path: 'legal/eliminar-cuenta',
+    loadComponent: () =>
+      import('./features/legal/pages/account-deletion/account-deletion.component').then((m) => m.AccountDeletionComponent),
+  },
+
   // ── Sitio público ───────────────────────────────────────────────────────
   {
     path: '',
