@@ -103,6 +103,12 @@ import { AuthShellComponent } from '../components/auth-shell/auth-shell.componen
         <a routerLink="/auth/register" [queryParams]="{ returnUrl: returnUrl() }"
            class="text-primary font-bold hover:underline">Crear cuenta</a>
       </p>
+
+      <p class="text-center text-label-sm font-heading text-on-surface-variant mt-4">
+        Al continuar, aceptas nuestra
+        <a routerLink="/legal/privacidad" target="_blank"
+           class="text-primary hover:underline">Política de Privacidad</a>.
+      </p>
     </app-auth-shell>
   `,
 })
