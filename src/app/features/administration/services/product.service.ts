@@ -156,7 +156,15 @@ export class ProductService {
     );
   }
 
-  /** Vincula un recurso al producto (capa Entitlement en la API — ruta admin). */
+  /** Reemplaza todos los recursos del producto en una sola llamada (PUT). */
+  async syncEntitlements(productId: string, resourceIds: string[]): Promise<void> {
+    const url = `${environment.apiUrl}/admin/products/${productId}/entitlements`;
+    const raw = await firstValueFrom(this.http.put<unknown>(url, { resourceIds }));
+    const updated = mapApiProduct(raw);
+    this._products.update((list) => list.map((p) => p.id === productId ? updated : p));
+  }
+
+  /** Vincula un recurso individual (usado desde el detalle del producto). */
   async addResourceEntitlement(productId: string, resource: Resource): Promise<void> {
     const url = `${environment.apiUrl}/admin/products/${productId}/entitlements`;
     const raw = await firstValueFrom(this.http.post<unknown>(url, { resourceId: resource.id }));
@@ -164,7 +172,7 @@ export class ProductService {
     this._products.update((list) => list.map((p) => p.id === productId ? updated : p));
   }
 
-  /** Desvincula un recurso del producto. */
+  /** Desvincula un recurso individual (usado desde el detalle del producto). */
   async removeResourceEntitlement(productId: string, resourceId: string): Promise<void> {
     const url = `${environment.apiUrl}/admin/products/${productId}/entitlements/${resourceId}`;
     const raw = await firstValueFrom(this.http.delete<unknown>(url));

@@ -74,14 +74,10 @@ export class AdminProductsComponent implements OnInit {
         ? await this.productService.update(editing.id, data)
         : await this.productService.create(data as any);
 
-      // Sincronizar entitlements: el PUT ignora los recursos — usamos los endpoints dedicados.
+      // Sincronizar entitlements con una sola llamada PUT (atómica, sin concurrencia).
       if (data.entitlements !== undefined) {
-        const desired  = new Set(data.entitlements.map((e) => e.referenceId));
-        const existing = new Set((saved.entitlements ?? []).map((e) => e.referenceId));
-        // addResourceEntitlement solo usa resource.id, pasamos un objeto mínimo
-        const fakeResource = (id: string) => ({ id } as any);
-        for (const rid of desired)  if (!existing.has(rid)) await this.productService.addResourceEntitlement(saved.id, fakeResource(rid));
-        for (const rid of existing) if (!desired.has(rid))  await this.productService.removeResourceEntitlement(saved.id, rid);
+        const resourceIds = data.entitlements.map((e) => e.referenceId);
+        await this.productService.syncEntitlements(saved.id, resourceIds);
       }
 
       if (coverFile) {
