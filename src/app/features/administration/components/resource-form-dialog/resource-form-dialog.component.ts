@@ -195,7 +195,7 @@ export class ResourceFormDialogComponent {
       fileSize:    type === 'pdf'     ? raw.fileSize || undefined : undefined,
       readTime:    type === 'article' ? raw.readTime || undefined : undefined,
       content:     type === 'article' ? (this.articleContent() || undefined) : undefined,
-      thumbnailGradient: this.resource()?.thumbnailGradient ?? 'from-violet-400 to-purple-600',
+      thumbnailGradient: this.resource()?.thumbnailGradient ?? 'from-navy-400 to-navy-800',
     };
 
     this.isSaving.set(true);

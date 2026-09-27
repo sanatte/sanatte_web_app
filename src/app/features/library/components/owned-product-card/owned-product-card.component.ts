@@ -10,7 +10,7 @@ import { getPrimaryImage } from '../../../administration/models/product.model';
   selector: 'app-owned-product-card',
   template: `
     <div class="group bg-white rounded-lg overflow-hidden flex flex-col shadow-card
-                hover:shadow-[0px_20px_40px_rgba(76,29,149,0.1)] transition-all cursor-pointer"
+                hover:shadow-card-hover transition-all cursor-pointer"
          (click)="open.emit(owned())">
       <!-- Thumbnail: foto real si existe, gradiente como fallback -->
       <div class="relative aspect-video overflow-hidden">
@@ -56,6 +56,6 @@ export class OwnedProductCardComponent {
 
   readonly imageUrl = computed(() => getPrimaryImage(this.owned().product)?.url ?? null);
   readonly imageGradient = computed(
-    () => getPrimaryImage(this.owned().product)?.gradient ?? 'from-violet-400 to-purple-600'
+    () => getPrimaryImage(this.owned().product)?.gradient ?? 'from-navy-400 to-navy-800'
   );
 }

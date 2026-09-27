@@ -12,7 +12,7 @@ function mapApi(raw: any): Ally {
     description:         raw.description ?? null,
     pillar:              raw.pillar,
     logoUrl:             raw.logoUrl ?? null,
-    brandColor:          raw.brandColor ?? '#7C4DFF',
+    brandColor:          raw.brandColor ?? '#1B2656',
     whatsApp:            raw.whatsApp ?? '',
     website:             raw.website ?? null,
     benefitTitle:        raw.benefitTitle,

@@ -50,7 +50,7 @@ interface PublicAlly {
                [class.cursor-pointer]="variant() === 'landing'"
                class="group bg-white rounded-2xl border border-transparent hover:border-primary/20
                       overflow-hidden flex flex-col transition-all"
-               style="box-shadow: 0px 10px 30px rgba(76,29,149,0.05)">
+               style="box-shadow: 0px 10px 30px rgb(var(--color-shadow) / 0.05)">
               <!-- Cover -->
               <div class="relative aspect-video overflow-hidden" [style.background-color]="a.brandColor">
                 @if (a.logoUrl) {

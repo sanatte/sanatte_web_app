@@ -70,7 +70,7 @@ type PageState = 'loading' | 'ok' | 'error';
                  class="flex-1 gradient-primary text-white py-4 rounded-full font-heading
                         font-bold text-label-md text-center hover:opacity-90 active:scale-95
                         transition-all flex items-center justify-center gap-2"
-                 style="box-shadow: 0 4px 14px rgba(107,56,212,0.3)">
+                 style="box-shadow: 0 4px 14px rgb(var(--color-primary) / 0.3)">
                 <span class="material-symbols-outlined text-[20px]">auto_stories</span>
                 Explorar mi biblioteca
               </a>

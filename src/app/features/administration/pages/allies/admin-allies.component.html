@@ -10,7 +10,7 @@
     <button (click)="openCreate()"
             class="flex items-center gap-2 px-6 py-3 gradient-primary text-white rounded-full
                    text-label-md font-heading font-bold hover:opacity-90 active:scale-95 transition-all"
-            style="box-shadow: 0 4px 14px 0 rgba(107,56,212,0.39)">
+            style="box-shadow: 0 4px 14px 0 rgb(var(--color-primary) / 0.39)">
       <span class="material-symbols-outlined text-[20px]">add</span>
       Nuevo aliado
     </button>
@@ -32,7 +32,7 @@
         <div class="group bg-white rounded-2xl border border-transparent
                     hover:border-primary/20 transition-all overflow-hidden flex flex-col"
              [class.opacity-60]="!a.isActive"
-             style="box-shadow: 0px 10px 30px rgba(76,29,149,0.05)">
+             style="box-shadow: 0px 10px 30px rgb(var(--color-shadow) / 0.05)">
           <!-- Cover -->
           <div class="relative aspect-video overflow-hidden">
             @if (a.logoUrl) {
@@ -257,7 +257,7 @@
         </button>
         <button type="button" (click)="onSubmit()" [disabled]="isSaving()"
                 class="px-8 py-3 gradient-primary text-white rounded-full text-label-md font-heading font-bold hover:opacity-90 active:scale-95 transition-all disabled:opacity-60 flex items-center gap-2"
-                style="box-shadow: 0 4px 14px 0 rgba(107,56,212,0.39)">
+                style="box-shadow: 0 4px 14px 0 rgb(var(--color-primary) / 0.39)">
           @if (isSaving()) {
             <span class="material-symbols-outlined animate-spin text-lg">progress_activity</span> Guardando…
           } @else {

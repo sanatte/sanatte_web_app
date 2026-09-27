@@ -40,7 +40,7 @@ export class CartService {
           product,
           quantity: i.quantity,
           imageUrl: getPrimaryImage(product)?.url ?? null,
-          gradient: getPrimaryImage(product)?.gradient ?? 'from-violet-400 to-purple-600',
+          gradient: getPrimaryImage(product)?.gradient ?? 'from-navy-400 to-navy-800',
           lineTotal: product.price * i.quantity,
         };
       })

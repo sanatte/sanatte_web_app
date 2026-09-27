@@ -1,5 +1,5 @@
 <div class="bg-white rounded-lg overflow-hidden border border-outline-variant/20"
-     style="box-shadow: 0px 10px 30px rgba(76,29,149,0.05)">
+     style="box-shadow: 0px 10px 30px rgb(var(--color-shadow) / 0.05)">
 
   <!-- Table header -->
   <div class="px-6 py-5 border-b border-outline-variant/30 flex flex-col sm:flex-row
@@ -19,7 +19,7 @@
       @if (selectedCount() > 0) {
         <button (click)="downloadCards.emit(selectedLicenses())"
                 class="flex items-center gap-2 px-4 py-2 rounded-full bg-primary text-white
-                       text-label-md font-heading hover:bg-primary-container transition-colors
+                       text-label-md font-heading hover:bg-primary-dark transition-colors
                        shadow-sm">
           <span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
           Descargar tarjetas de activación ({{ selectedCount() }})

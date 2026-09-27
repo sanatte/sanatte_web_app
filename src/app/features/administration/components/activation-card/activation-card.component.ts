@@ -89,12 +89,12 @@ const DEFAULT_TABS: CardTab[] = [
     .card-root {
       width: 560px;
       height: 469px;
-      background: #faf7f2;
+      background: rgb(var(--color-navy-50));
       border-radius: 0;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      box-shadow: 0 6px 28px rgba(30,27,46,0.13);
+      box-shadow: 0 6px 28px rgb(var(--color-shadow) / 0.13);
     }
 
     /* ── Header ── */
@@ -111,7 +111,7 @@ const DEFAULT_TABS: CardTab[] = [
     .product-title {
       font-size: 20px;
       font-weight: 800;
-      color: #1e1b2e;
+      color: rgb(var(--color-navy-950));
       margin: 0;
       line-height: 1.2;
       letter-spacing: -0.02em;
@@ -119,7 +119,7 @@ const DEFAULT_TABS: CardTab[] = [
 
     .product-sub {
       font-size: 12px;
-      color: #6b38d4;
+      color: rgb(var(--color-navy-800));
       margin: 6px 0 0;
       font-weight: 700;
       letter-spacing: 0.05em;
@@ -135,7 +135,7 @@ const DEFAULT_TABS: CardTab[] = [
 
     .header-rule {
       height: 1px;
-      background: linear-gradient(to right, transparent, #d8d0e8 30%, #d8d0e8 70%, transparent);
+      background: linear-gradient(to right, transparent, rgb(var(--color-foil-base)) 30%, rgb(var(--color-foil-base)) 70%, transparent);
       margin: 0 22px;
       flex-shrink: 0;
     }
@@ -175,7 +175,7 @@ const DEFAULT_TABS: CardTab[] = [
     .mantra {
       font-size: 13px;
       font-style: italic;
-      color: #2e2a45;
+      color: rgb(var(--color-navy-900));
       text-align: center;
       margin: 12px 0 0;
       line-height: 1.65;
@@ -187,7 +187,7 @@ const DEFAULT_TABS: CardTab[] = [
 
     .body-divider {
       width: 1px;
-      background: linear-gradient(to bottom, transparent, #d8d0e8 20%, #d8d0e8 80%, transparent);
+      background: linear-gradient(to bottom, transparent, rgb(var(--color-foil-base)) 20%, rgb(var(--color-foil-base)) 80%, transparent);
       flex-shrink: 0;
       align-self: stretch;
     }
@@ -208,13 +208,13 @@ const DEFAULT_TABS: CardTab[] = [
       object-fit: contain;
       display: block;
       border-radius: 8px;
-      filter: drop-shadow(0 2px 8px rgba(30,27,46,0.15));
+      filter: drop-shadow(0 2px 8px rgb(var(--color-shadow) / 0.15));
     }
 
     .serial {
       font-size: 11px;
       font-family: 'Courier New', monospace;
-      color: #3a3660;
+      color: rgb(var(--color-navy-700));
       letter-spacing: 0.12em;
       margin: 0;
       font-weight: 700;
@@ -222,7 +222,7 @@ const DEFAULT_TABS: CardTab[] = [
 
     /* ── Footer ── */
     .card-footer {
-      background: #1a1a3a;
+      background: rgb(var(--color-navy-900));
       padding: 10px 24px;
       display: flex;
       justify-content: space-around;

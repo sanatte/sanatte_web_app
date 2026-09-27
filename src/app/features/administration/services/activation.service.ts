@@ -20,7 +20,7 @@ function mapApiActivation(raw: any): Activation {
     userName:           raw.userName ?? undefined,
     userEmail:          raw.userEmail ?? undefined,
     userInitials:       raw.userInitials ?? undefined,
-    userAvatarGradient: 'from-violet-400 to-purple-600',
+    userAvatarGradient: 'from-navy-400 to-navy-800',
     status:             STATUS_MAP[raw.status] ?? 'success',
     date:               raw.date ?? '',
     time:               raw.time ?? '',

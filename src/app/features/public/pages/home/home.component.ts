@@ -46,7 +46,7 @@ const PLENA_SKU = 'WLN-001'; // clave de negocio estable (mock y API)
           <div class="flex flex-col sm:flex-row gap-2.5 sm:gap-3">
             <a [routerLink]="ctx.productLink(p.id)"
                class="px-6 sm:px-8 py-3 sm:py-3.5 rounded-full gradient-primary text-white font-heading font-bold text-center
-                      shadow-[0px_10px_30px_rgba(107,56,212,0.25)] hover:opacity-95 active:scale-[0.98] transition-all
+                      shadow-primary-lg hover:opacity-95 active:scale-[0.98] transition-all
                       flex items-center justify-center gap-2">
               Conocer Plena
               <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
@@ -96,7 +96,7 @@ const PLENA_SKU = 'WLN-001'; // clave de negocio estable (mock y API)
           </div>
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             @for (r of plenaResources(); track r.id) {
-              <div class="glass-card rounded-lg p-5 text-center hover:shadow-[0px_20px_40px_rgba(76,29,149,0.1)] transition-all">
+              <div class="glass-card rounded-lg p-5 text-center hover:shadow-card-hover transition-all">
                 <div class="w-12 h-12 rounded-2xl bg-primary-fixed flex items-center justify-center mx-auto mb-3">
                   <span class="material-symbols-outlined text-primary text-[24px]">{{ icon(r) }}</span>
                 </div>
@@ -203,7 +203,7 @@ export class HomeComponent {
   );
 
   readonly plenaGradient = computed(() =>
-    (this.plena() && getPrimaryImage(this.plena()!)?.gradient) || 'from-violet-400 via-purple-500 to-indigo-700'
+    (this.plena() && getPrimaryImage(this.plena()!)?.gradient) || 'from-navy-400 via-navy-600 to-navy-900'
   );
 
   readonly plenaResources = computed<Resource[]>(() => {

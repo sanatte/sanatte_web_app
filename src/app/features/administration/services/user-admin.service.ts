@@ -21,7 +21,7 @@ function mapApiUser(raw: any): AdminUser {
     role:                   ROLE_MAP[raw.role]   ?? UserRole.User,
     status:                 STATUS_MAP[raw.status] ?? 'active',
     avatarInitials:         name.split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2),
-    avatarGradient:         'from-violet-400 to-purple-600',
+    avatarGradient:         'from-navy-400 to-navy-800',
     productsCount:          raw.ordersCount ?? 0,
     activationsCount:       0,
     hasActiveSubscription:  false,
