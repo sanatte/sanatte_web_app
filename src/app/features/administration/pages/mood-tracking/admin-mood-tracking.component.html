@@ -1,0 +1,160 @@
+<div class="p-6 md:p-8">
+
+  <!-- Header -->
+  @if (focusedUser()) {
+    <div class="flex items-center gap-3 mb-6">
+      <button (click)="clearUserFocus()"
+              class="p-2 rounded-lg hover:bg-surface-container transition-colors">
+        <span class="material-symbols-outlined text-on-surface-variant">arrow_back</span>
+      </button>
+      <div>
+        <h1 class="font-heading text-headline-lg font-bold text-on-background">
+          {{ focusedUser()?.name }}
+        </h1>
+        <p class="text-label-sm text-on-surface-variant">{{ focusedUser()?.email }}</p>
+      </div>
+    </div>
+  } @else {
+    <app-admin-page-header
+      title="Tracking Emocional"
+      description="Historial de emociones registradas por los usuarios en su check-in diario de bienestar." />
+  }
+
+  <!-- Filtros -->
+  <div class="flex flex-wrap gap-3 mb-6">
+    <!-- Período -->
+    <select [(ngModel)]="selectedPeriod" (change)="onFilterChange()"
+            class="px-3 py-2 rounded-xl border border-outline-variant/30 bg-surface text-body-sm
+                   text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/40 transition">
+      <option value="7d">Última semana</option>
+      <option value="30d">Último mes</option>
+      <option value="90d">Últimos 3 meses</option>
+    </select>
+
+    <!-- Filtro por emoción -->
+    <select [(ngModel)]="selectedCatalog" (change)="onFilterChange()"
+            class="px-3 py-2 rounded-xl border border-outline-variant/30 bg-surface text-body-sm
+                   text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/40 transition">
+      <option value="">Todas las emociones</option>
+      @for (cat of catalogs(); track cat.id) {
+        <option [value]="cat.id">{{ cat.emojiCode }} {{ cat.name }}</option>
+      }
+    </select>
+  </div>
+
+  <!-- Gráficos (solo cuando hay usuario seleccionado) -->
+  @if (focusedUser() && entries().length > 0) {
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <div class="bg-surface-bright rounded-2xl border border-outline-variant/20 p-5 shadow-sm">
+        <h3 class="font-heading text-label-md font-semibold text-on-surface mb-4">Frecuencia por emoción</h3>
+        <canvas #barChart></canvas>
+      </div>
+      <div class="bg-surface-bright rounded-2xl border border-outline-variant/20 p-5 shadow-sm">
+        <h3 class="font-heading text-label-md font-semibold text-on-surface mb-4">Distribución emocional</h3>
+        <canvas #donutChart></canvas>
+      </div>
+    </div>
+  }
+
+  <!-- Estado de carga / error / vacío -->
+  @if (loading()) {
+    <div class="flex justify-center py-24">
+      <span class="material-symbols-outlined animate-spin text-primary text-[32px]">progress_activity</span>
+    </div>
+  } @else if (error()) {
+    <div class="glass-card rounded-xl p-6 text-center text-error">
+      <p class="text-label-md font-heading">{{ error() }}</p>
+    </div>
+  } @else if (entries().length === 0) {
+    <div class="glass-card rounded-xl p-12 text-center max-w-lg mx-auto">
+      <span class="material-symbols-outlined text-primary-light text-[48px] mb-3">mood</span>
+      <h3 class="font-heading text-headline-md text-on-surface mb-1">Sin registros</h3>
+      <p class="text-body-md text-on-surface-variant">No hay emociones registradas en este período.</p>
+    </div>
+  } @else {
+    <!-- Tabla -->
+    <div class="bg-surface-bright rounded-2xl shadow-sm border border-outline-variant/20 overflow-hidden">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-outline-variant/20 bg-surface-container-low">
+            @if (!focusedUser()) {
+              <th class="px-4 py-3 text-left font-heading text-label-sm text-on-surface-variant font-semibold">Usuario</th>
+            }
+            <th class="px-4 py-3 text-left font-heading text-label-sm text-on-surface-variant font-semibold">Emoción</th>
+            <th class="px-4 py-3 text-left font-heading text-label-sm text-on-surface-variant font-semibold hidden md:table-cell">Nota</th>
+            <th class="px-4 py-3 text-left font-heading text-label-sm text-on-surface-variant font-semibold">Fecha</th>
+            @if (!focusedUser()) {
+              <th class="px-4 py-3 text-center font-heading text-label-sm text-on-surface-variant font-semibold">Ver</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (entry of entries(); track entry.id) {
+            <tr class="border-b border-outline-variant/10 hover:bg-surface-container-low/50 transition-colors">
+              <!-- Usuario (vista global) -->
+              @if (!focusedUser()) {
+                <td class="px-4 py-3">
+                  <div>
+                    <p class="font-heading font-semibold text-on-surface text-label-md">{{ entry.userDisplayName }}</p>
+                    <p class="text-label-xs text-on-surface-variant">{{ entry.userEmail }}</p>
+                  </div>
+                </td>
+              }
+              <!-- Emoción -->
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-2">
+                  <span class="text-xl">{{ entry.moodEmoji }}</span>
+                  <span class="font-heading font-semibold text-on-surface text-label-md">{{ entry.moodName }}</span>
+                </div>
+              </td>
+              <!-- Nota -->
+              <td class="px-4 py-3 hidden md:table-cell">
+                <p class="text-body-sm text-on-surface-variant line-clamp-2 max-w-xs">
+                  {{ entry.note || '—' }}
+                </p>
+              </td>
+              <!-- Fecha -->
+              <td class="px-4 py-3">
+                <span class="text-label-sm text-on-surface-variant">{{ entry.recordedDate }}</span>
+              </td>
+              <!-- Ver detalles (vista global) -->
+              @if (!focusedUser()) {
+                <td class="px-4 py-3 text-center">
+                  <button (click)="focusUser(entry)"
+                          class="p-1.5 rounded-lg hover:bg-surface-container transition-colors"
+                          title="Ver historial del usuario">
+                    <span class="material-symbols-outlined text-on-surface-variant text-[18px]">person_search</span>
+                  </button>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginación -->
+    @if (totalPages() > 1) {
+      <div class="flex items-center justify-between mt-4">
+        <p class="text-label-sm text-on-surface-variant">
+          Página {{ currentPage() }} de {{ totalPages() }} — {{ total() }} registros
+        </p>
+        <div class="flex gap-2">
+          <button (click)="changePage(currentPage() - 1)"
+                  [disabled]="currentPage() === 1"
+                  class="px-4 py-2 rounded-xl border border-outline-variant/30 text-label-sm font-heading
+                         text-on-surface hover:bg-surface-container transition-colors disabled:opacity-40">
+            Anterior
+          </button>
+          <button (click)="changePage(currentPage() + 1)"
+                  [disabled]="currentPage() >= totalPages()"
+                  class="px-4 py-2 rounded-xl border border-outline-variant/30 text-label-sm font-heading
+                         text-on-surface hover:bg-surface-container transition-colors disabled:opacity-40">
+            Siguiente
+          </button>
+        </div>
+      </div>
+    }
+  }
+
+</div>

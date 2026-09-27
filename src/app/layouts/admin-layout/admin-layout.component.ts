@@ -45,9 +45,11 @@ export class AdminLayoutComponent {
           '/admin/orders':       'Pedidos',
           '/admin/licenses':     'Licencias',
           '/admin/locations':    'Ubicaciones',
-          '/admin/activations':  'Activaciones',
-          '/admin/reports':      'Reportes',
-          '/admin/settings':     'Configuración',
+          '/admin/activations':   'Activaciones',
+          '/admin/reports':       'Reportes',
+          '/admin/settings':      'Configuración',
+          '/admin/mood-catalog':  'Catálogo de Emociones',
+          '/admin/mood-tracking': 'Tracking Emocional',
         };
         this.pageTitle.set(titles[url] ?? 'Admin Dashboard');
       }
@@ -63,8 +65,10 @@ export class AdminLayoutComponent {
     { label: 'Logística',   route: '/admin/orders',       icon: 'local_shipping' },
     { label: 'Licencias',   route: '/admin/licenses',     icon: 'key' },
     { label: 'Ubicaciones', route: '/admin/locations',    icon: 'store' },
-    { label: 'Activaciones',route: '/admin/activations',  icon: 'verified' },
-    { label: 'Reportes',    route: '/admin/reports',      icon: 'bar_chart' },
+    { label: 'Activaciones',    route: '/admin/activations',   icon: 'verified' },
+    { label: 'Emociones',       route: '/admin/mood-catalog',  icon: 'sentiment_satisfied' },
+    { label: 'Tracking',        route: '/admin/mood-tracking', icon: 'monitoring' },
+    { label: 'Reportes',        route: '/admin/reports',       icon: 'bar_chart' },
   ];
 
   readonly bottomNav: NavItem[] = [

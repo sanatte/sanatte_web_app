@@ -73,5 +73,17 @@ export const administrationRoutes: Routes = [
     loadComponent: () =>
       import('./pages/settings/admin-settings.component').then((m) => m.AdminSettingsComponent),
   },
+  {
+    path: 'mood-catalog',
+    data: { title: 'Catálogo de Emociones' },
+    loadComponent: () =>
+      import('./pages/mood-catalog/admin-mood-catalog.component').then((m) => m.AdminMoodCatalogComponent),
+  },
+  {
+    path: 'mood-tracking',
+    data: { title: 'Tracking Emocional' },
+    loadComponent: () =>
+      import('./pages/mood-tracking/admin-mood-tracking.component').then((m) => m.AdminMoodTrackingComponent),
+  },
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
 ];
