@@ -1,36 +1,34 @@
-/* ── Fonts ───────────────────────────────────────────────────────────────── */
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Be+Vietnam+Pro:wght@400;500;600&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
+
+@import './styles/tokens.css';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ── Reproductor de video (Plyr) con color de marca ─────────────────────────── */
 @import 'plyr/dist/plyr.css';
 :root {
-  --plyr-color-main: #7C4DFF;
+  --plyr-color-main: rgb(var(--color-primary));
   --plyr-border-radius: 12px;
 }
 .plyr { border-radius: 16px; }
 
-/* ── Editor WYSIWYG (Quill) para artículos ──────────────────────────────────── */
 @import 'quill/dist/quill.snow.css';
 .ql-toolbar.ql-snow,
 .ql-container.ql-snow { border-color: theme('colors.outline-variant / 40%'); }
 .ql-toolbar.ql-snow { border-top-left-radius: 0.5rem; border-top-right-radius: 0.5rem; }
 .ql-container.ql-snow { border-bottom-left-radius: 0.5rem; border-bottom-right-radius: 0.5rem; }
-.ql-editor { min-height: 220px; font-family: 'Be Vietnam Pro', system-ui, sans-serif; font-size: 14px; }
+.ql-editor { min-height: 220px; font-family: theme('fontFamily.sans'); font-size: 14px; }
 .ql-editor.ql-blank::before { font-style: normal; color: theme('colors.on-surface-variant'); }
 
-/* ── Render del artículo (HTML del editor) ──────────────────────────────────── */
 .article-content {
-  font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+  font-family: theme('fontFamily.sans');
   color: theme('colors.on-surface-variant');
   line-height: 1.75;
 }
-.article-content h2 { font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 1.5rem; color: theme('colors.on-surface'); margin: 1.5rem 0 0.75rem; }
-.article-content h3 { font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 1.2rem; color: theme('colors.on-surface'); margin: 1.25rem 0 0.5rem; }
+.article-content h2 { font-family: theme('fontFamily.heading'); font-weight: 700; font-size: 1.5rem; color: theme('colors.on-surface'); margin: 1.5rem 0 0.75rem; }
+.article-content h3 { font-family: theme('fontFamily.heading'); font-weight: 700; font-size: 1.2rem; color: theme('colors.on-surface'); margin: 1.25rem 0 0.5rem; }
 .article-content p { margin: 0.75rem 0; }
 .article-content ul { list-style: disc; padding-left: 1.5rem; margin: 0.75rem 0; }
 .article-content ol { list-style: decimal; padding-left: 1.5rem; margin: 0.75rem 0; }
@@ -39,41 +37,36 @@
 .article-content strong { font-weight: 700; color: theme('colors.on-surface'); }
 .article-content blockquote { border-left: 4px solid theme('colors.primary'); padding: 0.25rem 0 0.25rem 1.25rem; font-style: italic; margin: 1rem 0; }
 
-/* ── Base ────────────────────────────────────────────────────────────────── */
 body {
-  font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+  font-family: theme('fontFamily.sans');
   background-color: theme('colors.background');
   color: theme('colors.on-background');
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Manrope', system-ui, sans-serif;
+  font-family: theme('fontFamily.heading');
 }
 
-/* ── Scrollbar ───────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar       { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: theme('colors.primary'); border-radius: 10px; }
 
-/* ── Utilities ───────────────────────────────────────────────────────────── */
 @layer components {
   .glass-card {
-    background: #ffffff;
-    box-shadow: 0px 10px 30px rgba(76, 29, 149, 0.07);
-    border: 1px solid rgba(203, 195, 215, 0.4);
+    background: theme('colors.surface-container-lowest');
+    box-shadow: theme('boxShadow.card-md');
+    border: 1px solid theme('colors.outline-variant / 40%');
   }
 
   .gradient-primary {
-    background: linear-gradient(135deg, #6b38d4 0%, #8455ef 100%);
+    background: linear-gradient(135deg, theme('colors.gradient-hero-start') 0%, theme('colors.gradient-hero-end') 100%);
   }
 
-  /* Fondo inmersivo para players de audio/video (visores) */
   .player-gradient {
-    background: linear-gradient(135deg, #4c1d95 0%, #1e1b4b 100%);
+    background: linear-gradient(135deg, theme('colors.gradient-player-start') 0%, theme('colors.gradient-player-end') 100%);
   }
 }
 
-/* ── Utilities ───────────────────────────────────────────────────────────── */
 @layer utilities {
   .scrollbar-hide {
     -ms-overflow-style: none;
@@ -82,19 +75,17 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-/* ── Select: reemplaza flecha nativa por chevron del design system ──────── */
 select {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='20' viewBox='0 96 960 960' width='20'%3E%3Cpath fill='%237b7486' d='M480 696 280 496l56-56 144 144 144-144 56 56-200 200Z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='20' viewBox='0 96 960 960' width='20'%3E%3Cpath fill='%236F6D88' d='M480 696 280 496l56-56 144 144 144-144 56 56-200 200Z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
   padding-right: 2.5rem;
 }
 select:focus {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='20' viewBox='0 96 960 960' width='20'%3E%3Cpath fill='%236b38d4' d='M480 696 280 496l56-56 144 144 144-144 56 56-200 200Z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='20' viewBox='0 96 960 960' width='20'%3E%3Cpath fill='%232E2380' d='M480 696 280 496l56-56 144 144 144-144 56 56-200 200Z'/%3E%3C/svg%3E");
 }
 
-/* ── Material Symbols ────────────────────────────────────────────────────── */
 .material-symbols-outlined {
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
   user-select: none;

@@ -101,7 +101,7 @@ import { ProductService } from '../../services/product.service';
             <button type="button" (click)="onSubmit()"
                     class="px-8 py-3 gradient-primary text-white rounded-full text-label-md
                            font-heading font-bold hover:opacity-90 active:scale-95 transition-all"
-                    style="box-shadow: 0 4px 14px 0 rgba(107,56,212,0.39)">
+                    style="box-shadow: 0 4px 14px 0 rgb(var(--color-primary) / 0.39)">
               Generar lote
             </button>
           </div>

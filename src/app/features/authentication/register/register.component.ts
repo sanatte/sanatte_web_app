@@ -83,7 +83,7 @@ import { AuthShellComponent } from '../components/auth-shell/auth-shell.componen
 
         <button type="submit" [disabled]="loading() || form.invalid"
                 class="group w-full py-3.5 rounded-full gradient-primary text-white font-heading font-bold
-                       shadow-[0px_10px_30px_rgba(107,56,212,0.25)] hover:opacity-95 active:scale-[0.98] transition-all
+                       shadow-primary-lg hover:opacity-95 active:scale-[0.98] transition-all
                        flex items-center justify-center gap-2 disabled:opacity-50">
           @if (loading()) {
             <span class="material-symbols-outlined animate-spin text-[20px]">progress_activity</span> Creando cuenta…

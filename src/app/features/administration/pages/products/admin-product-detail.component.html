@@ -27,7 +27,7 @@
       <a [routerLink]="['/admin/products']" [queryParams]="{ edit: p.id }"
          class="flex items-center gap-1.5 px-4 py-2 rounded-full gradient-primary text-white
                 text-label-sm font-heading font-semibold hover:opacity-90 transition-opacity"
-         style="box-shadow: 0 4px 14px rgba(107,56,212,0.3)">
+         style="box-shadow: 0 4px 14px rgb(var(--color-primary) / 0.3)">
         <span class="material-symbols-outlined text-[16px]">edit</span>
         Editar
       </a>
@@ -51,7 +51,7 @@
                class="w-full h-full object-cover">
         } @else {
           <div class="w-full h-full bg-gradient-to-br flex items-center justify-center"
-               [class]="displayImage()?.gradient ?? 'from-violet-400 to-purple-600'">
+               [class]="displayImage()?.gradient ?? 'from-brand-400 to-brand-800'">
             <span class="material-symbols-outlined text-white/30 text-[80px]">image</span>
           </div>
         }
@@ -68,7 +68,7 @@
                 <img [src]="img.url" [alt]="img.altText" class="w-full h-full object-cover">
               } @else {
                 <div class="w-full h-full bg-gradient-to-br flex items-center justify-center"
-                     [class]="img.gradient ?? 'from-violet-400 to-purple-600'">
+                     [class]="img.gradient ?? 'from-brand-400 to-brand-800'">
                   <span class="material-symbols-outlined text-white/60 text-[20px]">image</span>
                 </div>
               }

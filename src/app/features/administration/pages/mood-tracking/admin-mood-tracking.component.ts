@@ -8,6 +8,7 @@ import { MoodCatalogService } from '../../services/mood-catalog.service';
 import { MoodEntryAdmin } from '../../models/mood-catalog.model';
 import { AdminPageHeaderComponent } from '../../../../shared/components/admin-page-header/admin-page-header.component';
 import { Chart, registerables } from 'chart.js';
+import { themeHex } from '../../../../shared/utils/theme-color';
 
 Chart.register(...registerables);
 
@@ -115,7 +116,7 @@ export class AdminMoodTrackingComponent implements AfterViewInit, OnDestroy {
     }
     const labels  = Object.values(counts).map((c) => `${c.emoji} ${c.name}`);
     const data    = Object.values(counts).map((c) => c.count);
-    const colors  = ['#7C4DFF', '#FF8C00', '#20B2AA', '#9370DB', '#4682B4', '#DC143C'];
+    const colors  = ['primary', 'secondary', 'success', 'warning', 'info', 'error'].map(themeHex);
 
     // Destruir anteriores si existen
     this.barChart?.destroy();

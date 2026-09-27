@@ -17,7 +17,7 @@ const TYPE_LABEL: Record<string, string> = {
   imports: [MoneyPipe, RouterLink],
   template: `
     <div class="group bg-surface-container-lowest rounded-lg overflow-hidden shadow-card
-                hover:shadow-[0px_20px_40px_rgba(76,29,149,0.1)] transition-all flex flex-col">
+                hover:shadow-card-hover transition-all flex flex-col">
       <!-- Imagen -->
       <a [routerLink]="ctx.productLink(product().id)" class="block relative aspect-[4/3] overflow-hidden">
         @if (imageUrl(); as url) {
@@ -69,6 +69,6 @@ export class StoreProductCardComponent {
   readonly add     = output<Product>();
 
   readonly imageUrl  = computed(() => getPrimaryImage(this.product())?.url ?? null);
-  readonly gradient  = computed(() => getPrimaryImage(this.product())?.gradient ?? 'from-violet-400 to-purple-600');
+  readonly gradient  = computed(() => getPrimaryImage(this.product())?.gradient ?? 'from-brand-400 to-brand-800');
   readonly typeLabel = computed(() => TYPE_LABEL[this.product().type] ?? this.product().type);
 }

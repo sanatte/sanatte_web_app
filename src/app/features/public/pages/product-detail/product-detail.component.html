@@ -19,7 +19,7 @@
           @if (displayImage()?.url) {
             <img [src]="displayImage()!.url!" [alt]="p.name" class="w-full h-full object-cover">
           } @else {
-            <div class="w-full h-full bg-gradient-to-br {{ displayImage()?.gradient ?? 'from-violet-400 to-purple-600' }}"></div>
+            <div class="w-full h-full bg-gradient-to-br {{ displayImage()?.gradient ?? 'from-brand-400 to-brand-800' }}"></div>
           }
         </div>
         @if (p.images.length > 1) {

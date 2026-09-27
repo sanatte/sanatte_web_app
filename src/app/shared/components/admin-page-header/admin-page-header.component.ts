@@ -17,7 +17,7 @@ import { Component, input, output } from '@angular/core';
                 class="self-start sm:self-auto flex items-center gap-2 gradient-primary text-white
                        px-5 py-2.5 rounded-full text-label-md font-heading font-bold
                        hover:opacity-90 active:scale-95 transition-all whitespace-nowrap"
-                style="box-shadow: 0 4px 14px 0 rgba(107,56,212,0.39)">
+                style="box-shadow: 0 4px 14px 0 rgb(var(--color-primary) / 0.39)">
           <span class="material-symbols-outlined text-[18px]">{{ actionIcon() }}</span>
           {{ actionLabel() }}
         </button>

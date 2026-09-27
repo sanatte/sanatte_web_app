@@ -89,7 +89,7 @@ const TYPE_META: Record<number, { icon: string; label: string }> = {
             <a routerLink="/app/activate"
                class="inline-flex items-center gap-2 gradient-primary text-white px-6 py-3 rounded-full
                       text-label-md font-heading font-bold hover:opacity-90 active:scale-95 transition-all"
-               style="box-shadow: 0 4px 14px 0 rgba(107,56,212,0.39)">
+               style="box-shadow: 0 4px 14px 0 rgb(var(--color-primary) / 0.39)">
               <span class="material-symbols-outlined text-[18px]">bolt</span>
               Activar producto
             </a>

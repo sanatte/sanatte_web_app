@@ -1,10 +1,5 @@
 import { Component, input } from '@angular/core';
 
-/**
- * Contenedor de páginas legales (privacidad, eliminación de cuenta).
- * Estructura semántica: h1 + "última actualización" + prose proyectado.
- * Estas páginas son URLs públicas requeridas por App Store y Play Store.
- */
 @Component({
   selector: 'app-legal-page',
   standalone: true,
@@ -19,7 +14,6 @@ import { Component, input } from '@angular/core';
         </p>
       </header>
 
-      <!-- Contenido legal: estilos aplicados a los tags proyectados -->
       <div class="legal-prose text-on-surface-variant leading-relaxed space-y-4">
         <ng-content />
       </div>
@@ -27,18 +21,18 @@ import { Component, input } from '@angular/core';
   `,
   styles: [`
     .legal-prose ::ng-deep h2 {
-      font-family: 'Manrope', sans-serif;
+      font-family: var(--font-heading), sans-serif;
       font-weight: 700;
       font-size: 1.35rem;
-      color: #121c2a;
+      color: rgb(var(--color-on-surface));
       margin-top: 2rem;
       margin-bottom: 0.75rem;
     }
     .legal-prose ::ng-deep h3 {
-      font-family: 'Manrope', sans-serif;
+      font-family: var(--font-heading), sans-serif;
       font-weight: 600;
       font-size: 1.1rem;
-      color: #121c2a;
+      color: rgb(var(--color-on-surface));
       margin-top: 1.5rem;
       margin-bottom: 0.5rem;
     }
@@ -49,8 +43,8 @@ import { Component, input } from '@angular/core';
       margin-bottom: 0.75rem;
     }
     .legal-prose ::ng-deep li { margin-bottom: 0.35rem; }
-    .legal-prose ::ng-deep a { color: #6b38d4; text-decoration: underline; }
-    .legal-prose ::ng-deep strong { color: #121c2a; font-weight: 600; }
+    .legal-prose ::ng-deep a { color: rgb(var(--color-primary)); text-decoration: underline; }
+    .legal-prose ::ng-deep strong { color: rgb(var(--color-on-surface)); font-weight: 600; }
   `],
 })
 export class LegalPageComponent {

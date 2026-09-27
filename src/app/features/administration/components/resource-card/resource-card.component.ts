@@ -8,7 +8,7 @@ import { Resource, RESOURCE_TYPE_META } from '../../models/resource.model';
   template: `
     <div class="group bg-white rounded-lg overflow-hidden border border-transparent
                 hover:border-primary/20 transition-all flex flex-col h-full"
-         style="box-shadow: 0px 10px 30px rgba(76,29,149,0.05)">
+         style="box-shadow: 0px 10px 30px rgb(var(--color-shadow) / 0.05)">
 
       <!-- Thumbnail -->
       <div class="relative aspect-video overflow-hidden">

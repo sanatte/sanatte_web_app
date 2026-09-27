@@ -92,7 +92,7 @@ export class OrderCardComponent {
   });
   readonly thumbnail = computed(() => {
     const p = this.firstProduct();
-    return (p && getPrimaryImage(p)?.gradient) || 'from-violet-400 to-purple-600';
+    return (p && getPrimaryImage(p)?.gradient) || 'from-brand-400 to-brand-800';
   });
 
   readonly productSummary = computed(() => {

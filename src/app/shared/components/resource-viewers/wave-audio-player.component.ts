@@ -2,6 +2,7 @@ import {
   Component, ElementRef, AfterViewInit, OnDestroy, input, signal, viewChild,
 } from '@angular/core';
 import WaveSurfer from 'wavesurfer.js';
+import { themeHex, themeRgba } from '../../utils/theme-color';
 
 /**
  * Reproductor de audio estilo Spotify/Calm: portada (imagen o gradiente) como
@@ -54,7 +55,7 @@ import WaveSurfer from 'wavesurfer.js';
                     class="w-14 h-14 rounded-full gradient-primary flex items-center justify-center
                            text-white shadow-lg hover:scale-105 active:scale-95 transition-transform
                            disabled:opacity-60"
-                    style="box-shadow: 0 4px 14px rgba(107,56,212,0.39)">
+                    style="box-shadow: 0 4px 14px rgb(var(--color-primary) / 0.39)">
               <span class="material-symbols-outlined text-[32px]" style="font-variation-settings:'FILL' 1;">
                 {{ playing() ? 'pause' : 'play_arrow' }}
               </span>
@@ -73,7 +74,7 @@ import WaveSurfer from 'wavesurfer.js';
 export class WaveAudioPlayerComponent implements AfterViewInit, OnDestroy {
   readonly url = input.required<string>();
   readonly coverUrl = input<string | null>(null);
-  readonly coverGradient = input<string>('from-violet-400 to-purple-600');
+  readonly coverGradient = input<string>('from-brand-400 to-brand-800');
 
   private readonly container = viewChild.required<ElementRef<HTMLDivElement>>('waveform');
   private ws?: WaveSurfer;
@@ -89,9 +90,9 @@ export class WaveAudioPlayerComponent implements AfterViewInit, OnDestroy {
       container: this.container().nativeElement,
       url: this.url(),
       height: 64,
-      waveColor: 'rgba(124,77,255,0.25)',
-      progressColor: '#7C4DFF',
-      cursorColor: '#7C4DFF',
+      waveColor: themeRgba('primary', 0.25),
+      progressColor: themeHex('primary'),
+      cursorColor: themeHex('primary'),
       barWidth: 3,
       barGap: 2,
       barRadius: 3,

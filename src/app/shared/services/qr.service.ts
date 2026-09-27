@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import QRCode from 'qrcode';
+import { themeHex } from '../utils/theme-color';
 
 @Injectable({ providedIn: 'root' })
 export class QrService {
@@ -8,7 +9,7 @@ export class QrService {
       width: 1024,
       margin: 2,
       errorCorrectionLevel: 'M',
-      color: { dark: '#1e1b2e', light: '#ffffff' },
+      color: { dark: themeHex('brand-950'), light: '#ffffff' },
     });
   }
 

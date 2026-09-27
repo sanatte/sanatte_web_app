@@ -72,7 +72,7 @@ export class MediaPlayerComponent {
   readonly admin = input<boolean>(false);
   /** Portada del audio (imagen real o gradiente de fallback). */
   readonly coverUrl = input<string | null>(null);
-  readonly coverGradient = input<string>('from-violet-400 to-purple-600');
+  readonly coverGradient = input<string>('from-brand-400 to-brand-800');
 
   readonly state = signal<MediaState>('loading');
   readonly url   = signal<string | null>(null);

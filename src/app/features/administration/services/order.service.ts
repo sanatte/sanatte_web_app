@@ -24,7 +24,7 @@ export function mapApiOrder(raw: any): Order {
     buyerName:           raw.buyerName,
     buyerEmail:          raw.buyerEmail,
     buyerInitials:       raw.buyerInitials,
-    buyerAvatarGradient: 'from-violet-400 to-purple-600',
+    buyerAvatarGradient: 'from-brand-400 to-brand-800',
     products:            (raw.products ?? []).map((p: { id: string; name: string; type: number }) => ({
                            id: p.id, name: p.name, type: TYPE_MAP[p.type] ?? 'digital',
                          })),

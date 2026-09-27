@@ -23,7 +23,7 @@ function mapApiLicense(raw: any): License {
     userId:             raw.userId ?? undefined,
     userName:           raw.userName ?? undefined,
     userInitials:       raw.userInitials ?? undefined,
-    userAvatarGradient: 'from-violet-400 to-purple-600',
+    userAvatarGradient: 'from-brand-400 to-brand-800',
     status:             STATUS_MAP[raw.status] ?? 'available',
     generatedAt:        raw.generatedAt ?? '',
     activatedAt:        raw.activatedAt ?? undefined,

@@ -11,7 +11,7 @@ import { Component, input, output, computed } from '@angular/core';
 
         <!-- Card -->
         <div class="bg-white rounded-lg w-full max-w-md mx-4 shadow-2xl"
-             style="box-shadow: 0px 20px 50px rgba(76,29,149,0.12)"
+             style="box-shadow: 0px 20px 50px rgb(var(--color-shadow) / 0.12)"
              (click)="$event.stopPropagation()">
 
           <!-- Icon + Header -->

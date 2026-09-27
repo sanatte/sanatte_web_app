@@ -25,7 +25,7 @@ function mapApiResource(raw: any): Resource {
     readTime:          raw.readTime ?? undefined,
     content:           raw.content ?? null,
     thumbnailUrl:      raw.thumbnailUrl ?? null,
-    thumbnailGradient: raw.thumbnailGradient ?? 'from-violet-400 to-purple-600',
+    thumbnailGradient: raw.thumbnailGradient ?? 'from-brand-400 to-brand-800',
     createdAt:         raw.createdAt?.split('T')[0] ?? '',
     mediaContentType:  raw.mediaContentType ?? null,
     mediaSizeBytes:    raw.mediaSizeBytes ?? null,

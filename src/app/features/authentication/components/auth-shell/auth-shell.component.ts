@@ -18,7 +18,7 @@ import { RouterLink } from '@angular/router';
       <div class="relative z-10 w-full max-w-md">
         <!-- Tarjeta -->
         <div class="glass-card rounded-lg p-6 md:p-8 transition-all duration-500
-                    hover:shadow-[0px_20px_50px_rgba(76,29,149,0.10)]">
+                    hover:shadow-[0px_20px_50px_rgb(var(--color-shadow) / 0.10)]">
           <!-- Logo dentro de la tarjeta — lleva a inicio -->
           <div class="flex justify-center" style="margin-top:-40px;margin-bottom:-40px;">
             <a routerLink="/" title="Ir a inicio">
