@@ -9,7 +9,7 @@ export class QrService {
       width: 1024,
       margin: 2,
       errorCorrectionLevel: 'M',
-      color: { dark: themeHex('navy-950'), light: '#ffffff' },
+      color: { dark: themeHex('brand-950'), light: '#ffffff' },
     });
   }
 

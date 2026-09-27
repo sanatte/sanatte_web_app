@@ -47,5 +47,5 @@ export class ArticleReaderComponent {
   readonly readTime = input<string | null>(null);
   readonly content = input<string | null>(null);
   readonly coverUrl = input<string | null>(null);
-  readonly coverGradient = input<string>('from-navy-400 to-navy-800');
+  readonly coverGradient = input<string>('from-brand-400 to-brand-800');
 }

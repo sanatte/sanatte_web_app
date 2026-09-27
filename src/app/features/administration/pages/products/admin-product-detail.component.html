@@ -51,7 +51,7 @@
                class="w-full h-full object-cover">
         } @else {
           <div class="w-full h-full bg-gradient-to-br flex items-center justify-center"
-               [class]="displayImage()?.gradient ?? 'from-navy-400 to-navy-800'">
+               [class]="displayImage()?.gradient ?? 'from-brand-400 to-brand-800'">
             <span class="material-symbols-outlined text-white/30 text-[80px]">image</span>
           </div>
         }
@@ -68,7 +68,7 @@
                 <img [src]="img.url" [alt]="img.altText" class="w-full h-full object-cover">
               } @else {
                 <div class="w-full h-full bg-gradient-to-br flex items-center justify-center"
-                     [class]="img.gradient ?? 'from-navy-400 to-navy-800'">
+                     [class]="img.gradient ?? 'from-brand-400 to-brand-800'">
                   <span class="material-symbols-outlined text-white/60 text-[20px]">image</span>
                 </div>
               }

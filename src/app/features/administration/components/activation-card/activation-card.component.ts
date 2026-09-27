@@ -89,7 +89,7 @@ const DEFAULT_TABS: CardTab[] = [
     .card-root {
       width: 560px;
       height: 469px;
-      background: rgb(var(--color-navy-50));
+      background: rgb(var(--color-brand-50));
       border-radius: 0;
       display: flex;
       flex-direction: column;
@@ -111,7 +111,7 @@ const DEFAULT_TABS: CardTab[] = [
     .product-title {
       font-size: 20px;
       font-weight: 800;
-      color: rgb(var(--color-navy-950));
+      color: rgb(var(--color-brand-950));
       margin: 0;
       line-height: 1.2;
       letter-spacing: -0.02em;
@@ -119,7 +119,7 @@ const DEFAULT_TABS: CardTab[] = [
 
     .product-sub {
       font-size: 12px;
-      color: rgb(var(--color-navy-800));
+      color: rgb(var(--color-brand-800));
       margin: 6px 0 0;
       font-weight: 700;
       letter-spacing: 0.05em;
@@ -175,7 +175,7 @@ const DEFAULT_TABS: CardTab[] = [
     .mantra {
       font-size: 13px;
       font-style: italic;
-      color: rgb(var(--color-navy-900));
+      color: rgb(var(--color-brand-900));
       text-align: center;
       margin: 12px 0 0;
       line-height: 1.65;
@@ -214,7 +214,7 @@ const DEFAULT_TABS: CardTab[] = [
     .serial {
       font-size: 11px;
       font-family: 'Courier New', monospace;
-      color: rgb(var(--color-navy-700));
+      color: rgb(var(--color-brand-700));
       letter-spacing: 0.12em;
       margin: 0;
       font-weight: 700;
@@ -222,7 +222,7 @@ const DEFAULT_TABS: CardTab[] = [
 
     /* ── Footer ── */
     .card-footer {
-      background: rgb(var(--color-navy-900));
+      background: rgb(var(--color-brand-900));
       padding: 10px 24px;
       display: flex;
       justify-content: space-around;

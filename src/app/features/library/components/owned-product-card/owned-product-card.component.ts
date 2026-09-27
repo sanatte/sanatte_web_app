@@ -56,6 +56,6 @@ export class OwnedProductCardComponent {
 
   readonly imageUrl = computed(() => getPrimaryImage(this.owned().product)?.url ?? null);
   readonly imageGradient = computed(
-    () => getPrimaryImage(this.owned().product)?.gradient ?? 'from-navy-400 to-navy-800'
+    () => getPrimaryImage(this.owned().product)?.gradient ?? 'from-brand-400 to-brand-800'
   );
 }

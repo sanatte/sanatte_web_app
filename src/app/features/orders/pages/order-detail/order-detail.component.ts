@@ -149,7 +149,7 @@ export class OrderDetailComponent {
 
   gradientFor(productId: string): string {
     const p = this.products.getById(productId);
-    return (p && getPrimaryImage(p)?.gradient) || 'from-navy-400 to-navy-800';
+    return (p && getPrimaryImage(p)?.gradient) || 'from-brand-400 to-brand-800';
   }
 
   back(): void { this.router.navigate(['/app/orders']); }

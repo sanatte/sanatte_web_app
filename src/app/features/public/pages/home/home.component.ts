@@ -203,7 +203,7 @@ export class HomeComponent {
   );
 
   readonly plenaGradient = computed(() =>
-    (this.plena() && getPrimaryImage(this.plena()!)?.gradient) || 'from-navy-400 via-navy-600 to-navy-900'
+    (this.plena() && getPrimaryImage(this.plena()!)?.gradient) || 'from-brand-400 via-brand-600 to-brand-900'
   );
 
   readonly plenaResources = computed<Resource[]>(() => {

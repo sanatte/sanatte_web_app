@@ -69,6 +69,6 @@ export class StoreProductCardComponent {
   readonly add     = output<Product>();
 
   readonly imageUrl  = computed(() => getPrimaryImage(this.product())?.url ?? null);
-  readonly gradient  = computed(() => getPrimaryImage(this.product())?.gradient ?? 'from-navy-400 to-navy-800');
+  readonly gradient  = computed(() => getPrimaryImage(this.product())?.gradient ?? 'from-brand-400 to-brand-800');
   readonly typeLabel = computed(() => TYPE_LABEL[this.product().type] ?? this.product().type);
 }

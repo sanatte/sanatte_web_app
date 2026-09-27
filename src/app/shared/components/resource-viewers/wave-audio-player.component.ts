@@ -74,7 +74,7 @@ import { themeHex, themeRgba } from '../../utils/theme-color';
 export class WaveAudioPlayerComponent implements AfterViewInit, OnDestroy {
   readonly url = input.required<string>();
   readonly coverUrl = input<string | null>(null);
-  readonly coverGradient = input<string>('from-navy-400 to-navy-800');
+  readonly coverGradient = input<string>('from-brand-400 to-brand-800');
 
   private readonly container = viewChild.required<ElementRef<HTMLDivElement>>('waveform');
   private ws?: WaveSurfer;
