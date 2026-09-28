@@ -32,29 +32,19 @@ export class AdminMoodCatalogComponent {
   readonly saveError   = signal<string | null>(null);
 
   // ── Intro de la guía de emociones ──────────────────────────────────────────
+  // El display se deriva REACTIVAMENTE de la sección cargada (no se copia a
+  // signals locales), así se hidrata correctamente cuando el servicio termina
+  // de cargar y tras cada guardado.
   readonly emotionsSection = computed<GuideSection | undefined>(() =>
     this.guideSectionSvc.sections().find(s => s.key === 'emotions')
   );
-  readonly introSaving      = signal(false);
-  readonly introError       = signal<string | null>(null);
-  readonly introUploadProgress = signal<number | null>(null);
-  readonly introLinkedId    = signal<string | null>(null);
-  readonly introLinkedTitle = signal<string | null>(null);
-  readonly introLinkedType  = signal<string | null>(null);
+  readonly introLinkedId    = computed(() => this.emotionsSection()?.introResourceId ?? null);
+  readonly introLinkedTitle = computed(() => this.emotionsSection()?.introResourceTitle ?? null);
+  readonly introLinkedType  = computed(() => this.emotionsSection()?.introResourceContentType ?? null);
 
-  constructor() {
-    // Sincronizar estado del intro con la sección emotions cargada
-    const init = () => {
-      const s = this.emotionsSection();
-      if (s) {
-        this.introLinkedId.set(s.introResourceId ?? null);
-        this.introLinkedTitle.set(s.introResourceTitle ?? null);
-        this.introLinkedType.set(s.introResourceContentType ?? null);
-      }
-    };
-    // Ejecutar cuando el servicio cargue las secciones
-    init();
-  }
+  readonly introSaving         = signal(false);
+  readonly introError          = signal<string | null>(null);
+  readonly introUploadProgress = signal<number | null>(null);
 
   getIntroIcon(): string {
     return (this.introLinkedType() ?? '').startsWith('video') ? 'videocam' : 'headphones';
@@ -65,9 +55,6 @@ export class AdminMoodCatalogComponent {
   }
 
   unlinkIntro(): void {
-    this.introLinkedId.set(null);
-    this.introLinkedTitle.set(null);
-    this.introLinkedType.set(null);
     this.saveIntro(null);
   }
 
@@ -112,11 +99,9 @@ export class AdminMoodCatalogComponent {
         })
       );
 
-      this.introLinkedId.set(created.id);
-      this.introLinkedTitle.set(file.name);
-      this.introLinkedType.set(file.type);
       this.introUploadProgress.set(100);
       await this.saveIntro(created.id);
+      this.introUploadProgress.set(null);
 
     } catch {
       this.introError.set('Error al subir el archivo. Intenta de nuevo.');
@@ -127,9 +112,20 @@ export class AdminMoodCatalogComponent {
   }
 
   private async saveIntro(resourceId: string | null): Promise<void> {
-    const section = this.emotionsSection();
-    if (!section) return;
+    // La sección "emotions" es IsSystem — el backend debe exponerla en el listado
+    // admin. Si aún no cargó, forzamos una recarga antes de rendirnos.
+    let section = this.emotionsSection();
+    if (!section) {
+      await this.guideSectionSvc.loadAll();
+      section = this.emotionsSection();
+    }
+    if (!section) {
+      this.introError.set('No se encontró la sección de emociones. Recarga la página.');
+      return;
+    }
+
     this.introSaving.set(true);
+    this.introError.set(null);
     try {
       await this.guideSectionSvc.update(section.id, {
         key: section.key, title: section.title,
