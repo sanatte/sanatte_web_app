@@ -1,0 +1,152 @@
+@if (isOpen()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-on-background/40 backdrop-blur-sm"
+       (click)="onClose()">
+
+    <div class="bg-surface-bright rounded-2xl shadow-elevation-3 w-full max-w-lg max-h-[90vh] overflow-y-auto"
+         (click)="$event.stopPropagation()">
+
+      <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-outline-variant/20">
+        <h2 class="font-heading text-headline-md font-bold text-on-surface">{{ title() }}</h2>
+        <button (click)="onClose()"
+                class="p-2 rounded-lg hover:bg-surface-container transition-colors"
+                [disabled]="isSaving()">
+          <span class="material-symbols-outlined text-on-surface-variant">close</span>
+        </button>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-6 space-y-5">
+
+        @if (errorMessage()) {
+          <div class="rounded-xl bg-error-container p-3 flex items-start gap-2">
+            <span class="material-symbols-outlined text-error text-[18px] mt-0.5">error_outline</span>
+            <p class="text-label-sm text-on-error-container">{{ errorMessage() }}</p>
+          </div>
+        }
+
+        <!-- Key -->
+        <div>
+          <label class="block text-label-sm font-heading font-semibold text-on-surface-variant mb-1">
+            {{ t.key }} <span class="text-error">*</span>
+          </label>
+          <input formControlName="key" type="text" maxlength="80" [placeholder]="t.keyPlaceholder"
+                 class="w-full px-3 py-2.5 rounded-xl border border-outline-variant/30 bg-surface
+                        text-body-md text-on-surface placeholder:text-on-surface-variant/40 font-mono
+                        focus:outline-none focus:ring-2 focus:ring-primary/40 transition
+                        disabled:opacity-50 disabled:cursor-not-allowed" />
+          <p class="text-label-sm text-on-surface-variant mt-1">{{ t.keyHint }}</p>
+        </div>
+
+        <!-- Title -->
+        <div>
+          <label class="block text-label-sm font-heading font-semibold text-on-surface-variant mb-1">
+            {{ t.title }} <span class="text-error">*</span>
+          </label>
+          <input formControlName="title" type="text" maxlength="120" [placeholder]="t.titlePlaceholder"
+                 class="w-full px-3 py-2.5 rounded-xl border border-outline-variant/30 bg-surface
+                        text-body-md text-on-surface placeholder:text-on-surface-variant/40
+                        focus:outline-none focus:ring-2 focus:ring-primary/40 transition" />
+        </div>
+
+        <!-- Sort Order -->
+        <div class="w-40">
+          <label class="block text-label-sm font-heading font-semibold text-on-surface-variant mb-1">
+            {{ t.sortOrder }}
+          </label>
+          <input formControlName="sortOrder" type="number" min="0"
+                 class="w-full px-3 py-2.5 rounded-xl border border-outline-variant/30 bg-surface
+                        text-body-md text-on-surface
+                        focus:outline-none focus:ring-2 focus:ring-primary/40 transition" />
+        </div>
+
+        <!-- isActive (edit only) -->
+        @if (isEditMode()) {
+          <div class="flex items-center gap-3">
+            <input formControlName="isActive" type="checkbox" id="isActiveSec"
+                   class="w-5 h-5 rounded border-outline-variant accent-primary cursor-pointer" />
+            <label for="isActiveSec" class="text-label-md font-heading text-on-surface cursor-pointer">
+              {{ t.isActive }}
+            </label>
+          </div>
+        }
+
+        <!-- Intro resource -->
+        <div class="border border-outline-variant/30 rounded-xl p-4 space-y-3">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="material-symbols-outlined text-primary text-[20px]">play_circle</span>
+            <h3 class="font-heading text-label-md font-semibold text-on-surface">{{ t.resourceTitle }}</h3>
+            <span class="text-label-sm text-on-surface-variant">{{ t.resourceOptional }}</span>
+          </div>
+          <p class="text-label-md text-on-surface-variant">{{ t.resourceDescription }}</p>
+
+          @if (linkedResourceId()) {
+            <div class="flex items-center gap-3 p-3 bg-secondary-container/30 rounded-xl">
+              <span class="material-symbols-outlined text-primary text-[24px]">{{ getResourceIcon() }}</span>
+              <div class="flex-1 min-w-0">
+                <p class="text-label-sm font-semibold text-on-surface truncate">{{ linkedResourceTitle() }}</p>
+                <p class="text-label-sm text-on-surface-variant">{{ getResourceTypeLabel() }}</p>
+              </div>
+              <button type="button" (click)="unlinkResource()"
+                      class="p-1.5 rounded-lg hover:bg-error-container transition-colors" [title]="t.unlink">
+                <span class="material-symbols-outlined text-error text-[18px]">link_off</span>
+              </button>
+            </div>
+          } @else {
+            <label class="flex flex-col items-center justify-center gap-2 p-6 rounded-xl border-2 border-dashed
+                          border-outline-variant/40 cursor-pointer hover:border-primary/40 hover:bg-primary/5
+                          transition-all group">
+              <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary text-[32px] transition-colors">
+                upload_file
+              </span>
+              <p class="text-label-sm font-heading text-on-surface-variant group-hover:text-primary transition-colors">
+                {{ t.selectMedia }}
+              </p>
+              <p class="text-label-sm text-on-surface-variant">{{ t.mediaFormats }}</p>
+              <input type="file" accept="video/mp4,video/webm,audio/mpeg,audio/mp4,audio/aac,audio/wav"
+                     class="hidden" (change)="onMediaSelected($event)" />
+            </label>
+          }
+
+          @if (uploadProgress() !== null && uploadProgress()! < 100) {
+            <div>
+              <div class="flex justify-between text-label-sm text-on-surface-variant mb-1">
+                <span>{{ t.uploading }}</span>
+                <span>{{ uploadProgress() }}%</span>
+              </div>
+              <div class="h-1.5 bg-surface-container rounded-full overflow-hidden">
+                <div class="h-full bg-primary transition-all duration-300 rounded-full"
+                     [style.width.%]="uploadProgress()"></div>
+              </div>
+            </div>
+          }
+
+          @if (uploadError()) {
+            <p class="text-label-sm text-error flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">error_outline</span>
+              {{ uploadError() }}
+            </p>
+          }
+        </div>
+
+        <div class="flex justify-end gap-3 pt-2">
+          <button type="button" (click)="onClose()"
+                  [disabled]="isSaving()"
+                  class="px-5 py-2.5 rounded-full border border-outline-variant/40 text-label-md font-heading
+                         text-on-surface hover:bg-surface-container transition-colors disabled:opacity-50">
+            {{ c.actions.cancel }}
+          </button>
+          <button type="submit"
+                  [disabled]="form.invalid || isSaving() || uploadProgress() !== null && uploadProgress()! < 100"
+                  class="px-6 py-2.5 rounded-full gradient-primary text-white text-label-md font-heading font-bold
+                         hover:opacity-90 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed
+                         flex items-center gap-2">
+            @if (isSaving()) {
+              <span class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span>
+            }
+            {{ isEditMode() ? t.saveChanges : t.create }}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+}

@@ -53,7 +53,8 @@ export class AdminLayoutComponent {
     { label: this.t.nav.licenses,     route: '/admin/licenses',      icon: 'key' },
     { label: this.t.nav.locations,    route: '/admin/locations',     icon: 'store' },
     { label: this.t.nav.activations,  route: '/admin/activations',   icon: 'verified' },
-    { label: this.t.nav.moodCatalog,  route: '/admin/mood-catalog',  icon: 'sentiment_satisfied' },
+    { label: this.t.nav.guideSections, route: '/admin/guide-sections', icon: 'auto_stories' },
+    { label: this.t.nav.moodCatalog,  route: '/admin/mood-catalog',   icon: 'sentiment_satisfied' },
     { label: this.t.nav.moodTracking, route: '/admin/mood-tracking', icon: 'monitoring' },
     { label: this.t.nav.reports,      route: '/admin/reports',       icon: 'bar_chart' },
   ];
