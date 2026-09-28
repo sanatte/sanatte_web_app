@@ -74,6 +74,12 @@ export const administrationRoutes: Routes = [
       import('./pages/settings/admin-settings.component').then((m) => m.AdminSettingsComponent),
   },
   {
+    path: 'guide-sections',
+    data: { title: 'Secciones Guía' },
+    loadComponent: () =>
+      import('./pages/guide-sections/admin-guide-sections.component').then((m) => m.AdminGuideSectionsComponent),
+  },
+  {
     path: 'mood-catalog',
     data: { title: 'Catálogo de Emociones' },
     loadComponent: () =>
