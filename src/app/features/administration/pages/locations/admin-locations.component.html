@@ -1,288 +1,68 @@
-<div class="space-y-8">
+<section class="px-4 md:px-8 lg:px-container-padding-desktop py-6 max-w-[1400px] mx-auto space-y-8">
 
-  <!-- Encabezado -->
-  <div class="flex items-center justify-between">
-    <div>
-      <h1 class="text-headline-sm font-heading font-bold text-on-surface">Ubicaciones e inventario</h1>
-      <p class="text-label-md font-heading text-on-surface-variant mt-1">
-        Canales de venta y dónde está cada unidad física (derivado de las licencias).
-      </p>
-    </div>
-    <button (click)="openCreate()"
-            class="px-6 py-3 gradient-primary text-white rounded-full text-label-md font-heading font-bold
-                   hover:opacity-90 active:scale-95 transition-all">
-      + Nueva ubicación
-    </button>
+  <app-admin-page-header
+    [title]="t.title"
+    [description]="t.description"
+    [actionLabel]="t.newLocation"
+    actionIcon="add_business"
+    (action)="openCreate()" />
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6">
+    @for (metric of kpis(); track metric.id) {
+      <app-kpi-card [metric]="metric" />
+    }
   </div>
 
-  <!-- Inventario por ubicación -->
-  <section class="space-y-4">
-    <h2 class="text-title-md font-heading font-bold text-on-surface">Inventario</h2>
+  <div class="space-y-4">
+    <h4 class="font-heading text-headline-md text-on-surface">{{ t.inventory.title }}</h4>
 
     @if (inventoryByLocation().length === 0) {
-      <div class="bg-surface-container-low rounded-2xl p-8 text-center text-on-surface-variant font-heading text-label-md">
-        Aún no hay unidades. Genera licencias en <strong>Licencias</strong> y asígnalas a una ubicación.
+      <div class="glass-card p-10 rounded-lg flex flex-col items-center gap-3 text-center">
+        <span class="material-symbols-outlined text-[40px] text-outline">inventory_2</span>
+        <p class="text-label-md font-heading text-on-surface-variant">{{ t.inventory.empty }}</p>
       </div>
     } @else {
-      <div class="grid gap-4">
-        @for (group of inventoryByLocation(); track group.name) {
-          <div class="bg-surface-container-low rounded-2xl p-5">
-            <h3 class="text-label-lg font-heading font-bold text-on-surface mb-3">{{ group.name }}</h3>
-            <div class="overflow-x-auto">
-              <table class="w-full text-label-md font-heading">
-                <thead>
-                  <tr class="text-on-surface-variant text-left border-b border-outline-variant/30">
-                    <th class="py-2 pr-4 font-semibold">Producto</th>
-                    <th class="py-2 px-3 font-semibold text-center">Disponible</th>
-                    <th class="py-2 px-3 font-semibold text-center">Asignada</th>
-                    <th class="py-2 px-3 font-semibold text-center">Vendida</th>
-                    <th class="py-2 px-3 font-semibold text-center">Activada</th>
-                    <th class="py-2 pl-3 font-semibold text-center">Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (row of group.rows; track row.productId) {
-                    <tr class="border-b border-outline-variant/10">
-                      <td class="py-2 pr-4 text-on-surface">{{ row.productName }}</td>
-                      <td class="py-2 px-3 text-center">{{ row.available }}</td>
-                      <td class="py-2 px-3 text-center">{{ row.assigned }}</td>
-                      <td class="py-2 px-3 text-center">{{ row.sold }}</td>
-                      <td class="py-2 px-3 text-center">{{ row.active }}</td>
-                      <td class="py-2 pl-3 text-center font-bold text-on-surface">{{ row.total }}</td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
-          </div>
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        @for (group of inventoryByLocation(); track group.key) {
+          <app-location-inventory-table [name]="group.name" [rows]="group.rows" [isWarehouse]="group.isWarehouse" />
         }
       </div>
     }
-  </section>
+  </div>
 
-  <!-- Ubicaciones -->
-  <section class="space-y-4">
-    <h2 class="text-title-md font-heading font-bold text-on-surface">Canales / puntos</h2>
+  <div class="space-y-4">
+    <h4 class="font-heading text-headline-md text-on-surface">{{ t.channels.title }}</h4>
 
     @if (locations().length === 0) {
-      <div class="bg-surface-container-low rounded-2xl p-8 text-center text-on-surface-variant font-heading text-label-md">
-        No hay ubicaciones. Crea una para empezar a distribuir el inventario.
+      <div class="glass-card p-10 rounded-lg flex flex-col items-center gap-3 text-center">
+        <span class="material-symbols-outlined text-[40px] text-outline">storefront</span>
+        <p class="text-label-md font-heading text-on-surface-variant">{{ t.channels.empty }}</p>
       </div>
     } @else {
-      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
         @for (loc of locations(); track loc.id) {
-          <div class="bg-surface-container-low rounded-2xl p-5 space-y-3">
-            <div class="flex items-start justify-between">
-              <div>
-                <h3 class="text-label-lg font-heading font-bold text-on-surface">{{ loc.name }}</h3>
-                <p class="text-label-sm font-heading text-on-surface-variant">
-                  {{ typeLabel(loc.type) }} · {{ modelLabel(loc.salesModel) }}
-                </p>
-              </div>
-              @if (loc.type === 'physical_point' && loc.salesModel === 'consignment') {
-                <span class="text-label-sm font-heading font-semibold text-primary">
-                  {{ loc.commissionPercent }}% comisión
-                </span>
-              }
-            </div>
-            @if (loc.contactName || loc.contactPhone) {
-              <p class="text-label-sm font-heading text-on-surface-variant">
-                {{ loc.contactName }}@if (loc.contactPhone) {<span> · {{ loc.contactPhone }}</span>}
-              </p>
-            }
-            <div class="flex gap-2">
-              <button (click)="openAllocate(loc)"
-                      class="flex-1 py-2.5 rounded-full text-label-md font-heading font-bold
-                             bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
-                Asignar
-              </button>
-              <button (click)="openReturn(loc)"
-                      class="flex-1 py-2.5 rounded-full text-label-md font-heading font-bold
-                             bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-colors">
-                Devolver
-              </button>
-            </div>
-          </div>
+          <app-location-card
+            [location]="loc"
+            (assign)="openAllocate(loc, 'assign')"
+            (returnStock)="openAllocate(loc, 'return')" />
         }
       </div>
     }
-  </section>
-</div>
-
-<!-- Modal: crear ubicación -->
-@if (showCreate()) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" (click)="closeCreate()">
-    <div class="bg-white rounded-3xl w-full max-w-lg p-8 space-y-6" (click)="$event.stopPropagation()">
-      <h2 class="text-title-lg font-heading font-bold text-on-surface">Nueva ubicación</h2>
-
-      <form [formGroup]="createForm" (ngSubmit)="submitCreate()" class="space-y-4">
-        <div class="space-y-2">
-          <label class="text-label-md font-heading font-semibold text-on-surface">Nombre <span class="text-error">*</span></label>
-          <input formControlName="name" placeholder="Ej: Gym Pilates Norte"
-                 class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 outline-none
-                        focus:ring-2 focus:ring-primary/50 text-label-md font-heading"/>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
-          <div class="space-y-2">
-            <label class="text-label-md font-heading font-semibold text-on-surface">Tipo</label>
-            <select formControlName="type"
-                    class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 outline-none
-                           focus:ring-2 focus:ring-primary/50 text-label-md font-heading cursor-pointer">
-              <option value="physical_point">Punto físico</option>
-              <option value="ecommerce">Ecommerce</option>
-            </select>
-          </div>
-          <div class="space-y-2">
-            <label class="text-label-md font-heading font-semibold text-on-surface">Modelo</label>
-            <select formControlName="salesModel"
-                    class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 outline-none
-                           focus:ring-2 focus:ring-primary/50 text-label-md font-heading cursor-pointer">
-              <option value="consignment">Consignación</option>
-              <option value="wholesale">Venta en firme</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="space-y-2">
-          <label class="text-label-md font-heading font-semibold text-on-surface">Comisión (%)</label>
-          <input formControlName="commissionPercent" type="number" min="0" max="100"
-                 [attr.disabled]="(createForm.get('type')?.value !== 'physical_point' || createForm.get('salesModel')?.value !== 'consignment') ? true : null"
-                 class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 outline-none
-                        focus:ring-2 focus:ring-primary/50 text-label-md font-heading
-                        disabled:opacity-40 disabled:cursor-not-allowed"/>
-          <p class="text-label-sm font-heading text-on-surface-variant">
-            Solo aplica en consignación: porcentaje que retiene el punto al liquidar.
-          </p>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
-          <div class="space-y-2">
-            <label class="text-label-md font-heading font-semibold text-on-surface">Contacto</label>
-            <input formControlName="contactName" placeholder="Responsable"
-                   class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 outline-none
-                          focus:ring-2 focus:ring-primary/50 text-label-md font-heading"/>
-          </div>
-          <div class="space-y-2">
-            <label class="text-label-md font-heading font-semibold text-on-surface">Teléfono</label>
-            <input formControlName="contactPhone" placeholder="Opcional"
-                   class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 outline-none
-                          focus:ring-2 focus:ring-primary/50 text-label-md font-heading"/>
-          </div>
-        </div>
-
-        <div class="flex justify-end gap-3 pt-2">
-          <button type="button" (click)="closeCreate()"
-                  class="px-6 py-3 rounded-full text-label-md font-heading font-bold text-on-surface-variant
-                         hover:bg-surface-container-low transition-colors">Cancelar</button>
-          <button type="submit"
-                  class="px-8 py-3 gradient-primary text-white rounded-full text-label-md font-heading font-bold
-                         hover:opacity-90 active:scale-95 transition-all">Crear</button>
-        </div>
-      </form>
-    </div>
   </div>
-}
+</section>
 
-<!-- Modal: asignar / devolver unidades -->
-@if (allocateTarget(); as target) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" (click)="closeAllocate()">
-    <div class="bg-white rounded-3xl w-full max-w-md p-8 space-y-6" (click)="$event.stopPropagation()">
-      <div>
-        <h2 class="text-title-lg font-heading font-bold text-on-surface">
-          {{ allocateMode() === 'return' ? 'Devolver a bodega' : 'Asignar unidades' }}
-        </h2>
-        <p class="text-label-md font-heading text-on-surface-variant mt-1">
-          {{ allocateMode() === 'return' ? 'desde' : 'a' }} <strong>{{ target.name }}</strong>
-        </p>
-      </div>
+<app-location-form-dialog
+  [isOpen]="isCreateOpen()"
+  (save)="onCreate($event)"
+  (cancel)="closeCreate()" />
 
-      <form [formGroup]="allocateForm" (ngSubmit)="submitAllocate()" class="space-y-4">
-        <div class="space-y-2">
-          <label class="text-label-md font-heading font-semibold text-on-surface">Producto <span class="text-error">*</span></label>
-          <select formControlName="productId"
-                  (change)="onProductChange(allocateForm.get('productId')?.value ?? '')"
-                  class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 outline-none
-                         focus:ring-2 focus:ring-primary/50 text-label-md font-heading cursor-pointer">
-            <option value="" disabled>Selecciona un producto</option>
-            @for (p of products(); track p.id) {
-              @if (p.status === 'active') {
-                <option [value]="p.id">{{ p.name }}</option>
-              }
-            }
-          </select>
-
-          <!-- Stock disponible según modo (aparece al seleccionar producto) -->
-          @if (selectedProductId()) {
-            @if (allocateMode() === 'return') {
-              <p class="text-label-sm font-heading"
-                 [class]="maxReturnable() === 0 ? 'text-error' : 'text-on-surface-variant'">
-                @if (maxReturnable() === 0) {
-                  Este punto no tiene unidades asignadas de este producto.
-                } @else {
-                  Asignadas en este punto: <strong>{{ maxReturnable() }}</strong> unidad(es).
-                }
-              </p>
-            } @else {
-              <p class="text-label-sm font-heading"
-                 [class]="maxAssignable() === 0 ? 'text-error' : 'text-on-surface-variant'">
-                @if (maxAssignable() === 0) {
-                  Sin unidades disponibles en bodega. Genera o libera un lote primero.
-                } @else {
-                  Disponibles en bodega: <strong>{{ maxAssignable() }}</strong> unidad(es).
-                }
-              </p>
-            }
-          }
-        </div>
-
-        <div class="space-y-2">
-          <label class="text-label-md font-heading font-semibold text-on-surface">Cantidad</label>
-          <input formControlName="quantity" type="text" inputmode="numeric" appThousandsSeparator
-                 class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 outline-none
-                        focus:ring-2 focus:ring-primary/50 text-label-md font-heading"
-                 [class.ring-2]="quantityExceedsStock()"
-                 [class.ring-error]="quantityExceedsStock()"/>
-
-          @if (quantityExceedsStock()) {
-            <p class="text-label-sm font-heading text-error">
-              @if (allocateMode() === 'return') {
-                La cantidad supera las {{ maxReturnable() }} unidades asignadas en este punto.
-              } @else {
-                La cantidad supera las {{ maxAssignable() }} unidades disponibles en bodega.
-              }
-            </p>
-          } @else {
-            <p class="text-label-sm font-heading text-on-surface-variant">
-              @if (allocateMode() === 'return') {
-                Mueve unidades <strong>asignadas</strong> en este punto de vuelta a la bodega.
-              } @else {
-                Toma unidades <strong>disponibles</strong> en bodega y las mueve a este punto.
-              }
-            </p>
-          }
-        </div>
-
-        @if (allocateMessage()) {
-          <div class="bg-surface-container rounded-lg p-3 text-label-sm font-heading text-on-surface">
-            {{ allocateMessage() }}
-          </div>
-        }
-
-        <div class="flex justify-end gap-3 pt-2">
-          <button type="button" (click)="closeAllocate()"
-                  class="px-6 py-3 rounded-full text-label-md font-heading font-bold text-on-surface-variant
-                         hover:bg-surface-container-low transition-colors">Cerrar</button>
-          <button type="submit"
-                  [disabled]="allocating() || quantityExceedsStock()
-                            || (allocateMode() === 'return' && !!selectedProductId() && maxReturnable() === 0)
-                            || (allocateMode() === 'assign' && !!selectedProductId() && maxAssignable() === 0)"
-                  class="px-8 py-3 gradient-primary text-white rounded-full text-label-md font-heading font-bold
-                         hover:opacity-90 active:scale-95 transition-all disabled:opacity-50">
-            {{ allocating() ? 'Procesando…' : (allocateMode() === 'return' ? 'Devolver' : 'Asignar') }}
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-}
+<app-allocate-stock-dialog
+  [location]="allocateTarget()"
+  [mode]="allocateMode()"
+  [inventory]="inventory()"
+  [products]="products()"
+  [busy]="allocating()"
+  [message]="allocateMessage()"
+  (submitted)="onAllocate($event)"
+  (productChange)="clearAllocateMessage()"
+  (cancel)="closeAllocate()" />

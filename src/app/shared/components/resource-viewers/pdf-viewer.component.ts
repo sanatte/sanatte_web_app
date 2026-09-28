@@ -1,11 +1,7 @@
 import { Component, computed, inject, input, viewChild, ElementRef } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
+import { TEXTS } from '../../../core/i18n/texts';
 
-/**
- * Visor de PDF usando <iframe> nativo.
- * pdf.js requería XHR cross-origin a R2 (CORS), mientras que el iframe hace
- * una petición de navegación que el browser resuelve sin restricción CORS.
- */
 @Component({
   selector: 'app-pdf-viewer',
   template: `
@@ -14,10 +10,10 @@ import { DomSanitizer } from '@angular/platform-browser';
               [src]="safeUrl()"
               class="w-full"
               style="height: 75vh; border: none; display: block;"
-              title="Vista previa del documento">
+              [title]="t.frameTitle">
       </iframe>
       <button (click)="openFullscreen()"
-              title="Pantalla completa"
+              [title]="t.fullscreen"
               class="absolute top-3 right-3 p-2 rounded-lg bg-black/50 text-white
                      opacity-0 group-hover:opacity-100 transition-opacity
                      hover:bg-black/70">
@@ -28,6 +24,8 @@ import { DomSanitizer } from '@angular/platform-browser';
 })
 export class PdfViewerComponent {
   private readonly sanitizer = inject(DomSanitizer);
+
+  protected readonly t = TEXTS.shared.resourceViewers.pdf;
   private readonly frame = viewChild.required<ElementRef<HTMLIFrameElement>>('frame');
 
   readonly url = input.required<string>();

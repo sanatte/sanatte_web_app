@@ -8,17 +8,9 @@ import { ProductService } from '../../../administration/services/product.service
 import { CartService } from '../../services/cart.service';
 import { StoreContextService } from '../../services/store-context.service';
 import { Product, ProductImage } from '../../../administration/models/product.model';
-
-interface Review { author: string; initials: string; rating: number; text: string; }
+import { TEXTS } from '../../../../core/i18n/texts';
 
 const HIGHLIGHT_ICONS = ['auto_awesome', 'qr_code_scanner', 'spa', 'workspace_premium'];
-
-// Reviews mock (aún no en el modelo de datos).
-const MOCK_REVIEWS: Review[] = [
-  { author: 'Fiona M.',  initials: 'FM', rating: 5, text: 'La calidad del papel es increíble y el ritual de 90 días cambió mi mañana. La sincronización con la app es magia.' },
-  { author: 'Julien L.', initials: 'JL', rating: 5, text: 'Integrar el QR con contenido de meditación se siente como el futuro del journaling.' },
-  { author: 'Sarah A.',  initials: 'SA', rating: 4, text: 'Lo compré como regalo para mi hermana y el empaque fue impecable. La atención al detalle se nota.' },
-];
 
 @Component({
   selector: 'app-product-detail',
@@ -32,6 +24,8 @@ export class ProductDetailComponent {
   private readonly cart     = inject(CartService);
   readonly ctx              = inject(StoreContextService);
 
+  protected readonly t = TEXTS.public.productDetail;
+
   private readonly id = toSignal(this.route.paramMap.pipe(map((p) => p.get('id'))), { initialValue: null });
 
   readonly loading = signal(true);
@@ -42,9 +36,6 @@ export class ProductDetailComponent {
   });
 
   constructor() {
-    // Garantiza cargar el producto desde la API si no está en caché (F5 directo /
-    // link compartido) y reacciona a cambios de id. fetchById lo upserta en el
-    // signal → el computed 'product' lo encuentra.
     this.route.paramMap.pipe(takeUntilDestroyed()).subscribe(async (pm) => {
       const id = pm.get('id');
       if (!id) { this.loading.set(false); return; }
@@ -61,12 +52,11 @@ export class ProductDetailComponent {
     return this.selectedImage() ?? p.images.find((i) => i.isPrimary) ?? p.images[0] ?? null;
   });
 
-  readonly reviews = MOCK_REVIEWS;
+  readonly reviews = this.t.reviews.mock;
   readonly avgRating = computed(() =>
     this.reviews.reduce((s, r) => s + r.rating, 0) / this.reviews.length
   );
 
-  /** Highlights derivados de las primeras specs del producto. */
   readonly highlights = computed(() =>
     (this.product()?.specs ?? []).slice(0, 3).map((s, i) => ({
       icon: HIGHLIGHT_ICONS[i % HIGHLIGHT_ICONS.length],

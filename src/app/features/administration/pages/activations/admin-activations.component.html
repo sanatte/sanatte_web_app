@@ -1,20 +1,18 @@
 <section class="px-4 md:px-8 lg:px-container-padding-desktop py-6 max-w-[1400px] mx-auto space-y-6">
 
-  <!-- Header + KPIs -->
   <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
     <div>
       <nav class="flex items-center gap-1 text-label-sm font-heading text-outline
                   font-bold uppercase tracking-wider mb-2">
-        <span>Admin</span>
+        <span>{{ t.breadcrumbSection }}</span>
         <span class="material-symbols-outlined text-[14px]">chevron_right</span>
-        <span class="text-primary">Activaciones</span>
+        <span class="text-primary">{{ t.breadcrumbCurrent }}</span>
       </nav>
       <app-admin-page-header
-        title="Gestión de Activaciones"
-        description="Control de licencias físicas y vinculación de códigos QR." />
+        [title]="t.title"
+        [description]="t.description" />
     </div>
 
-    <!-- KPI chips -->
     <div class="flex flex-wrap gap-3 shrink-0">
       <div class="glass-card px-5 py-4 rounded-lg flex items-center gap-4 min-w-[160px]">
         <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
@@ -22,7 +20,7 @@
         </div>
         <div>
           <p class="text-label-sm font-heading text-on-surface-variant uppercase tracking-wide">
-            Total activas
+            {{ t.kpis.total }}
           </p>
           <p class="font-heading font-bold text-on-surface text-headline-md">
             {{ stats().total | number }}
@@ -35,7 +33,7 @@
         </div>
         <div>
           <p class="text-label-sm font-heading text-on-surface-variant uppercase tracking-wide">
-            Pendientes
+            {{ t.kpis.pending }}
           </p>
           <p class="font-heading font-bold text-on-surface text-headline-md">
             {{ stats().pending | number }}
@@ -45,11 +43,10 @@
     </div>
   </div>
 
-  <!-- Filter bar -->
   <div class="glass-card rounded-lg p-4 flex flex-wrap items-center gap-3">
     <div class="flex-1 min-w-[220px]">
       <app-search-input
-        placeholder="Buscar por código, producto o email..."
+        [placeholder]="t.searchPlaceholder"
         (search)="onSearch($event)" />
     </div>
     <select (change)="onStatusChange($event)"
@@ -64,18 +61,17 @@
                 border-outline-variant rounded-full cursor-pointer hover:border-primary/40
                 transition-colors">
       <span class="material-symbols-outlined text-outline text-[18px]">calendar_today</span>
-      <span class="text-label-md font-heading text-on-surface-variant">Últimos 30 días</span>
+      <span class="text-label-md font-heading text-on-surface-variant">{{ t.last30Days }}</span>
     </div>
     <button class="ml-auto flex items-center gap-2 px-5 py-2.5 gradient-primary text-white
                    rounded-full text-label-md font-heading font-semibold hover:opacity-90
                    active:scale-95 transition-all"
             style="box-shadow: 0 4px 14px rgb(var(--color-primary) / 0.25)">
       <span class="material-symbols-outlined text-[18px]">download</span>
-      <span class="hidden sm:inline">Exportar CSV</span>
+      <span class="hidden sm:inline">{{ t.exportCsv }}</span>
     </button>
   </div>
 
-  <!-- Table -->
   <app-activation-table
     [activations]="paginated()"
     [totalItems]="filtered().length"
@@ -85,15 +81,13 @@
     (revoke)="onRevoke($event)"
     (pageChange)="onPageChange($event)" />
 
-
 </section>
 
-<!-- Confirm Revoke -->
 <app-confirm-dialog
   [open]="isConfirmOpen()"
-  title="Revocar activación"
-  [message]="'¿Revocar la activación de ' + (activationToRevoke()?.licenseCode ?? '') + '? El usuario perderá acceso a los recursos desbloqueados.'"
-  confirmText="Sí, revocar"
+  [title]="t.revokeTitle"
+  [message]="t.revokeMessage(activationToRevoke()?.licenseCode ?? '')"
+  [confirmText]="t.revokeConfirm"
   variant="danger"
   (confirm)="confirmRevoke()"
   (cancel)="cancelRevoke()" />

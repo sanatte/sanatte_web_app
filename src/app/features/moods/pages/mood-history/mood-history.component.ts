@@ -5,6 +5,9 @@ import { Chart, registerables } from 'chart.js';
 import { UserMoodsService } from '../../services/user-moods.service';
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
 import { themeHex, themeRgba } from '../../../../shared/utils/theme-color';
+import { TEXTS } from '../../../../core/i18n/texts';
+
+const T = TEXTS.app.moods.history;
 
 Chart.register(...registerables);
 
@@ -27,16 +30,12 @@ interface WeekDay {
 }
 
 const PERIODS: PeriodOption[] = [
-  { key: 'week',    label: 'Semana',  days: 7 },
-  { key: 'month',   label: 'Mes',     days: 30 },
-  { key: 'quarter', label: '3 meses', days: 90 },
+  { key: 'week',    label: T.periods.week,    days: 7 },
+  { key: 'month',   label: T.periods.month,   days: 30 },
+  { key: 'quarter', label: T.periods.quarter, days: 90 },
 ];
 
-const PERIOD_SUBTITLES: Record<PeriodKey, string> = {
-  week:    'Así te has sentido durante los últimos 7 días.',
-  month:   'Así te has sentido durante los últimos 30 días.',
-  quarter: 'Así te has sentido durante los últimos 3 meses.',
-};
+const PERIOD_SUBTITLES: Record<PeriodKey, string> = T.subtitles;
 
 const WEEKDAY_FORMAT = new Intl.DateTimeFormat('es', { weekday: 'short' });
 const LONG_DATE_FORMAT = new Intl.DateTimeFormat('es', {
@@ -75,6 +74,8 @@ function hexToRgba(color: string | null | undefined, alpha: number): string | nu
 })
 export class MoodHistoryComponent {
   private readonly moods = inject(UserMoodsService);
+
+  protected readonly t = T;
 
   readonly entries        = this.moods.entries;
   readonly total          = this.moods.total;
@@ -234,7 +235,7 @@ export class MoodHistoryComponent {
           legend: { display: false },
           tooltip: {
             callbacks: {
-              label: (ctx) => `${ctx.parsed.y} ${ctx.parsed.y === 1 ? 'registro' : 'registros'}`,
+              label: (ctx) => T.summary.chartTooltip(ctx.parsed.y),
             },
           },
         },

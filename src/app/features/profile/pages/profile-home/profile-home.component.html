@@ -1,12 +1,10 @@
 <div class="max-w-4xl mx-auto space-y-section-gap">
 
-  <!-- Encabezado de perfil -->
   <header class="flex items-center gap-5">
-    <!-- Avatar con botón de upload -->
-    <label class="relative w-20 h-20 flex-shrink-0 cursor-pointer group" title="Cambiar foto de perfil">
+    <label class="relative w-20 h-20 flex-shrink-0 cursor-pointer group" [title]="t.header.changeAvatar">
       @if (profileService.profile().avatarUrl) {
         <img [src]="profileService.profile().avatarUrl!"
-             alt="Avatar"
+             [alt]="t.header.avatarAlt"
              class="w-20 h-20 rounded-full object-cover">
       } @else {
         <div class="w-20 h-20 rounded-full gradient-primary flex items-center justify-center
@@ -14,7 +12,6 @@
           {{ initial() }}
         </div>
       }
-      <!-- Overlay hover -->
       <div class="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center
                   opacity-0 group-hover:opacity-100 transition-opacity">
         @if (uploadingAvatar()) {
@@ -36,36 +33,35 @@
     </div>
   </header>
 
-  <!-- Datos personales -->
   <section class="glass-card rounded-lg p-6 md:p-8">
     <div class="flex items-center gap-2 mb-6">
       <span class="material-symbols-outlined text-primary">badge</span>
-      <h2 class="font-heading text-headline-md text-on-surface">Datos personales</h2>
+      <h2 class="font-heading text-headline-md text-on-surface">{{ t.personal.title }}</h2>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
       <div>
-        <label class="text-label-md font-heading font-semibold text-on-surface block mb-1.5">Nombre completo</label>
+        <label class="text-label-md font-heading font-semibold text-on-surface block mb-1.5">{{ t.personal.fullName }}</label>
         <input type="text" [value]="form().fullName" (input)="update('fullName', $any($event.target).value)"
                class="w-full px-4 py-3 bg-surface-container-low border border-transparent focus:border-primary
                       focus:ring-0 rounded-xl outline-none text-body-md transition-colors" />
       </div>
       <div>
-        <label class="text-label-md font-heading font-semibold text-on-surface block mb-1.5">Correo electrónico</label>
+        <label class="text-label-md font-heading font-semibold text-on-surface block mb-1.5">{{ t.personal.email }}</label>
         <input type="email" [value]="form().email" readonly
                class="w-full px-4 py-3 bg-surface-container border border-transparent rounded-xl outline-none
                       text-body-md text-on-surface-variant cursor-not-allowed" />
       </div>
       <div>
-        <label class="text-label-md font-heading font-semibold text-on-surface block mb-1.5">Fecha de nacimiento</label>
+        <label class="text-label-md font-heading font-semibold text-on-surface block mb-1.5">{{ t.personal.dateOfBirth }}</label>
         <input type="date" [value]="form().dateOfBirth" (input)="update('dateOfBirth', $any($event.target).value)"
                class="w-full px-4 py-3 bg-surface-container-low border border-transparent focus:border-primary
                       focus:ring-0 rounded-xl outline-none text-body-md transition-colors" />
       </div>
       <div>
-        <label class="text-label-md font-heading font-semibold text-on-surface block mb-1.5">Ubicación</label>
+        <label class="text-label-md font-heading font-semibold text-on-surface block mb-1.5">{{ t.personal.location }}</label>
         <input type="text" [value]="form().location" (input)="update('location', $any($event.target).value)"
-               placeholder="Ciudad, País"
+               [placeholder]="t.personal.locationPlaceholder"
                class="w-full px-4 py-3 bg-surface-container-low border border-transparent focus:border-primary
                       focus:ring-0 rounded-xl outline-none text-body-md placeholder:text-outline-variant transition-colors" />
       </div>
@@ -75,64 +71,61 @@
       @if (savedFlag()) {
         <span class="flex items-center gap-1 text-green-600 text-label-md font-heading font-semibold">
           <span class="material-symbols-outlined text-[18px]">check_circle</span>
-          Cambios guardados
+          {{ t.personal.saved }}
         </span>
       }
       <button (click)="saveChanges()"
               class="px-6 py-3 rounded-full bg-primary text-white font-heading font-bold text-label-md
                      shadow-primary hover:opacity-90 active:scale-95 transition-all">
-        Guardar cambios
+        {{ t.personal.save }}
       </button>
     </div>
   </section>
 
-  <!-- Seguridad -->
   <section class="glass-card rounded-lg p-6 md:p-8">
     <div class="flex items-center gap-2 mb-6">
       <span class="material-symbols-outlined text-primary">lock</span>
-      <h2 class="font-heading text-headline-md text-on-surface">Seguridad</h2>
+      <h2 class="font-heading text-headline-md text-on-surface">{{ t.security.title }}</h2>
     </div>
 
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4
                 p-5 bg-surface-container-low rounded-xl">
       <div>
-        <h3 class="font-heading font-bold text-on-surface">Contraseña y acceso</h3>
+        <h3 class="font-heading font-bold text-on-surface">{{ t.security.passwordTitle }}</h3>
         <p class="font-sans text-label-md text-on-surface-variant mt-0.5">
-          Actualiza tu contraseña con regularidad para mantener segura tu cuenta.
+          {{ t.security.passwordText }}
         </p>
       </div>
       <div class="flex gap-2 flex-shrink-0">
         <button class="px-5 py-2.5 rounded-full border border-outline-variant text-on-surface font-heading
                        font-semibold text-label-md hover:bg-surface-container transition-colors">
-          Cambiar contraseña
+          {{ t.security.changePassword }}
         </button>
         <button class="px-5 py-2.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant font-heading
                        font-semibold text-label-md hover:bg-primary-fixed-dim transition-colors">
-          Activar 2FA
+          {{ t.security.enable2fa }}
         </button>
       </div>
     </div>
     <p class="text-label-sm font-heading text-outline mt-3 flex items-center gap-1">
       <span class="material-symbols-outlined text-[14px]">info</span>
-      Estas opciones se conectarán al iniciar la autenticación con Firebase.
+      {{ t.security.note }}
     </p>
   </section>
 
-  <!-- Preferencias de correo (Newsletter) -->
   <section class="glass-card rounded-lg p-6 md:p-8">
     <div class="flex items-center gap-2 mb-6">
       <span class="material-symbols-outlined text-primary">mail</span>
-      <h2 class="font-heading text-headline-md text-on-surface">Preferencias de correo</h2>
+      <h2 class="font-heading text-headline-md text-on-surface">{{ t.email.title }}</h2>
     </div>
 
     <div class="flex items-center justify-between gap-4 p-5 bg-surface-container-low rounded-xl">
       <div class="min-w-0">
-        <h3 class="font-heading font-bold text-on-surface">Newsletter Sanatte</h3>
+        <h3 class="font-heading font-bold text-on-surface">{{ t.email.newsletterTitle }}</h3>
         <p class="font-sans text-label-md text-on-surface-variant mt-0.5">
-          Tips de bienestar, contenido nuevo y novedades. Puedes darte de baja cuando quieras.
+          {{ t.email.newsletterText }}
         </p>
       </div>
-      <!-- Toggle -->
       <button (click)="toggleNewsletter()" role="switch" [attr.aria-checked]="newsletter()"
               class="relative w-12 h-7 rounded-full transition-colors flex-shrink-0"
               [class]="newsletter() ? 'bg-primary' : 'bg-outline-variant'">
@@ -143,41 +136,39 @@
 
     <p class="text-label-sm font-heading text-outline mt-3 flex items-center gap-1">
       <span class="material-symbols-outlined text-[14px]">info</span>
-      Los correos de tu cuenta y pedidos (transaccionales) siempre se envían.
+      {{ t.email.note }}
     </p>
   </section>
 
-  <!-- Gestionar datos -->
   <section class="rounded-lg p-6 md:p-8 border border-error/20 bg-error-container/20">
     <div class="flex items-center gap-2 mb-2">
       <span class="material-symbols-outlined text-error">shield</span>
-      <h2 class="font-heading text-headline-md text-on-surface">Gestiona tus datos</h2>
+      <h2 class="font-heading text-headline-md text-on-surface">{{ t.data.title }}</h2>
     </div>
     <p class="font-sans text-label-md text-on-surface-variant mb-5">
-      Descarga tu historial de bienestar o gestiona la visibilidad de tu cuenta.
+      {{ t.data.description }}
     </p>
     <div class="flex flex-col sm:flex-row gap-3">
       <button class="px-5 py-2.5 rounded-full border border-outline-variant text-on-surface font-heading
                      font-semibold text-label-md hover:bg-surface-container transition-colors
                      flex items-center justify-center gap-2">
         <span class="material-symbols-outlined text-[18px]">download</span>
-        Exportar mis datos
+        {{ t.data.export }}
       </button>
       <button class="px-5 py-2.5 rounded-full border border-error text-error font-heading font-semibold
                      text-label-md hover:bg-error hover:text-white transition-colors
                      flex items-center justify-center gap-2">
         <span class="material-symbols-outlined text-[18px]">delete</span>
-        Eliminar cuenta
+        {{ t.data.deleteAccount }}
       </button>
     </div>
   </section>
 
-  <!-- Cerrar sesión -->
   <div class="pb-4">
     <button (click)="logout()"
             class="flex items-center gap-2 text-error font-heading font-semibold hover:underline">
       <span class="material-symbols-outlined text-[20px]">logout</span>
-      Cerrar sesión
+      {{ t.logout }}
     </button>
   </div>
 </div>

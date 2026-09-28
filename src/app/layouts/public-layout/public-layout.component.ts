@@ -2,36 +2,35 @@ import { Component, inject, computed, signal } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { CartService } from '../../features/public/services/cart.service';
 import { AuthService } from '../../core/services/auth.service';
+import { TEXTS } from '../../core/i18n/texts';
 
 @Component({
   selector: 'app-public-layout',
   imports: [RouterOutlet, RouterLink, RouterLinkActive],
   template: `
     <div class="min-h-screen flex flex-col bg-surface">
-      <!-- Navbar -->
       <header class="sticky top-0 z-30 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/20
                      px-container-padding-mobile md:px-container-padding-desktop h-16 flex items-center justify-between">
         <a routerLink="/" class="flex items-center gap-2">
-          <img src="images/logo.png" alt="Sanatte" style="height:150px;width:auto;margin-top:-48px;margin-bottom:-48px;" />
+          <img src="images/logo.png" [alt]="t.brand" style="height:150px;width:auto;margin-top:-48px;margin-bottom:-48px;" />
         </a>
 
         <nav class="hidden md:flex items-center gap-6">
           <a routerLink="/products" routerLinkActive="!text-primary"
              class="text-label-md font-heading text-on-surface-variant hover:text-primary transition-colors">
-            Productos
+            {{ t.nav.products }}
           </a>
           <a routerLink="/" fragment="aliados"
              class="text-label-md font-heading text-on-surface-variant hover:text-primary transition-colors">
-            Aliados
+            {{ t.nav.allies }}
           </a>
           <a routerLink="/blog" routerLinkActive="!text-primary"
-             class="text-label-md font-heading text-on-surface-variant hover:text-primary transition-colors">Blog</a>
+             class="text-label-md font-heading text-on-surface-variant hover:text-primary transition-colors">{{ t.nav.blog }}</a>
           <a routerLink="/faq" routerLinkActive="!text-primary"
-             class="text-label-md font-heading text-on-surface-variant hover:text-primary transition-colors">FAQ</a>
+             class="text-label-md font-heading text-on-surface-variant hover:text-primary transition-colors">{{ t.nav.faq }}</a>
         </nav>
 
         <div class="flex items-center gap-3">
-          <!-- Carrito -->
           <a routerLink="/cart" class="relative p-2 rounded-full hover:bg-surface-container transition-colors">
             <span class="material-symbols-outlined text-on-surface-variant">shopping_bag</span>
             @if (cartCount() > 0) {
@@ -43,7 +42,6 @@ import { AuthService } from '../../core/services/auth.service';
           </a>
 
           @if (isAuthenticated()) {
-            <!-- Menú de cuenta -->
             <div class="relative">
               <button (click)="menuOpen.set(!menuOpen())"
                       class="flex items-center gap-2 pl-1 pr-2 py-1 rounded-full hover:bg-surface-container transition-colors">
@@ -55,7 +53,6 @@ import { AuthService } from '../../core/services/auth.service';
               </button>
 
               @if (menuOpen()) {
-                <!-- backdrop para cerrar al hacer clic fuera -->
                 <button class="fixed inset-0 z-40 cursor-default" (click)="menuOpen.set(false)"></button>
                 <div class="absolute right-0 mt-2 w-60 z-50 bg-surface-container-lowest rounded-lg shadow-card
                             border border-outline-variant/20 overflow-hidden py-1">
@@ -75,7 +72,7 @@ import { AuthService } from '../../core/services/auth.service';
                           class="w-full flex items-center gap-3 px-4 py-2.5 text-label-md font-heading text-error
                                  hover:bg-error-container/40 transition-colors border-t border-outline-variant/20">
                     <span class="material-symbols-outlined text-[20px]">logout</span>
-                    Cerrar sesión
+                    {{ t.account.logout }}
                   </button>
                 </div>
               }
@@ -83,10 +80,10 @@ import { AuthService } from '../../core/services/auth.service';
           } @else {
             <a routerLink="/auth/login"
                class="hidden sm:inline-block px-4 py-2 rounded-full text-label-md font-heading text-primary
-                      border border-primary hover:bg-primary/5 transition-colors">Ingresar</a>
+                      border border-primary hover:bg-primary/5 transition-colors">{{ t.auth.login }}</a>
             <a routerLink="/auth/register"
                class="px-5 py-2 rounded-full text-label-md font-heading font-semibold text-white
-                      gradient-primary hover:opacity-90 transition-opacity">Registrarse</a>
+                      gradient-primary hover:opacity-90 transition-opacity">{{ t.auth.register }}</a>
           }
         </div>
       </header>
@@ -95,38 +92,37 @@ import { AuthService } from '../../core/services/auth.service';
         <router-outlet />
       </main>
 
-      <!-- Footer -->
       <footer class="bg-surface-container-lowest border-t border-outline-variant/20 mt-16
                      px-container-padding-mobile md:px-container-padding-desktop py-12">
         <div class="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
           <div class="col-span-2 md:col-span-1">
-            <span class="font-heading text-headline-md font-bold text-primary">Sanatte</span>
-            <p class="text-label-md font-heading text-on-surface-variant mt-2">Wellness Ecosystem</p>
+            <span class="font-heading text-headline-md font-bold text-primary">{{ t.brand }}</span>
+            <p class="text-label-md font-heading text-on-surface-variant mt-2">{{ t.footer.tagline }}</p>
           </div>
           <div>
-            <h4 class="font-heading font-bold text-on-surface text-label-md uppercase tracking-wider mb-3">Tienda</h4>
+            <h4 class="font-heading font-bold text-on-surface text-label-md uppercase tracking-wider mb-3">{{ t.footer.store.title }}</h4>
             <ul class="space-y-2 text-label-md font-heading text-on-surface-variant">
-              <li><a routerLink="/products" class="hover:text-primary transition-colors">Productos</a></li>
-              <li><a routerLink="/products" class="hover:text-primary transition-colors">Suscripciones</a></li>
+              <li><a routerLink="/products" class="hover:text-primary transition-colors">{{ t.footer.store.products }}</a></li>
+              <li><a routerLink="/products" class="hover:text-primary transition-colors">{{ t.footer.store.subscriptions }}</a></li>
             </ul>
           </div>
           <div>
-            <h4 class="font-heading font-bold text-on-surface text-label-md uppercase tracking-wider mb-3">Compañía</h4>
+            <h4 class="font-heading font-bold text-on-surface text-label-md uppercase tracking-wider mb-3">{{ t.footer.company.title }}</h4>
             <ul class="space-y-2 text-label-md font-heading text-on-surface-variant">
-              <li><a href="#" class="hover:text-primary transition-colors">Nosotros</a></li>
-              <li><a routerLink="/faq" class="hover:text-primary transition-colors">FAQ</a></li>
+              <li><a href="#" class="hover:text-primary transition-colors">{{ t.footer.company.about }}</a></li>
+              <li><a routerLink="/faq" class="hover:text-primary transition-colors">{{ t.footer.company.faq }}</a></li>
             </ul>
           </div>
           <div>
-            <h4 class="font-heading font-bold text-on-surface text-label-md uppercase tracking-wider mb-3">Legal</h4>
+            <h4 class="font-heading font-bold text-on-surface text-label-md uppercase tracking-wider mb-3">{{ t.footer.legal.title }}</h4>
             <ul class="space-y-2 text-label-md font-heading text-on-surface-variant">
-              <li><a routerLink="/legal/privacidad" class="hover:text-primary transition-colors">Privacidad</a></li>
-              <li><a routerLink="/legal/eliminar-cuenta" class="hover:text-primary transition-colors">Eliminar cuenta</a></li>
+              <li><a routerLink="/legal/privacidad" class="hover:text-primary transition-colors">{{ t.footer.legal.privacy }}</a></li>
+              <li><a routerLink="/legal/eliminar-cuenta" class="hover:text-primary transition-colors">{{ t.footer.legal.deleteAccount }}</a></li>
             </ul>
           </div>
         </div>
         <p class="max-w-6xl mx-auto mt-10 pt-6 border-t border-outline-variant/20 text-label-sm
-                  font-heading text-outline">© 2026 Sanatte. Todos los derechos reservados.</p>
+                  font-heading text-outline">{{ t.footer.copyright }}</p>
       </footer>
     </div>
   `,
@@ -136,23 +132,24 @@ export class PublicLayoutComponent {
   private readonly auth   = inject(AuthService);
   private readonly router = inject(Router);
 
+  protected readonly t = TEXTS.public.layout;
+
   readonly cartCount       = this.cart.count;
   readonly isAuthenticated = computed(() => this.auth.isAuthenticated());
-  readonly displayName     = computed(() => this.auth.currentUser()?.displayName ?? 'Usuario');
+  readonly displayName     = computed(() => this.auth.currentUser()?.displayName ?? this.t.account.defaultName);
   readonly userEmail       = computed(() => this.auth.currentUser()?.email ?? '');
   readonly userInitial     = computed(() => this.displayName().charAt(0).toUpperCase());
 
   readonly menuOpen = signal(false);
 
   readonly accountMenu = [
-    { label: 'Mi biblioteca', route: '/app/library',       icon: 'subscriptions' },
-    { label: 'Mis pedidos',   route: '/app/orders',        icon: 'receipt_long' },
-    { label: 'Suscripciones', route: '/app/subscriptions', icon: 'workspace_premium' },
-    { label: 'Perfil',        route: '/app/profile',       icon: 'person' },
+    { label: this.t.account.menu.library,       route: '/app/library',       icon: 'subscriptions' },
+    { label: this.t.account.menu.orders,        route: '/app/orders',        icon: 'receipt_long' },
+    { label: this.t.account.menu.subscriptions, route: '/app/subscriptions', icon: 'workspace_premium' },
+    { label: this.t.account.menu.profile,       route: '/app/profile',       icon: 'person' },
   ];
 
   constructor() {
-    // Cierra el menú al navegar.
     this.router.events.subscribe((e) => {
       if (e instanceof NavigationEnd) this.menuOpen.set(false);
     });

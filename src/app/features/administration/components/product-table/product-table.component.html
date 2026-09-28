@@ -5,37 +5,29 @@
     <table class="w-full text-left border-collapse">
       <thead class="bg-surface-container-low border-b border-outline-variant/30">
         <tr>
-          <!-- Siempre visible -->
           <th class="px-4 md:px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
-            Producto
+            {{ t.table.columns.product }}
           </th>
-          <!-- md+ -->
           <th class="hidden md:table-cell px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
-            Tipo
+            {{ t.table.columns.type }}
           </th>
-          <!-- md+ -->
           <th class="hidden md:table-cell px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
-            Precio
+            {{ t.table.columns.price }}
           </th>
-          <!-- lg+ -->
           <th class="hidden lg:table-cell px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
-            Recursos
+            {{ t.table.columns.resources }}
           </th>
-          <!-- lg+ -->
           <th class="hidden lg:table-cell px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
-            Acceso
+            {{ t.table.columns.access }}
           </th>
-          <!-- xl+ -->
           <th class="hidden xl:table-cell px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
-            Ventas
+            {{ t.table.columns.sales }}
           </th>
-          <!-- Siempre visible -->
           <th class="px-4 md:px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
-            Estado
+            {{ t.table.columns.status }}
           </th>
-          <!-- Siempre visible -->
           <th class="px-4 md:px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider text-right">
-            Acciones
+            {{ t.table.columns.actions }}
           </th>
         </tr>
       </thead>
@@ -44,7 +36,6 @@
         @for (product of products(); track product.id) {
           <tr class="hover:bg-surface-container-low/50 transition-colors">
 
-            <!-- Producto — siempre visible -->
             <td class="px-4 md:px-6 py-3 md:py-4">
               <div class="flex items-center gap-3">
                 <div class="w-9 h-9 md:w-12 md:h-12 rounded-lg flex-shrink-0
@@ -70,7 +61,6 @@
               </div>
             </td>
 
-            <!-- Tipo — md+ -->
             <td class="hidden md:table-cell px-6 py-4">
               <span class="px-3 py-1 rounded-full text-label-sm font-heading font-semibold"
                     [class]="typeConfig(product.type).classes">
@@ -78,18 +68,16 @@
               </span>
             </td>
 
-            <!-- Precio — md+ -->
             <td class="hidden md:table-cell px-6 py-4 text-label-md font-heading text-on-surface">
               {{ priceLabel(product) }}
             </td>
 
-            <!-- Recursos — lg+ -->
             <td class="hidden lg:table-cell px-6 py-4">
               @if (contentCount(product) > 0) {
                 <div class="flex items-center gap-1.5">
                   <span class="material-symbols-outlined text-[15px] text-primary">perm_media</span>
                   <span class="text-label-sm font-heading text-on-surface-variant">
-                    {{ contentCount(product) }} recurso{{ contentCount(product) !== 1 ? 's' : '' }}
+                    {{ t.resourceCount(contentCount(product)) }}
                   </span>
                 </div>
               } @else {
@@ -97,7 +85,6 @@
               }
             </td>
 
-            <!-- Acceso — lg+ -->
             <td class="hidden lg:table-cell px-6 py-4">
               <div class="flex items-center gap-1.5">
                 <span class="material-symbols-outlined text-[15px]"
@@ -111,34 +98,31 @@
               </div>
             </td>
 
-            <!-- Ventas — xl+ -->
             <td class="hidden xl:table-cell px-6 py-4">
               <p class="text-label-md font-heading font-semibold text-on-surface">
                 {{ product.salesCount | number }}
               </p>
               <p class="text-label-sm font-heading text-outline mt-0.5">
-                {{ product.type === 'physical' ? 'activadas' : product.type === 'subscription' ? 'activos' : 'vendidos' }}
+                {{ t.salesUnits[product.type] }}
               </p>
             </td>
 
-            <!-- Estado — siempre visible -->
             <td class="px-4 md:px-6 py-3 md:py-4">
               <app-status-badge [status]="product.status" />
             </td>
 
-            <!-- Acciones — siempre visible -->
             <td class="px-4 md:px-6 py-3 md:py-4 text-right">
               <div class="flex justify-end gap-1">
                 <button (click)="editProduct.emit(product)"
                         class="p-1.5 md:p-2 rounded-full text-outline hover:text-primary
                                hover:bg-primary-fixed transition-colors"
-                        title="Editar">
+                        [title]="c.actions.edit">
                   <span class="material-symbols-outlined text-[18px]">edit</span>
                 </button>
                 <button (click)="deleteProduct.emit(product)"
                         class="p-1.5 md:p-2 rounded-full text-outline hover:text-error
                                hover:bg-error-container transition-colors"
-                        title="Eliminar">
+                        [title]="c.actions.delete">
                   <span class="material-symbols-outlined text-[18px]">delete</span>
                 </button>
               </div>
@@ -154,7 +138,7 @@
                 inventory_2
               </span>
               <p class="text-label-md font-heading text-on-surface-variant">
-                No se encontraron productos
+                {{ t.table.empty }}
               </p>
             </td>
           </tr>
@@ -163,13 +147,12 @@
     </table>
   </div>
 
-  <!-- Pagination -->
   <div class="px-4 md:px-6 border-t border-outline-variant/20 bg-surface-container-lowest">
     <app-pagination
       [currentPage]="currentPage()"
       [pageSize]="pageSize()"
       [total]="totalItems()"
-      label="productos"
+      [label]="t.table.paginationLabel"
       (pageChange)="pageChange.emit($event)" />
   </div>
 

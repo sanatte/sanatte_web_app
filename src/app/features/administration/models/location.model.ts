@@ -31,13 +31,3 @@ export interface AllocationResult {
   allocated: number;
   availableRemaining: number;
 }
-
-export const LOCATION_TYPE_LABEL: Record<LocationType, string> = {
-  ecommerce: 'Ecommerce',
-  physical_point: 'Punto físico',
-};
-
-export const SALES_MODEL_LABEL: Record<SalesModel, string> = {
-  consignment: 'Consignación',
-  wholesale: 'Venta en firme',
-};

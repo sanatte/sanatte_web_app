@@ -3,6 +3,7 @@ import { StatusBadgeComponent } from '../../../../shared/components/status-badge
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
 import { AdminUser } from '../../models/user-admin.model';
 import { UserRole } from '../../../../core/models/role.model';
+import { TEXTS } from '../../../../core/i18n/texts';
 
 @Component({
   selector: 'app-user-table',
@@ -21,8 +22,11 @@ export class UserTableComponent {
 
   readonly UserRole = UserRole;
 
+  protected readonly t = TEXTS.admin.users.table;
+  private readonly roles = TEXTS.admin.users.roles;
+
   roleLabel(role: UserRole): string {
-    return role === UserRole.Admin ? 'Admin' : 'Usuario';
+    return this.roles[role];
   }
 
   roleClasses(role: UserRole): string {

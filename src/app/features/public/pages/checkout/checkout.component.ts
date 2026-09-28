@@ -6,6 +6,7 @@ import { CartService } from '../../services/cart.service';
 import { CheckoutService } from '../../services/checkout.service';
 import { StoreContextService } from '../../services/store-context.service';
 import { AuthService } from '../../../../core/services/auth.service';
+import { TEXTS } from '../../../../core/i18n/texts';
 
 @Component({
   selector: 'app-checkout',
@@ -17,6 +18,8 @@ export class CheckoutComponent {
   private readonly checkout = inject(CheckoutService);
   private readonly auth     = inject(AuthService);
   readonly ctx              = inject(StoreContextService);
+
+  protected readonly t = TEXTS.public.checkout;
 
   readonly lines    = this.cart.lines;
   readonly subtotal = this.cart.subtotal;
@@ -30,7 +33,6 @@ export class CheckoutComponent {
     }, 0).toFixed(2)
   );
 
-  // Descuento aplicado
   readonly appliedCode  = this.checkout.appliedCode;
   readonly discountInfo = this.checkout.discountInfo;
   readonly discountAmount = computed(() => {
@@ -47,12 +49,10 @@ export class CheckoutComponent {
   readonly paying       = signal(false);
   readonly errorMessage = signal('');
 
-  // Campo de código de descuento
   discountCodeInput = '';
   readonly discountError   = signal('');
   readonly validatingCode  = this.checkout.validatingCode;
 
-  // Datos de envío (solo físicos)
   shipName = '';
   shipAddress = '';
   shipCity = '';
@@ -64,7 +64,7 @@ export class CheckoutComponent {
     this.discountError.set('');
     const result = await this.checkout.validateDiscountCode(this.discountCodeInput);
     if (!result.isValid) {
-      this.discountError.set(result.errorMessage ?? 'Código no válido.');
+      this.discountError.set(result.errorMessage ?? this.t.summary.invalidCode);
     }
     this.discountCodeInput = '';
   }
@@ -81,7 +81,7 @@ export class CheckoutComponent {
     try {
       await this.checkout.startPayment();
     } catch {
-      this.errorMessage.set('No pudimos iniciar el pago. Intenta de nuevo.');
+      this.errorMessage.set(this.t.payment.startError);
       this.paying.set(false);
     }
   }

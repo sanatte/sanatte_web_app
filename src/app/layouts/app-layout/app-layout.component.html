@@ -1,29 +1,24 @@
 <div class="flex min-h-screen bg-background">
 
-  <!-- ── Backdrop móvil ──────────────────────────────────────────────────── -->
   @if (sidebarOpen()) {
     <div class="fixed inset-0 z-40 bg-on-background/40 backdrop-blur-sm lg:hidden"
          (click)="closeSidebar()"></div>
   }
 
-  <!-- ── Sidebar ─────────────────────────────────────────────────────────── -->
   <aside class="fixed left-0 top-0 h-screen w-64 flex flex-col py-unit px-4
                 bg-surface-container-low shadow-sm z-50 transition-transform duration-300"
          [class]="sidebarOpen() ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
 
-    <!-- Logo -->
     <div class="mb-10 px-2 mt-4 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <img src="images/logo.png" alt="Sanatte" style="height:56px;width:auto;" />
+        <img src="images/logo.png" [alt]="t.logoAlt" style="height:56px;width:auto;" />
       </div>
-      <!-- Cerrar sidebar en móvil -->
       <button (click)="closeSidebar()"
               class="lg:hidden p-1.5 rounded-lg hover:bg-surface-variant transition-colors">
         <span class="material-symbols-outlined text-on-surface-variant text-[20px]">close</span>
       </button>
     </div>
 
-    <!-- Main nav -->
     <nav class="flex-1 space-y-1 overflow-y-auto">
       @for (item of mainNav; track item.route) {
         <a [routerLink]="item.route"
@@ -38,7 +33,6 @@
       }
     </nav>
 
-    <!-- Bottom: footer usuario premium (abre menú de cuenta hacia arriba) -->
     <div class="mt-auto pt-4 border-t border-outline-variant/30 relative">
       @if (footerMenuOpen()) {
         <button class="fixed inset-0 z-40 cursor-default" (click)="footerMenuOpen.set(false)"></button>
@@ -47,19 +41,19 @@
           <a routerLink="/app/profile"
              class="flex items-center gap-3 px-4 py-2.5 text-label-md font-heading text-on-surface
                     hover:bg-surface-container-low transition-colors">
-            <span class="material-symbols-outlined text-[20px] text-on-surface-variant">person</span> Perfil
+            <span class="material-symbols-outlined text-[20px] text-on-surface-variant">person</span> {{ t.account.profile }}
           </a>
           @if (isAdmin()) {
             <a routerLink="/admin/dashboard"
                class="flex items-center gap-3 px-4 py-2.5 text-label-md font-heading text-primary
                       hover:bg-primary-fixed/40 transition-colors border-t border-outline-variant/20">
-              <span class="material-symbols-outlined text-[20px]">admin_panel_settings</span> Panel de administración
+              <span class="material-symbols-outlined text-[20px]">admin_panel_settings</span> {{ t.account.adminPanel }}
             </a>
           }
           <button (click)="logout()"
                   class="w-full flex items-center gap-3 px-4 py-2.5 text-label-md font-heading text-error
                          hover:bg-error-container/40 transition-colors border-t border-outline-variant/20">
-            <span class="material-symbols-outlined text-[20px]">logout</span> Cerrar sesión
+            <span class="material-symbols-outlined text-[20px]">logout</span> {{ t.account.logout }}
           </button>
         </div>
       }
@@ -80,16 +74,13 @@
     </div>
   </aside>
 
-  <!-- ── Main ────────────────────────────────────────────────────────────── -->
   <main class="flex-1 flex flex-col min-w-0 lg:ml-64">
 
-    <!-- Topbar -->
     <header class="sticky top-0 z-40 flex items-center justify-between gap-3
                    px-4 lg:px-container-padding-desktop py-3
                    bg-surface-bright/80 backdrop-blur-xl border-b border-outline-variant/20">
 
       <div class="flex items-center gap-3">
-        <!-- Hamburger (solo móvil) -->
         <button (click)="toggleSidebar()"
                 class="lg:hidden p-2 rounded-lg hover:bg-surface-container transition-colors">
           <span class="material-symbols-outlined text-on-surface-variant">menu</span>
@@ -99,11 +90,10 @@
           {{ pageTitle() }}
         </h2>
 
-        <!-- Search (solo desktop) -->
         <div class="relative hidden xl:block">
           <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2
                        text-outline text-[18px]">search</span>
-          <input type="text" placeholder="Buscar en mi biblioteca..."
+          <input type="text" [placeholder]="t.searchPlaceholder"
                  class="pl-9 pr-4 py-2 bg-surface-container rounded-full border-none
                         focus:ring-2 focus:ring-primary/50 text-label-md w-56
                         transition-all outline-none"/>
@@ -111,11 +101,9 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <!-- Search icon en móvil -->
         <button class="xl:hidden p-2 hover:bg-surface-container rounded-full transition-colors">
           <span class="material-symbols-outlined text-on-surface-variant text-[20px]">search</span>
         </button>
-        <!-- Carrito -->
         <a routerLink="/app/cart" class="relative p-2 hover:bg-surface-container rounded-full transition-colors">
           <span class="material-symbols-outlined text-on-surface-variant text-[20px]">shopping_bag</span>
           @if (cartCount() > 0) {
@@ -129,7 +117,6 @@
           <span class="material-symbols-outlined text-on-surface-variant text-[20px]">notifications</span>
           <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full"></span>
         </button>
-        <!-- Menú de cuenta -->
         <div class="relative">
           <button (click)="toggleMenu()"
                   class="w-8 h-8 rounded-full gradient-primary flex items-center justify-center
@@ -147,24 +134,24 @@
               <a routerLink="/app/profile"
                  class="flex items-center gap-3 px-4 py-2.5 text-label-md font-heading text-on-surface
                         hover:bg-surface-container-low transition-colors">
-                <span class="material-symbols-outlined text-[20px] text-on-surface-variant">person</span> Perfil
+                <span class="material-symbols-outlined text-[20px] text-on-surface-variant">person</span> {{ t.account.profile }}
               </a>
               <a routerLink="/app/orders"
                  class="flex items-center gap-3 px-4 py-2.5 text-label-md font-heading text-on-surface
                         hover:bg-surface-container-low transition-colors">
-                <span class="material-symbols-outlined text-[20px] text-on-surface-variant">receipt_long</span> Mis pedidos
+                <span class="material-symbols-outlined text-[20px] text-on-surface-variant">receipt_long</span> {{ t.account.orders }}
               </a>
               @if (isAdmin()) {
                 <a routerLink="/admin/dashboard"
                    class="flex items-center gap-3 px-4 py-2.5 text-label-md font-heading text-primary
                           hover:bg-primary-fixed/40 transition-colors border-t border-outline-variant/20">
-                  <span class="material-symbols-outlined text-[20px]">admin_panel_settings</span> Panel de administración
+                  <span class="material-symbols-outlined text-[20px]">admin_panel_settings</span> {{ t.account.adminPanel }}
                 </a>
               }
               <button (click)="logout()"
                       class="w-full flex items-center gap-3 px-4 py-2.5 text-label-md font-heading text-error
                              hover:bg-error-container/40 transition-colors border-t border-outline-variant/20">
-                <span class="material-symbols-outlined text-[20px]">logout</span> Cerrar sesión
+                <span class="material-symbols-outlined text-[20px]">logout</span> {{ t.account.logout }}
               </button>
             </div>
           }
@@ -172,7 +159,6 @@
       </div>
     </header>
 
-    <!-- Page content -->
     <div class="flex-1 min-w-0 px-container-padding-mobile lg:px-container-padding-desktop py-gutter">
       <router-outlet />
     </div>

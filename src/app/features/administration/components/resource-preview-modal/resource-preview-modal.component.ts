@@ -2,6 +2,7 @@ import { Component, input, output, computed } from '@angular/core';
 import { Resource } from '../../models/resource.model';
 import { MediaPlayerComponent } from '../../../../shared/components/resource-viewers/media-player.component';
 import { ArticleReaderComponent } from '../../../../shared/components/resource-viewers/article-reader.component';
+import { TEXTS } from '../../../../core/i18n/texts';
 
 @Component({
   selector: 'app-resource-preview-modal',
@@ -9,6 +10,8 @@ import { ArticleReaderComponent } from '../../../../shared/components/resource-v
   templateUrl: './resource-preview-modal.component.html',
 })
 export class ResourcePreviewModalComponent {
+  protected readonly t = TEXTS.admin.resources;
+
   readonly isOpen             = input.required<boolean>();
   readonly linkedProductCount = input(0);
   readonly resource           = input<Resource | null>(null);
@@ -19,7 +22,7 @@ export class ResourcePreviewModalComponent {
   readonly metaLabel = computed(() => {
     const r = this.resource();
     if (!r) return '';
-    return r.duration ?? r.fileSize ?? (r.readTime ? `${r.readTime} lectura` : '');
+    return r.duration ?? r.fileSize ?? (r.readTime ? this.t.readTime(r.readTime) : '');
   });
 
   readonly metaIcon = computed(() => {
@@ -32,10 +35,11 @@ export class ResourcePreviewModalComponent {
 
   readonly metaKey = computed(() => {
     const r = this.resource();
-    if (!r) return 'Duración';
-    if (r.duration) return 'Duración';
-    if (r.fileSize) return 'Tamaño';
-    return 'Lectura';
+    const keys = this.t.preview.metaKeys;
+    if (!r) return keys.duration;
+    if (r.duration) return keys.duration;
+    if (r.fileSize) return keys.size;
+    return keys.reading;
   });
 
   readonly statusBg = computed(() =>

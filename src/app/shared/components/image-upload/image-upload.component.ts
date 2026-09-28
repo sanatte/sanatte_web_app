@@ -1,6 +1,7 @@
 import {
   Component, input, output, signal, computed, ViewChild, ElementRef
 } from '@angular/core';
+import { TEXTS } from '../../../core/i18n/texts';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
@@ -8,7 +9,6 @@ const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
   selector: 'app-image-upload',
   template: `
     <div class="relative group">
-      <!-- Zona de previsualización / drop zone -->
       <div class="w-full rounded-lg overflow-hidden border-2 transition-all cursor-pointer"
            [class]="dragOver()
              ? 'border-primary bg-primary-fixed/30 scale-[1.01]'
@@ -20,26 +20,22 @@ const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
            (drop)="onDrop($event)">
 
         @if (previewSrc()) {
-          <!-- Imagen existente o preview de la seleccionada -->
           <img [src]="previewSrc()" [alt]="altText()"
                class="w-full h-full object-cover">
-          <!-- Overlay al hover -->
           <div class="absolute inset-0 bg-black/40 flex flex-col items-center justify-center
                       gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <span class="material-symbols-outlined text-white text-[32px]">upload</span>
             <span class="text-white text-label-sm font-heading font-semibold">
-              Cambiar imagen
+              {{ t.change }}
             </span>
           </div>
         } @else if (gradient()) {
-          <!-- Fallback gradient -->
           <div class="w-full h-full bg-gradient-to-br flex flex-col items-center
                       justify-center gap-2" [class]="gradient()!">
             <span class="material-symbols-outlined text-white/60 text-[40px]">{{ icon() }}</span>
-            <span class="text-white/60 text-label-sm font-heading">Subir imagen</span>
+            <span class="text-white/60 text-label-sm font-heading">{{ t.upload }}</span>
           </div>
         } @else {
-          <!-- Sin imagen ni gradient -->
           <div class="w-full h-full flex flex-col items-center justify-center gap-3
                       bg-surface-container-low p-4">
             <div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center
@@ -48,16 +44,15 @@ const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
             </div>
             <div class="text-center">
               <p class="text-label-md font-heading font-bold text-on-surface">
-                Arrastra o <span class="text-primary underline">selecciona</span>
+                {{ t.dropOr }} <span class="text-primary underline">{{ t.select }}</span>
               </p>
               <p class="text-label-sm font-heading text-outline mt-0.5">
-                JPG, PNG o WebP — máx. {{ maxMb() }} MB
+                {{ t.formats(maxMb()) }}
               </p>
             </div>
           </div>
         }
 
-        <!-- Spinner de carga -->
         @if (uploading()) {
           <div class="absolute inset-0 bg-black/50 flex items-center justify-center">
             <div class="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -65,7 +60,6 @@ const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
         }
       </div>
 
-      <!-- Error -->
       @if (errorMsg()) {
         <p class="mt-1.5 text-label-sm text-error flex items-center gap-1">
           <span class="material-symbols-outlined text-[14px]">error</span>
@@ -80,11 +74,13 @@ const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
   `,
 })
 export class ImageUploadComponent {
+  protected readonly t = TEXTS.common.imageUpload;
+
   @ViewChild('fileInput') private fileInputRef!: ElementRef<HTMLInputElement>;
 
   readonly currentUrl  = input<string | null>(null);
   readonly gradient    = input<string | null>(null);
-  readonly altText     = input('Imagen');
+  readonly altText     = input<string>(TEXTS.common.imageUpload.alt);
   readonly icon        = input('image');
   readonly aspectRatio = input('1 / 1');
   readonly maxMb       = input(10);
@@ -122,14 +118,14 @@ export class ImageUploadComponent {
     this.errorMsg.set('');
 
     if (!ALLOWED_TYPES.includes(file.type)) {
-      const msg = 'Tipo no permitido. Usa JPG, PNG o WebP.';
+      const msg = this.t.invalidType;
       this.errorMsg.set(msg);
       this.uploadError.emit(msg);
       return;
     }
 
     if (file.size > this.maxMb() * 1024 * 1024) {
-      const msg = `El archivo supera ${this.maxMb()} MB.`;
+      const msg = this.t.tooLarge(this.maxMb());
       this.errorMsg.set(msg);
       this.uploadError.emit(msg);
       return;

@@ -6,12 +6,6 @@ import { AuthService } from '../../../core/services/auth.service';
 import { Order } from '../../administration/models/order.model';
 import { environment } from '../../../../environments/environment';
 
-/**
- * UserOrdersService — pedidos del usuario autenticado (vista cliente).
- *
- * Consume `GET /api/me/orders`, que devuelve los pedidos del usuario resuelto
- * por FirebaseUid. Reutiliza el mapper del servicio admin (mismo DTO).
- */
 @Injectable({ providedIn: 'root' })
 export class UserOrdersService {
   private readonly http = inject(HttpClient);
@@ -23,7 +17,6 @@ export class UserOrdersService {
 
   readonly orders  = this._orders.asReadonly();
   readonly loading = this._loading.asReadonly();
-  /** true una vez que terminó el primer intento de carga (para gates de F5). */
   readonly loaded  = this._loaded.asReadonly();
 
   constructor() { this.load(); }

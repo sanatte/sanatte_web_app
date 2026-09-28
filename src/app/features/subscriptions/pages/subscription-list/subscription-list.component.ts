@@ -3,6 +3,7 @@ import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
 import { UserSubscriptionService } from '../../services/user-subscription.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { Product } from '../../../administration/models/product.model';
+import { TEXTS } from '../../../../core/i18n/texts';
 
 @Component({
   selector: 'app-subscription-list',
@@ -11,6 +12,8 @@ import { Product } from '../../../administration/models/product.model';
 })
 export class SubscriptionListComponent {
   private readonly subs = inject(UserSubscriptionService);
+
+  protected readonly t = TEXTS.app.subscriptions.list;
 
   readonly subscription   = this.subs.subscription;
   readonly currentPlan    = this.subs.currentPlan;
@@ -26,7 +29,7 @@ export class SubscriptionListComponent {
   isCurrent = (sku: string) => this.subs.isCurrentPlan(sku);
 
   periodLabel(plan: Product): string {
-    return plan.billingPeriod === 'annual' ? '/año' : '/mes';
+    return plan.billingPeriod === 'annual' ? this.t.periods.annual : this.t.periods.monthly;
   }
 
   requestCancel(): void { this.confirmCancelOpen.set(true); }

@@ -1,0 +1,73 @@
+import type { DeliveryStatus } from '../../../../features/administration/models/order.model';
+
+export const ORDERS_TEXTS = {
+  page: {
+    breadcrumbSection: 'Commerce',
+    breadcrumbCurrent: 'Pedidos',
+    title: 'Gestión de Pedidos',
+    description: 'Supervisa, filtra y actualiza el estado de todas las órdenes.',
+    searchPlaceholder: 'Buscar pedido, cliente...',
+    kpis: {
+      total: 'Total Pedidos (MTD)',
+      pending: 'Pendientes de acción',
+      actionRequired: 'Acción requerida',
+      revenue: 'Ingresos Totales',
+    },
+    tabs: {
+      all: 'Todos',
+      pending: 'Pendientes',
+      completed: 'Completados',
+      cancelled: 'Cancelados',
+    },
+    markDelivered: 'Marcar como Entregado',
+    confirmQrActivation: 'Confirmar activación QR',
+    confirmMessage: (label: string, orderNumber: string, buyerName: string) =>
+      `¿Confirmar: "${label}" para el pedido ${orderNumber} de ${buyerName}?`,
+    confirmText: 'Sí, confirmar',
+    detailComingSoon: (orderNumber: string) => `Detalle del pedido ${orderNumber} — próximamente`,
+    noPhysicalProducts: 'El pedido no tiene productos físicos que requieran activación.',
+    activationGenerated: (count: number, orderNumber: string) =>
+      `Se generó ${count} licencia(s) de activación para ${orderNumber}. Se descargó su QR para imprimir e incluir en el empaque.`,
+    activationError: 'No se pudo generar la licencia de activación.',
+  },
+  table: {
+    columns: {
+      orderId: 'ID Pedido',
+      buyer: 'Comprador',
+      products: 'Productos',
+      date: 'Fecha',
+      total: 'Total',
+      payment: 'Pago',
+      delivery: 'Entrega / Activación',
+      actions: 'Acciones',
+    },
+    viewDetail: 'Ver detalle',
+    changeDelivery: 'Cambiar estado de entrega',
+    generateActivation: 'Generar QR de activación (al empacar)',
+    print: 'Imprimir',
+    empty: 'No se encontraron pedidos',
+    paginationLabel: 'pedidos',
+  },
+  shipDialog: {
+    title: 'Marcar como Enviado',
+    carrier: 'Transportadora',
+    carrierPlaceholder: 'Selecciona la transportadora',
+    otherCarrier: 'Otro',
+    trackingNumber: 'Número de guía',
+    trackingNumberPlaceholder: 'ej. 1234567890',
+    trackingUrl: 'Link de rastreo',
+    trackingUrlPlaceholder: 'https://rastreo.transportadora.com/...',
+    optional: '(opcional)',
+    viewTracking: 'Ver rastreo ↗',
+    submit: 'Confirmar envío',
+  },
+  deliveryStatuses: {
+    preparing: 'Preparando',
+    shipped: 'Enviado',
+    delivered: 'Entregado',
+    pending_activation: 'Pend. activación',
+    digital_active: 'Acceso activo',
+    subscription_active: 'Suscripción activa',
+    cancelled: 'Cancelado',
+  } satisfies Record<DeliveryStatus, string>,
+} as const;

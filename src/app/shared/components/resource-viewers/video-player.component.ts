@@ -3,11 +3,6 @@ import {
 } from '@angular/core';
 import Plyr from 'plyr';
 
-/**
- * Reproductor de video con Plyr (controles profesionales: play, seek, volumen,
- * velocidad, PiP, fullscreen), temizado con el color de marca. Reproduce la URL
- * firmada de R2 con streaming progresivo (Range/206).
- */
 @Component({
   selector: 'app-video-player',
   template: `

@@ -3,18 +3,12 @@ import {
 } from '@angular/core';
 import WaveSurfer from 'wavesurfer.js';
 import { themeHex, themeRgba } from '../../utils/theme-color';
+import { TEXTS } from '../../../core/i18n/texts';
 
-/**
- * Reproductor de audio estilo Spotify/Calm: portada (imagen o gradiente) como
- * héroe + onda interactiva (wavesurfer.js) debajo con controles. La onda es
- * clicable para saltar. Reproduce la URL firmada de R2. Se recrea al cambiar de
- * recurso (lo maneja el @switch de MediaPlayerComponent) → inicializa en AfterViewInit.
- */
 @Component({
   selector: 'app-wave-audio-player',
   template: `
     <div class="w-full rounded-2xl overflow-hidden shadow-lg bg-white border border-outline-variant/20">
-      <!-- Portada -->
       <div class="w-full aspect-video relative bg-gradient-to-br {{ coverGradient() }}">
         @if (coverUrl(); as cover) {
           <img [src]="cover" alt="" class="absolute inset-0 w-full h-full object-cover"/>
@@ -23,23 +17,21 @@ import { themeHex, themeRgba } from '../../utils/theme-color';
             <span class="material-symbols-outlined text-white/85 text-[64px]">headphones</span>
           </div>
         }
-        <!-- Degradado inferior para fundir con la onda -->
         <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/25 to-transparent"></div>
       </div>
 
-      <!-- Onda + controles -->
       <div class="p-5 md:p-6">
         <div class="relative min-h-[64px] flex items-center">
           <div #waveform class="w-full cursor-pointer"></div>
           @if (!ready() && !failed()) {
             <div class="absolute inset-0 flex items-center justify-center gap-2 text-on-surface-variant">
               <span class="material-symbols-outlined animate-spin text-[20px] text-primary">progress_activity</span>
-              <span class="text-label-sm font-heading">Generando onda…</span>
+              <span class="text-label-sm font-heading">{{ t.generating }}</span>
             </div>
           }
           @if (failed()) {
             <div class="absolute inset-0 flex items-center justify-center text-error">
-              <span class="text-label-sm font-heading">No se pudo cargar el audio.</span>
+              <span class="text-label-sm font-heading">{{ t.error }}</span>
             </div>
           }
         </div>
@@ -72,6 +64,8 @@ import { themeHex, themeRgba } from '../../utils/theme-color';
   `,
 })
 export class WaveAudioPlayerComponent implements AfterViewInit, OnDestroy {
+  protected readonly t = TEXTS.shared.resourceViewers.waveAudio;
+
   readonly url = input.required<string>();
   readonly coverUrl = input<string | null>(null);
   readonly coverGradient = input<string>('from-brand-400 to-brand-800');

@@ -1,17 +1,20 @@
 import { Component, input, computed } from '@angular/core';
+import { TEXTS } from '../../../core/i18n/texts';
 
 interface StatusConfig { label: string; dot: string; badge: string; }
 
+const L = TEXTS.common.statusBadge;
+
 const STATUS_MAP: Record<string, StatusConfig> = {
-  active:    { label: 'Activo',      dot: 'bg-emerald-500', badge: 'bg-green-100 text-green-700' },
-  inactive:  { label: 'Inactivo',    dot: 'bg-outline',     badge: 'bg-surface-variant text-outline' },
-  blocked:   { label: 'Bloqueado',   dot: 'bg-error',       badge: 'bg-error-container text-error' },
-  published: { label: 'Publicado',   dot: 'bg-emerald-500', badge: 'bg-green-100 text-green-700' },
-  draft:     { label: 'Borrador',    dot: 'bg-secondary',   badge: 'bg-secondary-fixed text-on-secondary-fixed-variant' },
-  pending:   { label: 'Pendiente',   dot: 'bg-warning',     badge: 'bg-amber-100 text-amber-700' },
-  paid:      { label: 'Pagado',      dot: 'bg-emerald-500', badge: 'bg-green-100 text-green-700' },
-  shipped:   { label: 'Enviado',     dot: 'bg-sky-500',     badge: 'bg-blue-100 text-blue-700' },
-  cancelled: { label: 'Cancelado',   dot: 'bg-error',       badge: 'bg-error-container text-error' },
+  active:    { label: L.active,     dot: 'bg-emerald-500', badge: 'bg-green-100 text-green-700' },
+  inactive:  { label: L.inactive,   dot: 'bg-outline',     badge: 'bg-surface-variant text-outline' },
+  blocked:   { label: L.blocked,    dot: 'bg-error',       badge: 'bg-error-container text-error' },
+  published: { label: L.published,  dot: 'bg-emerald-500', badge: 'bg-green-100 text-green-700' },
+  draft:     { label: L.draft,      dot: 'bg-secondary',   badge: 'bg-secondary-fixed text-on-secondary-fixed-variant' },
+  pending:   { label: L.pending,    dot: 'bg-warning',     badge: 'bg-amber-100 text-amber-700' },
+  paid:      { label: L.paid,       dot: 'bg-emerald-500', badge: 'bg-green-100 text-green-700' },
+  shipped:   { label: L.shipped,    dot: 'bg-sky-500',     badge: 'bg-blue-100 text-blue-700' },
+  cancelled: { label: L.cancelled,  dot: 'bg-error',       badge: 'bg-error-container text-error' },
 };
 
 const FALLBACK: StatusConfig = {

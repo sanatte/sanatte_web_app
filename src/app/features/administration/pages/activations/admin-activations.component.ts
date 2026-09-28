@@ -6,6 +6,7 @@ import { AdminPageHeaderComponent } from '../../../../shared/components/admin-pa
 import { SearchInputComponent } from '../../../../shared/components/search-input/search-input.component';
 import { Activation, ActivationStatus } from '../../models/activation.model';
 import { DecimalPipe } from '@angular/common';
+import { TEXTS } from '../../../../core/i18n/texts';
 
 type StatusFilter = 'all' | ActivationStatus;
 const PAGE_SIZE = 10;
@@ -18,6 +19,8 @@ const PAGE_SIZE = 10;
 export class AdminActivationsComponent {
   private readonly activationService = inject(ActivationService);
 
+  protected readonly t = TEXTS.admin.activations.page;
+
   readonly searchTerm       = signal('');
   readonly statusFilter     = signal<StatusFilter>('all');
   readonly currentPage      = signal(1);
@@ -27,10 +30,10 @@ export class AdminActivationsComponent {
   readonly stats        = this.activationService.stats;
 
   readonly statusOptions = [
-    { value: 'all',     label: 'Estado: Todos'  },
-    { value: 'success', label: 'Exitosas'        },
-    { value: 'pending', label: 'En proceso'      },
-    { value: 'failed',  label: 'Fallidas'        },
+    { value: 'all',     label: this.t.statusFilter.all     },
+    { value: 'success', label: this.t.statusFilter.success },
+    { value: 'pending', label: this.t.statusFilter.pending },
+    { value: 'failed',  label: this.t.statusFilter.failed  },
   ];
 
   readonly filtered = computed(() => {
@@ -59,9 +62,7 @@ export class AdminActivationsComponent {
   }
   onPageChange(page: number): void { this.currentPage.set(page); }
 
-  onViewDetail(act: Activation): void {
-    // placeholder - detalle de activación
-  }
+  onViewDetail(act: Activation): void {}
 
   onRevoke(act: Activation): void {
     this.activationToRevoke.set(act);

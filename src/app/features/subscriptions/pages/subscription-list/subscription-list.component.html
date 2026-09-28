@@ -1,30 +1,28 @@
 <div class="max-w-5xl mx-auto space-y-section-gap">
 
-  <!-- Header -->
   <header>
-    <h1 class="font-heading text-headline-lg text-on-surface mb-2">Mi Suscripción</h1>
+    <h1 class="font-heading text-headline-lg text-on-surface mb-2">{{ t.title }}</h1>
     <p class="font-sans text-body-lg text-on-surface-variant">
-      Gestiona tu plan, método de pago y facturación.
+      {{ t.description }}
     </p>
   </header>
 
   @if (hasActive() && currentPlan(); as plan) {
-    <!-- Plan actual (hero) -->
     <section class="rounded-lg overflow-hidden gradient-primary text-white shadow-primary">
       <div class="p-6 md:p-8">
         <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
           <div>
             <div class="flex items-center gap-2 mb-2">
               <span class="px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-label-sm font-heading font-bold uppercase tracking-wider">
-                Plan actual
+                {{ t.currentPlan }}
               </span>
               @if (isCancelling()) {
                 <span class="px-3 py-1 rounded-full bg-white/90 text-error text-label-sm font-heading font-bold">
-                  Se cancela el {{ subscription().nextBillingDate }}
+                  {{ t.cancelsOn(subscription().nextBillingDate) }}
                 </span>
               } @else {
                 <span class="px-3 py-1 rounded-full bg-white/90 text-primary text-label-sm font-heading font-bold flex items-center gap-1">
-                  <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Activa
+                  <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> {{ t.active }}
                 </span>
               }
             </div>
@@ -39,63 +37,58 @@
           </div>
         </div>
 
-        <!-- Datos de ciclo -->
         <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6 pt-6 border-t border-white/20">
           <div>
-            <p class="text-label-sm uppercase tracking-wider text-white/70">Recursos incluidos</p>
+            <p class="text-label-sm uppercase tracking-wider text-white/70">{{ t.resourcesIncluded }}</p>
             <p class="font-heading text-headline-md mt-0.5">{{ resourceCount() }}</p>
           </div>
           <div>
-            <p class="text-label-sm uppercase tracking-wider text-white/70">Miembro desde</p>
+            <p class="text-label-sm uppercase tracking-wider text-white/70">{{ t.memberSince }}</p>
             <p class="font-heading text-lg mt-0.5">{{ subscription().startedAt }}</p>
           </div>
           <div>
             <p class="text-label-sm uppercase tracking-wider text-white/70">
-              {{ isCancelling() ? 'Acceso hasta' : 'Próxima factura' }}
+              {{ isCancelling() ? t.accessUntil : t.nextInvoice }}
             </p>
             <p class="font-heading text-lg mt-0.5">{{ subscription().nextBillingDate }}</p>
           </div>
         </div>
       </div>
 
-      <!-- Acciones -->
       <div class="bg-black/10 px-6 md:px-8 py-4 flex flex-wrap gap-3">
         @if (isCancelling()) {
           <button (click)="reactivate()"
                   class="px-6 py-2.5 rounded-full bg-white text-primary font-heading font-bold text-label-md
                          hover:bg-white/90 active:scale-95 transition-all">
-            Reactivar suscripción
+            {{ t.reactivate }}
           </button>
         } @else {
           <button (click)="requestCancel()"
                   class="px-6 py-2.5 rounded-full bg-white/15 backdrop-blur-md border border-white/30
                          text-white font-heading font-bold text-label-md hover:bg-white/25
                          active:scale-95 transition-all">
-            Cancelar suscripción
+            {{ t.cancel }}
           </button>
         }
       </div>
     </section>
   } @else {
-    <!-- Sin suscripción activa -->
     <section class="glass-card rounded-lg p-12 text-center">
       <div class="w-20 h-20 rounded-full bg-primary-fixed flex items-center justify-center mx-auto mb-6">
         <span class="material-symbols-outlined text-primary text-[40px]">workspace_premium</span>
       </div>
-      <h3 class="font-heading text-headline-md text-on-surface mb-2">No tienes una suscripción activa</h3>
+      <h3 class="font-heading text-headline-md text-on-surface mb-2">{{ t.noActive.title }}</h3>
       <p class="font-sans text-body-md text-on-surface-variant max-w-md mx-auto">
-        Elige un plan para acceder a la biblioteca completa de recursos de bienestar.
+        {{ t.noActive.description }}
       </p>
     </section>
   }
 
-  <!-- Método de pago + Facturación -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter">
-    <!-- Método de pago -->
     <section class="glass-card rounded-lg p-6">
       <div class="flex items-center gap-2 mb-4">
         <span class="material-symbols-outlined text-primary">credit_card</span>
-        <h3 class="font-heading text-headline-md text-on-surface">Método de pago</h3>
+        <h3 class="font-heading text-headline-md text-on-surface">{{ t.paymentMethod.title }}</h3>
       </div>
       <div class="flex items-center justify-between gap-4">
         <div class="flex items-center gap-3">
@@ -105,25 +98,24 @@
           </div>
           <div>
             <p class="font-heading font-semibold text-on-surface">•••• {{ paymentMethod().last4 }}</p>
-            <p class="text-label-sm font-heading text-on-surface-variant">Vence {{ paymentMethod().expiry }}</p>
+            <p class="text-label-sm font-heading text-on-surface-variant">{{ t.paymentMethod.expires(paymentMethod().expiry) }}</p>
           </div>
         </div>
         <button class="px-4 py-2 rounded-full border border-outline-variant text-on-surface font-heading
                        font-semibold text-label-sm hover:bg-surface-container transition-colors">
-          Actualizar
+          {{ t.paymentMethod.update }}
         </button>
       </div>
       <p class="text-label-sm font-heading text-outline mt-4 flex items-center gap-1">
         <span class="material-symbols-outlined text-[14px]">lock</span>
-        Pagos procesados de forma segura (se integrará con Mercado Pago).
+        {{ t.paymentMethod.secure }}
       </p>
     </section>
 
-    <!-- Historial de facturación -->
     <section class="glass-card rounded-lg p-6">
       <div class="flex items-center gap-2 mb-4">
         <span class="material-symbols-outlined text-primary">receipt_long</span>
-        <h3 class="font-heading text-headline-md text-on-surface">Facturación</h3>
+        <h3 class="font-heading text-headline-md text-on-surface">{{ t.billing.title }}</h3>
       </div>
       <div class="divide-y divide-outline-variant/20">
         @for (inv of invoices(); track inv.id) {
@@ -135,7 +127,7 @@
             <div class="flex items-center gap-3">
               <span class="font-heading font-bold text-on-surface">{{ inv.amount | money }}</span>
               <button class="p-1.5 rounded-full text-on-surface-variant hover:text-primary hover:bg-primary-fixed transition-colors"
-                      title="Descargar factura">
+                      [title]="t.billing.downloadInvoice">
                 <span class="material-symbols-outlined text-[18px]">download</span>
               </button>
             </div>
@@ -145,9 +137,8 @@
     </section>
   </div>
 
-  <!-- Planes disponibles -->
   <section>
-    <h3 class="font-heading text-headline-md text-on-surface mb-4">Planes disponibles</h3>
+    <h3 class="font-heading text-headline-md text-on-surface mb-4">{{ t.plans.title }}</h3>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
       @for (plan of availablePlans(); track plan.id) {
         <div class="glass-card rounded-lg p-6 flex flex-col transition-all"
@@ -159,7 +150,7 @@
             </div>
             @if (isCurrent(plan.sku)) {
               <span class="px-3 py-1 rounded-full bg-primary text-white text-label-sm font-heading font-bold flex-shrink-0">
-                Tu plan
+                {{ t.plans.yourPlan }}
               </span>
             }
           </div>
@@ -182,7 +173,7 @@
                   [class]="isCurrent(plan.sku)
                     ? 'bg-surface-container text-outline cursor-default'
                     : 'bg-primary text-white hover:opacity-90 active:scale-95'">
-            {{ isCurrent(plan.sku) ? 'Plan actual' : 'Cambiar a este plan' }}
+            {{ isCurrent(plan.sku) ? t.plans.current : t.plans.switchTo }}
           </button>
         </div>
       }
@@ -190,13 +181,12 @@
   </section>
 </div>
 
-<!-- Confirmación de cancelación (reusa ConfirmDialog) -->
 <app-confirm-dialog
   [open]="confirmCancelOpen()"
-  title="¿Cancelar tu suscripción?"
-  message="Mantendrás el acceso hasta el final del periodo ya pagado. Después perderás el acceso a los recursos del plan."
-  confirmText="Sí, cancelar"
-  cancelText="Conservar plan"
+  [title]="t.cancelDialog.title"
+  [message]="t.cancelDialog.message"
+  [confirmText]="t.cancelDialog.confirm"
+  [cancelText]="t.cancelDialog.cancel"
   variant="danger"
   (confirm)="confirmCancel()"
   (cancel)="confirmCancelOpen.set(false)"></app-confirm-dialog>

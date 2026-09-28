@@ -1,6 +1,7 @@
 import { Component, computed, input, output, signal } from '@angular/core';
 import { StatusBadgeComponent } from '../../../../shared/components/status-badge/status-badge.component';
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
+import { TEXTS } from '../../../../core/i18n/texts';
 import { License, LicenseStatus } from '../../models/license.model';
 
 @Component({
@@ -9,6 +10,8 @@ import { License, LicenseStatus } from '../../models/license.model';
   templateUrl: './license-table.component.html',
 })
 export class LicenseTableComponent {
+  protected readonly t = TEXTS.admin.licenses.table;
+
   readonly licenses    = input.required<License[]>();
   readonly totalItems  = input.required<number>();
   readonly currentPage = input.required<number>();
@@ -25,8 +28,6 @@ export class LicenseTableComponent {
 
   readonly selectedIds = signal<Set<string>>(new Set());
 
-  // Solo licencias aún no usadas pueden imprimirse como tarjeta de activación.
-  // 'active', 'sold', 'assigned' ya fueron entregadas — reimprimir sería un duplicado.
   readonly selectableLicenses = computed(() =>
     this.licenses().filter(l => l.status === 'preparing' || l.status === 'available')
   );
@@ -82,14 +83,7 @@ export class LicenseTableComponent {
   }
 
   statusLabel(status: LicenseStatus): string {
-    return {
-      preparing: 'En preparación',
-      available: 'Disponible',
-      assigned: 'Asignada',
-      sold: 'Vendida',
-      active: 'Activa',
-      revoked: 'Revocada',
-    }[status] ?? status;
+    return this.t.statuses[status] ?? status;
   }
 
   statusVariant(status: LicenseStatus): string {

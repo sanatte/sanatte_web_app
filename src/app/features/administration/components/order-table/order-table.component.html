@@ -5,37 +5,29 @@
     <table class="w-full text-left border-collapse">
       <thead class="bg-surface-container-low/50 border-b border-outline-variant/20">
         <tr>
-          <!-- Siempre -->
           <th class="px-4 md:px-6 py-4 text-label-sm font-heading text-outline uppercase tracking-wider">
-            ID Pedido
+            {{ t.columns.orderId }}
           </th>
-          <!-- Siempre -->
           <th class="px-4 md:px-6 py-4 text-label-sm font-heading text-outline uppercase tracking-wider">
-            Comprador
+            {{ t.columns.buyer }}
           </th>
-          <!-- lg+ -->
           <th class="hidden lg:table-cell px-6 py-4 text-label-sm font-heading text-outline uppercase tracking-wider">
-            Productos
+            {{ t.columns.products }}
           </th>
-          <!-- lg+ -->
           <th class="hidden lg:table-cell px-6 py-4 text-label-sm font-heading text-outline uppercase tracking-wider">
-            Fecha
+            {{ t.columns.date }}
           </th>
-          <!-- Siempre -->
           <th class="px-4 md:px-6 py-4 text-label-sm font-heading text-outline uppercase tracking-wider">
-            Total
+            {{ t.columns.total }}
           </th>
-          <!-- md+ -->
           <th class="hidden md:table-cell px-6 py-4 text-label-sm font-heading text-outline uppercase tracking-wider">
-            Pago
+            {{ t.columns.payment }}
           </th>
-          <!-- md+ -->
           <th class="hidden md:table-cell px-6 py-4 text-label-sm font-heading text-outline uppercase tracking-wider">
-            Entrega / Activación
+            {{ t.columns.delivery }}
           </th>
-          <!-- Siempre -->
           <th class="px-4 md:px-6 py-4 text-label-sm font-heading text-outline uppercase tracking-wider text-right">
-            Acciones
+            {{ t.columns.actions }}
           </th>
         </tr>
       </thead>
@@ -44,18 +36,15 @@
         @for (order of orders(); track order.id) {
           <tr class="hover:bg-surface-container-low/30 transition-colors">
 
-            <!-- ID Pedido — siempre -->
             <td class="px-4 md:px-6 py-4 md:py-5">
               <span class="font-heading font-bold text-primary text-label-md">
                 {{ order.orderNumber }}
               </span>
-              <!-- Estado de pago inline en móvil -->
               <div class="md:hidden mt-1">
                 <app-status-badge [status]="order.paymentStatus" />
               </div>
             </td>
 
-            <!-- Comprador — siempre -->
             <td class="px-4 md:px-6 py-4 md:py-5">
               <div class="flex items-center gap-3">
                 <div class="w-8 h-8 md:w-9 md:h-9 rounded-full flex-shrink-0 flex items-center
@@ -71,10 +60,8 @@
               </div>
             </td>
 
-            <!-- Productos — lg+ -->
             <td class="hidden lg:table-cell px-6 py-5">
               <div class="flex items-center">
-                <!-- Primeros 2 iconos -->
                 <div class="flex -space-x-1.5">
                   @for (product of order.products.slice(0, 2); track product.id) {
                     <div class="w-8 h-8 rounded-lg border-2 border-white flex items-center
@@ -87,7 +74,6 @@
                     </div>
                   }
                 </div>
-                <!-- Overflow -->
                 @if (order.products.length > 2) {
                   <div class="w-8 h-8 rounded-lg border-2 border-white bg-surface-container-high
                               -ml-1.5 flex items-center justify-center
@@ -98,25 +84,21 @@
               </div>
             </td>
 
-            <!-- Fecha — lg+ -->
             <td class="hidden lg:table-cell px-6 py-5">
               <p class="text-sm text-on-surface">{{ order.date }}</p>
               <p class="text-[11px] text-outline mt-0.5">{{ order.time }}</p>
             </td>
 
-            <!-- Total — siempre -->
             <td class="px-4 md:px-6 py-4 md:py-5">
               <span class="font-heading font-bold text-on-surface">
                 {{ order.total | money }}
               </span>
             </td>
 
-            <!-- Pago — md+ -->
             <td class="hidden md:table-cell px-6 py-5">
               <app-status-badge [status]="order.paymentStatus" />
             </td>
 
-            <!-- Entrega/Activación — md+ -->
             <td class="hidden md:table-cell px-6 py-5">
               <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full
                            text-label-sm font-heading font-bold"
@@ -126,7 +108,6 @@
                 </span>
                 {{ deliveryConfig(order.deliveryStatus).label }}
               </span>
-              <!-- Guía de envío -->
               @if (order.shippingCarrier && order.trackingNumber) {
                 <div class="mt-1.5 flex items-center gap-1">
                   <span class="material-symbols-outlined text-[13px] text-on-surface-variant">
@@ -150,20 +131,19 @@
               }
             </td>
 
-            <!-- Acciones — siempre -->
             <td class="px-4 md:px-6 py-4 md:py-5 text-right">
               <div class="flex items-center justify-end gap-1">
                 <button (click)="viewOrder.emit(order)"
                         class="p-2 text-outline hover:text-primary hover:bg-primary/5
                                rounded-full transition-colors"
-                        title="Ver detalle">
+                        [title]="t.viewDetail">
                   <span class="material-symbols-outlined text-[18px] md:text-[20px]">visibility</span>
                 </button>
                 @if (canChangeDelivery(order)) {
                   <button (click)="changeDelivery.emit(order)"
                           class="p-2 text-outline hover:text-secondary hover:bg-secondary/5
                                  rounded-full transition-colors hidden sm:block"
-                          title="Cambiar estado de entrega">
+                          [title]="t.changeDelivery">
                     <span class="material-symbols-outlined text-[18px] md:text-[20px]">
                       local_shipping
                     </span>
@@ -173,13 +153,13 @@
                   <button (click)="generateActivation.emit(order)"
                           class="p-2 text-outline hover:text-primary hover:bg-primary/5
                                  rounded-full transition-colors"
-                          title="Generar QR de activación (al empacar)">
+                          [title]="t.generateActivation">
                     <span class="material-symbols-outlined text-[18px] md:text-[20px]">qr_code_2</span>
                   </button>
                 }
                 <button class="p-2 text-outline hover:text-primary hover:bg-primary/5
                                rounded-full transition-colors hidden sm:block"
-                        title="Imprimir">
+                        [title]="t.print">
                   <span class="material-symbols-outlined text-[18px] md:text-[20px]">print</span>
                 </button>
               </div>
@@ -195,7 +175,7 @@
                 receipt_long
               </span>
               <p class="text-label-md font-heading text-on-surface-variant">
-                No se encontraron pedidos
+                {{ t.empty }}
               </p>
             </td>
           </tr>
@@ -204,13 +184,12 @@
     </table>
   </div>
 
-  <!-- Pagination -->
   <div class="px-4 md:px-6 border-t border-outline-variant/20 bg-surface-container-lowest">
     <app-pagination
       [currentPage]="currentPage()"
       [pageSize]="pageSize()"
       [total]="totalItems()"
-      label="pedidos"
+      [label]="t.paginationLabel"
       (pageChange)="pageChange.emit($event)" />
   </div>
 

@@ -10,6 +10,7 @@ import { GenerateBatchDialogComponent } from '../../components/generate-batch-di
 import { QrService } from '../../../../shared/services/qr.service';
 import { environment } from '../../../../../environments/environment';
 import { DecimalPipe } from '@angular/common';
+import { TEXTS } from '../../../../core/i18n/texts';
 
 const PAGE_SIZE = 10;
 
@@ -22,6 +23,9 @@ export class AdminLicensesComponent {
   private readonly licenseService = inject(LicenseService);
   private readonly qr             = inject(QrService);
   private readonly cardPdf        = inject(CardPdfService);
+
+  protected readonly t = TEXTS.admin.licenses.page;
+  protected readonly c = TEXTS.common;
 
   readonly searchTerm    = signal('');
   readonly currentPage   = signal(1);
@@ -65,9 +69,7 @@ export class AdminLicensesComponent {
     navigator.clipboard?.writeText(license.code).catch(() => {});
   }
 
-  onViewOrder(license: License): void {
-    // Navigate to order - placeholder
-  }
+  onViewOrder(license: License): void {}
 
   onDownloadQr(license: License): void {
     const url = `${environment.publicBaseUrl}/activate?code=${encodeURIComponent(license.code)}`;

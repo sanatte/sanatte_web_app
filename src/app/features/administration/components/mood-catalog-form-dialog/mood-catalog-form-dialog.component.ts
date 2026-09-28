@@ -1,11 +1,12 @@
 import {
-  Component, input, output, inject, signal, computed, effect, OnChanges
+  Component, input, output, inject, signal, computed, effect
 } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { MoodCatalog } from '../../models/mood-catalog.model';
 import { environment } from '../../../../../environments/environment';
+import { TEXTS } from '../../../../core/i18n/texts';
 
 export interface MoodCatalogFormEvent {
   name: string;
@@ -22,9 +23,12 @@ export interface MoodCatalogFormEvent {
   imports: [ReactiveFormsModule],
   templateUrl: './mood-catalog-form-dialog.component.html',
 })
-export class MoodCatalogFormDialogComponent implements OnChanges {
+export class MoodCatalogFormDialogComponent {
   private readonly fb   = inject(FormBuilder);
   private readonly http = inject(HttpClient);
+
+  protected readonly t = TEXTS.admin.moodCatalog.formDialog;
+  protected readonly c = TEXTS.common;
 
   readonly isOpen       = input.required<boolean>();
   readonly editingItem  = input<MoodCatalog | null>(null);
@@ -34,7 +38,6 @@ export class MoodCatalogFormDialogComponent implements OnChanges {
   readonly close = output<void>();
   readonly save  = output<MoodCatalogFormEvent>();
 
-  // Estado local del upload de media
   readonly uploadProgress = signal<number | null>(null);
   readonly uploadError    = signal<string | null>(null);
   readonly linkedResourceId    = signal<string | null>(null);
@@ -42,7 +45,7 @@ export class MoodCatalogFormDialogComponent implements OnChanges {
   readonly linkedResourceType  = signal<string | null>(null);
 
   readonly isEditMode = computed(() => this.editingItem() !== null);
-  readonly title      = computed(() => this.isEditMode() ? 'Editar emoción' : 'Nueva emoción');
+  readonly title      = computed(() => this.isEditMode() ? this.t.editTitle : this.t.createTitle);
 
   readonly form = this.fb.nonNullable.group({
     name:        ['', [Validators.required, Validators.maxLength(80)]],
@@ -54,7 +57,6 @@ export class MoodCatalogFormDialogComponent implements OnChanges {
   });
 
   constructor() {
-    // Sincronizar el formulario cuando cambia el item a editar
     effect(() => {
       const item = this.editingItem();
       if (!this.isOpen()) return;
@@ -80,8 +82,6 @@ export class MoodCatalogFormDialogComponent implements OnChanges {
       this.uploadError.set(null);
     });
   }
-
-  ngOnChanges(): void { /* Angular require OnChanges para el input() */ }
 
   onClose(): void { this.close.emit(); }
 
@@ -112,7 +112,7 @@ export class MoodCatalogFormDialogComponent implements OnChanges {
 
     const allowed = ['video/mp4', 'video/webm', 'audio/mpeg', 'audio/mp4', 'audio/aac', 'audio/wav'];
     if (!allowed.includes(file.type)) {
-      this.uploadError.set('Formato no válido. Usa MP4, WebM, MP3, AAC o WAV.');
+      this.uploadError.set(this.t.invalidFormat);
       input.value = '';
       return;
     }
@@ -123,20 +123,18 @@ export class MoodCatalogFormDialogComponent implements OnChanges {
     try {
       const base = `${environment.apiUrl}/admin/resources`;
 
-      // 1) Crear Resource shell (título provisional = nombre de la emoción o archivo)
       const resourceName = this.form.getRawValue().name || file.name;
-      const typeInt = file.type.startsWith('video') ? 1 : 0; // 0=audio, 1=video
+      const typeInt = file.type.startsWith('video') ? 1 : 0;
       const created = await firstValueFrom(
         this.http.post<{ id: string; title: string }>(base, {
           title: `Media lúdico: ${resourceName}`,
           description: `Herramienta lúdica explicativa de la emoción "${resourceName}".`,
           type: typeInt,
-          status: 1, // published
+          status: 1,
           tags: ['mood-resource'],
         })
       );
 
-      // 2) URL firmada de subida
       const signed = await firstValueFrom(
         this.http.post<{ uploadUrl: string; storagePath: string }>(
           `${base}/${created.id}/media/upload-url`,
@@ -144,10 +142,8 @@ export class MoodCatalogFormDialogComponent implements OnChanges {
         )
       );
 
-      // 3) PUT directo a R2 con progreso (sin interceptor de auth)
       await this.uploadToR2(signed.uploadUrl, file, (pct) => this.uploadProgress.set(pct));
 
-      // 4) Confirmar
       await firstValueFrom(
         this.http.put(`${base}/${created.id}/media`, {
           storagePath:  signed.storagePath,
@@ -156,14 +152,13 @@ export class MoodCatalogFormDialogComponent implements OnChanges {
         })
       );
 
-      // 5) Vincular el resource al formulario
       this.linkedResourceId.set(created.id);
       this.linkedResourceTitle.set(file.name);
       this.linkedResourceType.set(file.type);
       this.uploadProgress.set(100);
 
     } catch (e) {
-      this.uploadError.set('Error al subir el archivo. Intenta de nuevo.');
+      this.uploadError.set(this.t.uploadError);
       this.uploadProgress.set(null);
     } finally {
       input.value = '';
@@ -191,6 +186,6 @@ export class MoodCatalogFormDialogComponent implements OnChanges {
 
   getResourceTypeLabel(): string {
     const ct = this.linkedResourceType() ?? '';
-    return ct.startsWith('video') ? 'Video' : 'Audio';
+    return ct.startsWith('video') ? TEXTS.admin.moodCatalog.mediaTypes.video : TEXTS.admin.moodCatalog.mediaTypes.audio;
   }
 }

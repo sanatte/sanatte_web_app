@@ -1,3 +1,4 @@
+import { TEXTS } from '../../../core/i18n/texts';
 import { Component, input, output, computed } from '@angular/core';
 
 @Component({
@@ -5,15 +6,13 @@ import { Component, input, output, computed } from '@angular/core';
   template: `
     <div class="flex flex-col sm:flex-row items-center justify-between gap-3 px-2 py-3">
 
-      <!-- Contador -->
       <p class="text-label-sm font-heading text-on-surface-variant">
-        Mostrando
+        {{ t.showing }}
         <span class="font-bold text-on-surface">{{ startItem() }}–{{ endItem() }}</span>
-        de <span class="font-bold text-on-surface">{{ total() }}</span>
+        {{ t.of }} <span class="font-bold text-on-surface">{{ total() }}</span>
         {{ label() }}
       </p>
 
-      <!-- Páginas -->
       <nav class="flex items-center gap-1">
         <button (click)="goToPage(currentPage() - 1)"
                 [disabled]="currentPage() === 1"
@@ -53,10 +52,12 @@ import { Component, input, output, computed } from '@angular/core';
   `,
 })
 export class PaginationComponent {
+  protected readonly t = TEXTS.common.pagination;
+
   readonly currentPage = input.required<number>();
   readonly pageSize    = input.required<number>();
   readonly total       = input.required<number>();
-  readonly label       = input('resultados');
+  readonly label       = input<string>(TEXTS.common.pagination.results);
   readonly pageChange  = output<number>();
 
   readonly totalPages = computed(() =>
@@ -81,7 +82,7 @@ export class PaginationComponent {
 
     const pages: number[] = [1];
 
-    if (current > 3) pages.push(-1); // ellipsis
+    if (current > 3) pages.push(-1);
 
     const start = Math.max(2, current - 1);
     const end = Math.min(total - 1, current + 1);
@@ -90,7 +91,7 @@ export class PaginationComponent {
       pages.push(i);
     }
 
-    if (current < total - 2) pages.push(-1); // ellipsis
+    if (current < total - 2) pages.push(-1);
 
     pages.push(total);
     return pages;

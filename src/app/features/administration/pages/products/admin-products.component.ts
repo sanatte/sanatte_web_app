@@ -7,6 +7,7 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
 import { AdminPageHeaderComponent } from '../../../../shared/components/admin-page-header/admin-page-header.component';
 import { SearchInputComponent } from '../../../../shared/components/search-input/search-input.component';
 import { Product } from '../../models/product.model';
+import { TEXTS } from '../../../../core/i18n/texts';
 
 const PAGE_SIZE = 8;
 
@@ -19,6 +20,8 @@ const PAGE_SIZE = 8;
   templateUrl: './admin-products.component.html',
 })
 export class AdminProductsComponent implements OnInit {
+  protected readonly t = TEXTS.admin.products;
+
   private readonly productService = inject(ProductService);
   private readonly route          = inject(ActivatedRoute);
 
@@ -47,13 +50,12 @@ export class AdminProductsComponent implements OnInit {
 
   readonly deleteMessage = computed(() => {
     const p = this.productToDelete();
-    return p ? `¿Eliminar "${p.name}" (${p.sku})? Esta acción no se puede deshacer.` : '';
+    return p ? this.t.page.deleteMessage(p.name, p.sku) : '';
   });
 
   onSearch(term: string): void { this.searchTerm.set(term); this.currentPage.set(1); }
 
   ngOnInit(): void {
-    // Abre el dialog de edición cuando se llega desde /admin/products/:id con ?edit=id
     const editId = this.route.snapshot.queryParamMap.get('edit');
     if (editId) {
       const p = this.productService.getById(editId);
@@ -74,21 +76,19 @@ export class AdminProductsComponent implements OnInit {
         ? await this.productService.update(editing.id, data)
         : await this.productService.create(data as any);
 
-      // Sincronizar entitlements con una sola llamada PUT (atómica, sin concurrencia).
       if (data.entitlements !== undefined) {
         const resourceIds = data.entitlements.map((e) => e.referenceId);
         await this.productService.syncEntitlements(saved.id, resourceIds);
       }
 
       if (coverFile) {
-        try { await this.productService.uploadImage(saved.id, coverFile, '', true); }
-        catch { /* portada opcional: el admin puede subirla desde el detalle */ }
+        await this.productService.uploadImage(saved.id, coverFile, '', true).catch(() => undefined);
       }
       this.closeModal();
     } catch (e: unknown) {
       this.saveError.set(
         (e as { error?: { detail?: string } })?.error?.detail
-          ?? 'No se pudo guardar el producto. Revisa los datos e intenta de nuevo.'
+          ?? this.t.page.saveError
       );
     } finally {
       this.saving.set(false);
@@ -112,7 +112,7 @@ export class AdminProductsComponent implements OnInit {
     } catch (e: unknown) {
       this.deleteError.set(
         (e as { error?: { detail?: string } })?.error?.detail
-          ?? 'No se pudo eliminar el producto.'
+          ?? this.t.page.deleteError
       );
     }
   }

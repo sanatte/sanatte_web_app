@@ -1,0 +1,58 @@
+export const PUBLIC_CHECKOUT_TEXTS = {
+  placed: {
+    title: '¡Gracias por tu compra!',
+    orderBefore: 'Tu pedido ',
+    orderAfter: (email: string) => ` fue confirmado. Te enviamos el detalle a ${email}.`,
+    description: 'Los productos digitales ya están disponibles en tu biblioteca. Los físicos serán despachados pronto.',
+    goToLibrary: 'Ir a mi biblioteca',
+    viewOrders: 'Ver mis pedidos',
+  },
+  empty: {
+    title: 'No hay productos para pagar',
+    viewCatalog: 'Ver catálogo',
+  },
+  header: {
+    title: 'Finalizar compra',
+    buyingAs: 'Comprando como ',
+    email: (email: string) => ` (${email})`,
+  },
+  shipping: {
+    title: 'Datos de envío',
+    fullName: 'Nombre completo',
+    address: 'Dirección',
+    addressPlaceholder: 'Calle, número, apto',
+    city: 'Ciudad',
+  },
+  digital: {
+    title: 'Entrega digital inmediata',
+    description: 'Tu compra estará disponible al instante en tu biblioteca. No requiere envío.',
+  },
+  payment: {
+    title: 'Pago seguro',
+    before: 'Al continuar te llevaremos a ',
+    provider: 'Mercado Pago',
+    after:
+      ' para completar el pago de forma segura (tarjeta, PSE, Efecty o saldo en cuenta). Volverás a Sanatte automáticamente al terminar.',
+    startError: 'No pudimos iniciar el pago. Intenta de nuevo.',
+  },
+  summary: {
+    title: 'Tu pedido',
+    quantity: (n: number) => `x${n}`,
+    discountApplied: (code: string | null, percent: number | null | undefined) => `${code ?? ''} — ${percent ?? ''}% de descuento`,
+    ally: (name: string | null | undefined) => `Aliado: ${name ?? ''}`,
+    hasCode: '¿Tienes un código de aliado?',
+    codePlaceholder: 'Ej. KAYLA',
+    apply: 'Aplicar',
+    applying: '…',
+    invalidCode: 'Código no válido.',
+    subtotal: 'Subtotal',
+    shipping: 'Envío',
+    free: 'Gratis',
+    discount: (percent: number | null | undefined) => `Descuento (${percent ?? ''}%)`,
+    taxIncluded: 'IVA incluido',
+    total: 'Total',
+    redirecting: 'Redirigiendo a Mercado Pago…',
+    pay: (amount: string) => `Pagar ${amount}`,
+    backToCart: 'Volver al carrito',
+  },
+} as const;

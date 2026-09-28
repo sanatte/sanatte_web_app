@@ -6,25 +6,25 @@
       <thead class="bg-surface-container-low border-b border-outline-variant/30">
         <tr>
           <th class="px-4 md:px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
-            Usuario
+            {{ t.columns.user }}
           </th>
           <th class="hidden md:table-cell px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
-            Rol
+            {{ t.columns.role }}
           </th>
           <th class="hidden lg:table-cell px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
-            Productos
+            {{ t.columns.products }}
           </th>
           <th class="hidden lg:table-cell px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
-            Suscripción
+            {{ t.columns.subscription }}
           </th>
           <th class="hidden xl:table-cell px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
-            Último acceso
+            {{ t.columns.lastLogin }}
           </th>
           <th class="px-4 md:px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
-            Estado
+            {{ t.columns.status }}
           </th>
           <th class="px-4 md:px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider text-right">
-            Acciones
+            {{ t.columns.actions }}
           </th>
         </tr>
       </thead>
@@ -33,7 +33,6 @@
         @for (user of users(); track user.id) {
           <tr class="hover:bg-surface-container-low/50 transition-colors">
 
-            <!-- Usuario — siempre -->
             <td class="px-4 md:px-6 py-3 md:py-4">
               <div class="flex items-center gap-3">
                 <div class="w-9 h-9 md:w-10 md:h-10 rounded-full flex-shrink-0 flex items-center
@@ -47,7 +46,6 @@
                     {{ user.displayName }}
                   </p>
                   <p class="text-label-sm font-heading text-outline truncate">{{ user.email }}</p>
-                  <!-- Rol inline en móvil -->
                   <span class="md:hidden inline-block mt-1 px-2 py-0.5 rounded-full
                                text-[11px] font-heading font-semibold"
                         [class]="roleClasses(user.role)">
@@ -57,7 +55,6 @@
               </div>
             </td>
 
-            <!-- Rol — md+ -->
             <td class="hidden md:table-cell px-6 py-4">
               <span class="px-3 py-1 rounded-full text-label-sm font-heading font-semibold"
                     [class]="roleClasses(user.role)">
@@ -65,25 +62,23 @@
               </span>
             </td>
 
-            <!-- Productos — lg+ -->
             <td class="hidden lg:table-cell px-6 py-4">
               <div class="flex items-center gap-3">
                 <div>
                   <p class="text-label-md font-heading font-semibold text-on-surface">
                     {{ user.productsCount }}
-                    <span class="font-normal text-outline">comprados</span>
+                    <span class="font-normal text-outline">{{ t.purchased }}</span>
                   </p>
                   @if (user.activationsCount > 0) {
                     <p class="text-label-sm font-heading text-primary mt-0.5">
                       <span class="material-symbols-outlined text-[13px] align-middle">qr_code_scanner</span>
-                      {{ user.activationsCount }} activado{{ user.activationsCount !== 1 ? 's' : '' }}
+                      {{ t.activated(user.activationsCount) }}
                     </p>
                   }
                 </div>
               </div>
             </td>
 
-            <!-- Suscripción — lg+ -->
             <td class="hidden lg:table-cell px-6 py-4">
               @if (user.hasActiveSubscription) {
                 <div class="flex items-center gap-1.5 text-primary">
@@ -95,35 +90,30 @@
               }
             </td>
 
-            <!-- Último acceso — xl+ -->
             <td class="hidden xl:table-cell px-6 py-4 text-label-sm font-heading text-on-surface-variant">
               {{ user.lastLoginAt }}
             </td>
 
-            <!-- Estado — siempre -->
             <td class="px-4 md:px-6 py-3 md:py-4">
               <app-status-badge [status]="user.status" />
             </td>
 
-            <!-- Acciones — siempre -->
             <td class="px-4 md:px-6 py-3 md:py-4 text-right">
               <div class="flex justify-end gap-1">
-                <!-- Toggle estado -->
                 <button (click)="toggleStatus.emit(user)"
                         class="p-1.5 md:p-2 rounded-full transition-colors"
                         [class]="user.status === 'active'
                           ? 'text-outline hover:text-warning hover:bg-amber-50'
                           : 'text-outline hover:text-emerald-600 hover:bg-green-50'"
-                        [title]="user.status === 'active' ? 'Bloquear' : 'Desbloquear'">
+                        [title]="user.status === 'active' ? t.block : t.unblock">
                   <span class="material-symbols-outlined text-[18px]">
                     {{ user.status === 'active' ? 'block' : 'check_circle' }}
                   </span>
                 </button>
-                <!-- Eliminar -->
                 <button (click)="deleteUser.emit(user)"
                         class="p-1.5 md:p-2 rounded-full text-outline hover:text-error
                                hover:bg-error-container transition-colors"
-                        title="Eliminar">
+                        [title]="t.delete">
                   <span class="material-symbols-outlined text-[18px]">delete</span>
                 </button>
               </div>
@@ -139,7 +129,7 @@
                 group
               </span>
               <p class="text-label-md font-heading text-on-surface-variant">
-                No se encontraron usuarios
+                {{ t.empty }}
               </p>
             </td>
           </tr>
@@ -148,13 +138,12 @@
     </table>
   </div>
 
-  <!-- Pagination -->
   <div class="px-4 md:px-6 border-t border-outline-variant/20 bg-surface-container-lowest">
     <app-pagination
       [currentPage]="currentPage()"
       [pageSize]="pageSize()"
       [total]="totalItems()"
-      label="usuarios"
+      [label]="t.paginationLabel"
       (pageChange)="pageChange.emit($event)" />
   </div>
 

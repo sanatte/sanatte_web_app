@@ -1,0 +1,37 @@
+export const APP_LAYOUT_TEXTS = {
+  logoAlt: 'Sanatte',
+  nav: {
+    library: 'Biblioteca',
+    activate: 'Activar producto',
+    products: 'Tienda',
+    allies: 'Aliados',
+    orders: 'Mis pedidos',
+    moods: 'Mis emociones',
+    subscriptions: 'Suscripciones',
+    profile: 'Perfil',
+  },
+  defaultTitle: 'Mi Biblioteca',
+  routeTitles: {
+    '/app/library': 'Mi Biblioteca',
+    '/app/products': 'Tienda',
+    '/app/cart': 'Carrito',
+    '/app/checkout': 'Finalizar compra',
+    '/app/activate': 'Activar producto',
+    '/app/orders': 'Mis Pedidos',
+    '/app/moods': 'Mis emociones',
+    '/app/subscriptions': 'Suscripciones',
+    '/app/profile': 'Perfil',
+  } as Readonly<Record<string, string>>,
+  searchPlaceholder: 'Buscar en mi biblioteca...',
+  account: {
+    defaultName: 'Usuario',
+    roles: {
+      admin: 'Administrador',
+      client: 'Cliente',
+    },
+    profile: 'Perfil',
+    orders: 'Mis pedidos',
+    adminPanel: 'Panel de administración',
+    logout: 'Cerrar sesión',
+  },
+} as const;

@@ -2,15 +2,20 @@ import { Component, inject, signal, computed } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { AllyService } from '../../services/ally.service';
 import { Ally, WELLNESS_PILLARS } from '../../models/ally.model';
+import { TEXTS } from '../../../../core/i18n/texts';
+import { AdminPageHeaderComponent } from '../../../../shared/components/admin-page-header/admin-page-header.component';
 
 @Component({
   selector: 'app-admin-allies',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, AdminPageHeaderComponent],
   templateUrl: './admin-allies.component.html',
 })
 export class AdminAlliesComponent {
   private readonly svc = inject(AllyService);
   private readonly fb = inject(FormBuilder);
+
+  protected readonly t = TEXTS.admin.allies;
+  protected readonly c = TEXTS.common;
 
   readonly allies  = this.svc.allies;
   readonly loading = this.svc.loading;
@@ -75,7 +80,7 @@ export class AdminAlliesComponent {
     const file = input.files?.[0] ?? null;
     if (!file) return;
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-      this.errorMsg.set('El logo debe ser JPEG, PNG o WebP.');
+      this.errorMsg.set(this.t.form.logoInvalid);
       input.value = '';
       return;
     }
@@ -96,22 +101,21 @@ export class AdminAlliesComponent {
 
       const logo = this.selectedLogo();
       if (logo) {
-        try { await this.svc.uploadLogo(saved.id, logo); }
-        catch { /* logo opcional: se puede reintentar */ }
+        await this.svc.uploadLogo(saved.id, logo).catch(() => undefined);
       }
       this.isModalOpen.set(false);
     } catch (e: unknown) {
       this.errorMsg.set(
         (e as { error?: { detail?: string } })?.error?.detail
         ?? (e as Error)?.message
-        ?? 'No se pudo guardar el aliado.');
+        ?? this.t.form.saveError);
     } finally {
       this.isSaving.set(false);
     }
   }
 
   async onDelete(a: Ally): Promise<void> {
-    if (confirm(`¿Eliminar al aliado "${a.name}"? Esta acción no se puede deshacer.`)) {
+    if (confirm(this.t.page.deleteConfirm(a.name))) {
       await this.svc.delete(a.id);
     }
   }

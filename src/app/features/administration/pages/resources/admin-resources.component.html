@@ -1,16 +1,14 @@
 <section class="px-4 md:px-8 lg:px-container-padding-desktop py-6 max-w-[1400px] mx-auto">
 
   <app-admin-page-header
-    title="Catálogo de Recursos"
-    description="Gestiona todos los activos digitales de bienestar de la plataforma."
-    actionLabel="Subir recurso"
+    [title]="t.page.title"
+    [description]="t.page.description"
+    [actionLabel]="t.page.upload"
     actionIcon="upload"
     (action)="openCreate()" />
 
-  <!-- Tabs + Filters -->
   <div class="space-y-4 mb-6">
     <div class="border-b border-outline-variant/30">
-      <!-- Tabs con scroll horizontal en móvil -->
       <div class="flex items-end justify-between gap-4 overflow-x-auto scrollbar-hide pb-0">
         <div class="flex gap-4 md:gap-6 shrink-0">
           @for (tab of tabs; track tab.key) {
@@ -23,19 +21,16 @@
             </button>
           }
         </div>
-        <!-- Search desktop -->
         <div class="hidden sm:block shrink-0 pb-2 w-52">
-          <app-search-input placeholder="Buscar título o tag..." (search)="onSearch($event)" />
+          <app-search-input [placeholder]="t.page.searchPlaceholder" (search)="onSearch($event)" />
         </div>
       </div>
-      <!-- Search móvil -->
       <div class="sm:hidden mt-2 mb-3">
-        <app-search-input placeholder="Buscar..." (search)="onSearch($event)" />
+        <app-search-input [placeholder]="c.search.placeholder" (search)="onSearch($event)" />
       </div>
     </div>
   </div>
 
-  <!-- Grid -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 
     @for (resource of paginated(); track resource.id) {
@@ -50,19 +45,17 @@
         (thumbnailSelected)="onThumbnailSelected($event)" />
     }
 
-    <!-- Empty state -->
     @if (paginated().length === 0) {
       <div class="col-span-full flex flex-col items-center justify-center py-20">
         <span class="material-symbols-outlined text-[56px] text-outline-variant mb-3">
           perm_media
         </span>
         <p class="font-heading text-label-md text-on-surface-variant">
-          No se encontraron recursos
+          {{ t.page.empty }}
         </p>
       </div>
     }
 
-    <!-- Upload placeholder (último card) -->
     @if (paginated().length > 0) {
       <button (click)="openCreate()"
               class="group aspect-video border-2 border-dashed border-outline-variant
@@ -71,26 +64,24 @@
                      text-on-surface-variant hover:text-primary">
         <span class="material-symbols-outlined text-[40px]">upload_file</span>
         <div class="text-center">
-          <p class="text-label-md font-heading font-bold">Nuevo recurso</p>
-          <p class="text-[12px] font-heading opacity-70">Arrastra o haz clic</p>
+          <p class="text-label-md font-heading font-bold">{{ t.page.newResource }}</p>
+          <p class="text-[12px] font-heading opacity-70">{{ t.page.newResourceHint }}</p>
         </div>
       </button>
     }
   </div>
 
-  <!-- Pagination -->
   <div class="mt-8">
     <app-pagination
       [currentPage]="currentPage()"
       [pageSize]="8"
       [total]="filtered().length"
-      label="recursos"
+      [label]="t.page.paginationLabel"
       (pageChange)="currentPage.set($event)" />
   </div>
 
 </section>
 
-<!-- Preview Modal -->
 <app-resource-preview-modal
   [isOpen]="isPreviewOpen()"
   [resource]="previewingResource()"
@@ -98,7 +89,6 @@
   (close)="closePreview()"
   (edit)="onPreviewEdit($event)" />
 
-<!-- Dialogs -->
 <app-resource-form-dialog
   [isOpen]="isModalOpen()"
   [resource]="editingResource()"
@@ -108,9 +98,9 @@
 
 <app-confirm-dialog
   [open]="isConfirmOpen()"
-  title="Eliminar recurso"
+  [title]="t.page.deleteTitle"
   [message]="deleteMessage()"
-  confirmText="Sí, eliminar"
+  [confirmText]="t.page.deleteConfirm"
   variant="danger"
   (confirm)="confirmDelete()"
   (cancel)="cancelDelete()" />

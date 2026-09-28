@@ -5,18 +5,11 @@ import { environment } from '../../../../environments/environment';
 import { WaveAudioPlayerComponent } from './wave-audio-player.component';
 import { PdfViewerComponent } from './pdf-viewer.component';
 import { VideoPlayerComponent } from './video-player.component';
+import { TEXTS } from '../../../core/i18n/texts';
 
 type MediaState = 'loading' | 'ready' | 'not_ready' | 'error';
 interface StreamResponse { url: string; contentType: string; expiresAt: string; }
 
-/**
- * MediaPlayer — reproductor funcional de un recurso del usuario.
- *
- * Pide una URL firmada temporal a `GET /api/me/resources/{slug}/stream` (que
- * valida el acceso) y reproduce con elementos nativos: <video>/<audio> (soportan
- * Range/206 → arranque directo y seek) o incrusta el PDF. Reacciona al cambio de
- * `slug` para recargar cuando el usuario elige otro recurso de la playlist.
- */
 @Component({
   selector: 'app-media-player',
   imports: [WaveAudioPlayerComponent, PdfViewerComponent, VideoPlayerComponent],
@@ -26,7 +19,7 @@ interface StreamResponse { url: string; contentType: string; expiresAt: string; 
         <div class="w-full aspect-video rounded-xl bg-surface-container-low
                     flex flex-col items-center justify-center gap-3 text-on-surface-variant">
           <span class="material-symbols-outlined animate-spin text-primary text-[32px]">progress_activity</span>
-          <span class="text-label-md font-heading">Preparando el reproductor…</span>
+          <span class="text-label-md font-heading">{{ t.loading }}</span>
         </div>
       }
       @case ('ready') {
@@ -48,14 +41,14 @@ interface StreamResponse { url: string; contentType: string; expiresAt: string; 
         <div class="w-full aspect-video rounded-xl bg-surface-container-low border border-outline-variant/30
                     flex flex-col items-center justify-center gap-3 text-on-surface-variant">
           <span class="material-symbols-outlined text-[32px]">hourglass_empty</span>
-          <span class="text-label-md font-heading">Este contenido se está preparando. Vuelve pronto.</span>
+          <span class="text-label-md font-heading">{{ t.notReady }}</span>
         </div>
       }
       @case ('error') {
         <div class="w-full aspect-video rounded-xl bg-error-container/40 border border-error/30
                     flex flex-col items-center justify-center gap-3 text-error">
           <span class="material-symbols-outlined text-[32px]">error</span>
-          <span class="text-label-md font-heading">No se pudo cargar el contenido. Intenta de nuevo.</span>
+          <span class="text-label-md font-heading">{{ t.error }}</span>
         </div>
       }
     }
@@ -64,13 +57,12 @@ interface StreamResponse { url: string; contentType: string; expiresAt: string; 
 export class MediaPlayerComponent {
   private readonly http = inject(HttpClient);
 
+  protected readonly t = TEXTS.shared.resourceViewers.media;
+
   readonly kind = input.required<'audio' | 'video' | 'pdf'>();
-  /** Modo usuario: reproduce por slug vía /me/resources/{slug}/stream (valida acceso). */
   readonly slug = input<string>('');
-  /** Modo admin (preview): reproduce por id vía /admin/resources/{id}/stream (sin entitlement). */
   readonly resourceId = input<string>('');
   readonly admin = input<boolean>(false);
-  /** Portada del audio (imagen real o gradiente de fallback). */
   readonly coverUrl = input<string | null>(null);
   readonly coverGradient = input<string>('from-brand-400 to-brand-800');
 
@@ -79,7 +71,6 @@ export class MediaPlayerComponent {
 
   constructor() {
     effect(() => {
-      // Recarga al cambiar el recurso (slug en modo usuario, id en modo admin).
       const key = this.admin() ? this.resourceId() : this.slug();
       if (key) this.load(key);
     });
@@ -96,7 +87,6 @@ export class MediaPlayerComponent {
       this.url.set(s.url);
       this.state.set('ready');
     } catch (e) {
-      // 404 → el recurso existe pero aún no tiene archivo subido.
       const status = e instanceof HttpErrorResponse ? e.status : 0;
       this.state.set(status === 404 ? 'not_ready' : 'error');
     }

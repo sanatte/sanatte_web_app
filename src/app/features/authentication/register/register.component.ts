@@ -3,15 +3,16 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { AuthShellComponent } from '../components/auth-shell/auth-shell.component';
+import { TEXTS } from '../../../core/i18n/texts';
 
 @Component({
   selector: 'app-register',
   imports: [ReactiveFormsModule, RouterLink, AuthShellComponent],
   template: `
     <app-auth-shell icon="person_add">
-      <h1 class="font-heading text-headline-md text-on-surface mb-1">Crea tu cuenta</h1>
+      <h1 class="font-heading text-headline-md text-on-surface mb-1">{{ t.title }}</h1>
       <p class="font-sans text-label-md text-on-surface-variant mb-6">
-        Empieza tu camino de bienestar con Sanatte.
+        {{ t.subtitle }}
       </p>
 
       @if (errorMessage()) {
@@ -22,48 +23,47 @@ import { AuthShellComponent } from '../components/auth-shell/auth-shell.componen
         </div>
       }
 
-      <!-- Google -->
       <button (click)="withGoogle()" [disabled]="loading()"
               class="w-full py-3 rounded-full border border-outline-variant bg-white font-heading
                      font-semibold text-on-surface flex items-center justify-center gap-2
                      hover:bg-surface-container transition-colors disabled:opacity-50">
         <img src="https://www.google.com/favicon.ico" alt="" class="w-4 h-4" />
-        Registrarse con Google
+        {{ t.google }}
       </button>
 
       <div class="flex items-center gap-3 my-5">
         <div class="flex-1 h-px bg-outline-variant/40"></div>
-        <span class="text-label-sm font-heading text-outline">O ingresa tu correo</span>
+        <span class="text-label-sm font-heading text-outline">{{ t.divider }}</span>
         <div class="flex-1 h-px bg-outline-variant/40"></div>
       </div>
 
       <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
         <div>
-          <label class="text-label-md font-heading font-semibold text-on-surface block mb-1.5">Nombre</label>
+          <label class="text-label-md font-heading font-semibold text-on-surface block mb-1.5">{{ t.form.name }}</label>
           <div class="relative group">
             <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline
                          group-focus-within:text-primary transition-colors text-[20px]">person</span>
-            <input formControlName="name" type="text" placeholder="Tu nombre"
+            <input formControlName="name" type="text" [placeholder]="t.form.namePlaceholder"
                    class="w-full pl-12 pr-4 py-3.5 bg-surface-container-low border border-transparent focus:border-primary
                           focus:ring-4 focus:ring-primary/10 rounded-full outline-none text-body-md transition-all" />
           </div>
         </div>
         <div>
-          <label class="text-label-md font-heading font-semibold text-on-surface block mb-1.5">Correo electrónico</label>
+          <label class="text-label-md font-heading font-semibold text-on-surface block mb-1.5">{{ t.form.email }}</label>
           <div class="relative group">
             <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline
                          group-focus-within:text-primary transition-colors text-[20px]">mail</span>
-            <input formControlName="email" type="email" placeholder="ejemplo@correo.com"
+            <input formControlName="email" type="email" [placeholder]="t.form.emailPlaceholder"
                    class="w-full pl-12 pr-4 py-3.5 bg-surface-container-low border border-transparent focus:border-primary
                           focus:ring-4 focus:ring-primary/10 rounded-full outline-none text-body-md transition-all" />
           </div>
         </div>
         <div>
-          <label class="text-label-md font-heading font-semibold text-on-surface block mb-1.5">Contraseña</label>
+          <label class="text-label-md font-heading font-semibold text-on-surface block mb-1.5">{{ t.form.password }}</label>
           <div class="relative group">
             <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline
                          group-focus-within:text-primary transition-colors text-[20px]">lock</span>
-            <input formControlName="password" [type]="showPassword() ? 'text' : 'password'" placeholder="Mínimo 6 caracteres"
+            <input formControlName="password" [type]="showPassword() ? 'text' : 'password'" [placeholder]="t.form.passwordPlaceholder"
                    class="w-full pl-12 pr-11 py-3.5 bg-surface-container-low border border-transparent focus:border-primary
                           focus:ring-4 focus:ring-primary/10 rounded-full outline-none text-body-md transition-all" />
             <button type="button" (click)="showPassword.set(!showPassword())"
@@ -76,8 +76,8 @@ import { AuthShellComponent } from '../components/auth-shell/auth-shell.componen
         <label class="flex items-start gap-2 cursor-pointer">
           <input formControlName="terms" type="checkbox" class="mt-0.5 accent-primary w-4 h-4" />
           <span class="text-label-sm font-heading text-on-surface-variant">
-            Acepto la
-            <a routerLink="/legal/privacidad" target="_blank" class="text-primary hover:underline">Política de Privacidad</a>.
+            {{ t.form.termsPrefix }}
+            <a routerLink="/legal/privacidad" target="_blank" class="text-primary hover:underline">{{ t.form.termsLink }}</a>.
           </span>
         </label>
 
@@ -86,18 +86,18 @@ import { AuthShellComponent } from '../components/auth-shell/auth-shell.componen
                        shadow-primary-lg hover:opacity-95 active:scale-[0.98] transition-all
                        flex items-center justify-center gap-2 disabled:opacity-50">
           @if (loading()) {
-            <span class="material-symbols-outlined animate-spin text-[20px]">progress_activity</span> Creando cuenta…
+            <span class="material-symbols-outlined animate-spin text-[20px]">progress_activity</span> {{ t.submitting }}
           } @else {
-            Continuar
+            {{ t.submit }}
             <span class="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
           }
         </button>
       </form>
 
       <p class="text-center text-label-md font-heading text-on-surface-variant mt-6">
-        ¿Ya tienes cuenta?
+        {{ t.hasAccount }}
         <a routerLink="/auth/login" [queryParams]="{ returnUrl: returnUrl() }"
-           class="text-primary font-bold hover:underline">Inicia sesión</a>
+           class="text-primary font-bold hover:underline">{{ t.login }}</a>
       </p>
     </app-auth-shell>
   `,
@@ -107,6 +107,9 @@ export class RegisterComponent {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+
+  protected readonly t = TEXTS.auth.register;
+  private readonly errors = TEXTS.auth.errors;
 
   readonly form = this.fb.nonNullable.group({
     name: ['', [Validators.required, Validators.minLength(2)]],
@@ -126,17 +129,13 @@ export class RegisterComponent {
     const { name, email, password } = this.form.getRawValue();
     try {
       await this.auth.register(name, email, password);
-      // Verificación estricta: va a "verifica tu correo" (aún sin sesión activa).
       await this.router.navigate(['/auth/verify-email'], {
         queryParams: this.returnUrl() ? { returnUrl: this.returnUrl() } : {},
       });
     } catch (e) {
       const code = (e as { code?: string })?.code;
       this.errorMessage.set(
-        code === 'auth/email-already-in-use' ? 'El correo ya está registrado. Inicia sesión.'
-        : code === 'auth/weak-password'      ? 'La contraseña debe tener al menos 6 caracteres.'
-        : code === 'auth/invalid-email'      ? 'El correo no es válido.'
-        : 'No se pudo crear la cuenta. Intenta de nuevo.'
+        (code && this.errors.register.codes[code]) || this.errors.register.fallback
       );
     }
   }
@@ -144,13 +143,13 @@ export class RegisterComponent {
   async withGoogle(): Promise<void> {
     this.errorMessage.set('');
     try {
-      await this.auth.signInWithGoogle(); // Google entra ya verificado
+      await this.auth.signInWithGoogle();
       await this.router.navigateByUrl(this.returnUrl() || '/app/library');
     } catch (e) {
       this.errorMessage.set(
         e instanceof Error && e.message === 'backend-unreachable'
-          ? 'No pudimos conectar con el servidor. Intenta más tarde.'
-          : 'No se pudo continuar con Google.'
+          ? this.errors.backendUnreachable
+          : this.t.errors.google
       );
     }
   }

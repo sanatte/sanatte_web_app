@@ -5,10 +5,9 @@
 } @else if (product(); as p) {
 <section class="px-4 md:px-8 lg:px-container-padding-desktop py-6 max-w-[1400px] mx-auto">
 
-  <!-- Breadcrumb + acciones -->
   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
     <nav class="flex items-center gap-1.5 text-label-sm font-heading text-outline font-bold uppercase tracking-wider">
-      <a routerLink="/admin/products" class="hover:text-primary transition-colors">Productos</a>
+      <a routerLink="/admin/products" class="hover:text-primary transition-colors">{{ t.detail.breadcrumb }}</a>
       <span class="material-symbols-outlined text-[14px]">chevron_right</span>
       <span class="text-primary">{{ p.name }}</span>
     </nav>
@@ -22,29 +21,26 @@
         <span class="material-symbols-outlined text-[16px]">
           {{ p.status === 'active' ? 'pause_circle' : 'play_circle' }}
         </span>
-        {{ p.status === 'active' ? 'Desactivar' : 'Activar' }}
+        {{ p.status === 'active' ? t.detail.deactivate : t.detail.activate }}
       </button>
       <a [routerLink]="['/admin/products']" [queryParams]="{ edit: p.id }"
          class="flex items-center gap-1.5 px-4 py-2 rounded-full gradient-primary text-white
                 text-label-sm font-heading font-semibold hover:opacity-90 transition-opacity"
          style="box-shadow: 0 4px 14px rgb(var(--color-primary) / 0.3)">
         <span class="material-symbols-outlined text-[16px]">edit</span>
-        Editar
+        {{ c.actions.edit }}
       </a>
       <button (click)="isConfirmOpen.set(true)"
               class="p-2 rounded-full text-outline hover:text-error hover:bg-error-container
-                     transition-colors" title="Eliminar producto">
+                     transition-colors" [title]="t.deleteTitle">
         <span class="material-symbols-outlined text-[20px]">delete</span>
       </button>
     </div>
   </div>
 
-  <!-- Fila principal: Galería + Info -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
 
-    <!-- Galería -->
     <div class="space-y-3">
-      <!-- Imagen principal -->
       <div class="w-full aspect-square rounded-lg overflow-hidden relative">
         @if (displayImage()?.url) {
           <img [src]="displayImage()!.url!" [alt]="displayImage()!.altText"
@@ -57,7 +53,6 @@
         }
       </div>
 
-      <!-- Miniaturas + botón agregar -->
       <div class="flex gap-3 overflow-x-auto scrollbar-hide pb-1 items-start">
         @for (img of p.images; track img.id) {
           <div class="relative flex-shrink-0 pt-2 pr-2">
@@ -74,33 +69,30 @@
               }
             </div>
 
-            <!-- Marcar principal (siempre visible) o badge si ya lo es -->
             @if (img.isPrimary) {
               <span class="absolute bottom-1 left-1 bg-primary text-white text-[9px]
                            font-heading font-bold px-1.5 py-0.5 rounded-full leading-none">
-                Principal
+                {{ t.detail.primary }}
               </span>
             } @else {
               <button (click)="setPrimary(img); $event.stopPropagation()"
                       class="absolute bottom-1 left-1 w-6 h-6 bg-white shadow-md rounded-full
                              text-primary flex items-center justify-center hover:bg-primary hover:text-white
                              transition-colors"
-                      title="Marcar como principal">
+                      [title]="t.detail.markPrimary">
                 <span class="material-symbols-outlined text-[15px]">star</span>
               </button>
             }
 
-            <!-- Eliminar (siempre visible; permite borrar cualquiera, incluida la última) -->
             <button (click)="removeImage(img); $event.stopPropagation()"
                     class="absolute top-0 right-0 w-6 h-6 bg-error text-white shadow-md rounded-full
                            flex items-center justify-center hover:bg-red-700 transition-colors"
-                    title="Eliminar imagen">
+                    [title]="t.detail.deleteImage">
               <span class="material-symbols-outlined text-[14px]">close</span>
             </button>
           </div>
         }
 
-        <!-- Botón agregar imagen -->
         <app-image-upload
           class="flex-shrink-0 w-20 h-20 block"
           aspectRatio="1 / 1"
@@ -117,9 +109,7 @@
       }
     </div>
 
-    <!-- Info del producto -->
     <div class="space-y-5">
-      <!-- Badges -->
       <div class="flex flex-wrap gap-2">
         <span class="px-3 py-1 rounded-full text-label-sm font-heading font-semibold"
               [class]="typeClasses()">
@@ -130,14 +120,14 @@
           <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-100
                        text-amber-700 text-label-sm font-heading font-semibold">
             <span class="material-symbols-outlined text-[14px]">qr_code_scanner</span>
-            QR + Activación
+            {{ t.accessTypes.qr_activation }}
           </span>
         }
       </div>
 
       <div>
         <h1 class="font-heading text-headline-lg text-on-surface font-bold">{{ p.name }}</h1>
-        <p class="text-label-md font-heading text-outline mt-1">SKU: {{ p.sku }}</p>
+        <p class="text-label-md font-heading text-outline mt-1">{{ t.detail.skuPrefix }} {{ p.sku }}</p>
       </div>
 
       <div class="flex items-baseline gap-2">
@@ -146,7 +136,7 @@
         </span>
         @if (p.type === 'subscription') {
           <span class="text-label-md font-heading text-on-surface-variant">
-            / {{ p.billingPeriod === 'monthly' ? 'mes' : 'año' }}
+            / {{ t.billingPeriods[p.billingPeriod ?? 'annual'] }}
           </span>
         }
       </div>
@@ -155,7 +145,6 @@
         {{ p.description }}
       </p>
 
-      <!-- Tags / Feature pills -->
       @if (p.tags.length) {
         <div class="flex flex-wrap gap-2">
           @for (tag of p.tags; track tag) {
@@ -167,47 +156,44 @@
         </div>
       }
 
-      <!-- Stats rápidas -->
       <div class="grid grid-cols-3 gap-3 pt-2">
         <div class="bg-surface-container-low rounded-lg p-4 text-center">
           <p class="font-heading font-bold text-on-surface text-headline-md">
             {{ p.salesCount | number }}
           </p>
           <p class="text-label-sm font-heading text-on-surface-variant mt-0.5">
-            {{ p.type === 'physical' ? 'Activadas' : p.type === 'subscription' ? 'Activos' : 'Vendidos' }}
+            {{ t.salesLabels[p.type] }}
           </p>
         </div>
         <div class="bg-surface-container-low rounded-lg p-4 text-center">
           <p class="font-heading font-bold text-on-surface text-headline-md">
             {{ entitlementCount() }}
           </p>
-          <p class="text-label-sm font-heading text-on-surface-variant mt-0.5">Recursos</p>
+          <p class="text-label-sm font-heading text-on-surface-variant mt-0.5">{{ t.detail.resources }}</p>
         </div>
         <div class="bg-surface-container-low rounded-lg p-4 text-center">
           @if (p.stock !== undefined) {
             <p class="font-heading font-bold text-on-surface text-headline-md">{{ p.stock | number }}</p>
             <p class="text-label-sm font-heading text-on-surface-variant mt-0.5">
-              {{ p.type === 'physical' ? 'Stock' : 'Límite' }}
+              {{ p.type === 'physical' ? t.detail.stock : t.detail.limit }}
             </p>
           } @else {
             <p class="font-heading font-bold text-primary text-headline-md">∞</p>
-            <p class="text-label-sm font-heading text-on-surface-variant mt-0.5">Sin límite</p>
+            <p class="text-label-sm font-heading text-on-surface-variant mt-0.5">{{ t.detail.noLimit }}</p>
           }
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Fila: Recursos vinculados + Specs -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
 
-    <!-- Recursos vinculados -->
     <div class="glass-card p-6 rounded-lg">
       <div class="flex items-center justify-between mb-5">
-        <h3 class="font-heading text-headline-md text-on-surface">Recursos vinculados</h3>
+        <h3 class="font-heading text-headline-md text-on-surface">{{ t.detail.linkedResources }}</h3>
         <div class="flex items-center gap-2">
           <span class="text-label-sm font-heading text-on-surface-variant">
-            {{ linkedResources().length }} recurso{{ linkedResources().length !== 1 ? 's' : '' }}
+            {{ t.resourceCount(linkedResources().length) }}
           </span>
           @if (availableResources().length > 0) {
             <button (click)="isPickerOpen.set(!isPickerOpen())"
@@ -219,18 +205,17 @@
               <span class="material-symbols-outlined text-[14px]">
                 {{ isPickerOpen() ? 'close' : 'add' }}
               </span>
-              {{ isPickerOpen() ? 'Cerrar' : 'Agregar' }}
+              {{ isPickerOpen() ? c.actions.close : t.detail.add }}
             </button>
           }
         </div>
       </div>
 
-      <!-- Picker de recursos disponibles -->
       @if (isPickerOpen()) {
         <div class="mb-4 border border-primary/20 rounded-lg overflow-hidden">
           <div class="px-4 py-2.5 bg-primary-fixed border-b border-primary/10">
             <p class="text-label-sm font-heading font-semibold text-primary">
-              Selecciona un recurso para agregar
+              {{ t.detail.pickerTitle }}
             </p>
           </div>
           <div class="max-h-48 overflow-y-auto divide-y divide-outline-variant/20">
@@ -250,7 +235,7 @@
                     {{ resource.title }}
                   </p>
                   <p class="text-label-sm font-heading text-outline capitalize">
-                    {{ resource.type }}
+                    {{ resourceTypeLabel(resource.type) }}
                     @if (resource.duration) { · {{ resource.duration }} }
                     @if (resource.fileSize) { · {{ resource.fileSize }} }
                   </p>
@@ -281,7 +266,7 @@
                   {{ res.title }}
                 </p>
                 <p class="text-label-sm font-heading text-outline capitalize mt-0.5">
-                  {{ res.type }}
+                  {{ resourceTypeLabel(res.type) }}
                   @if (res.duration) { · {{ res.duration }} }
                   @if (res.fileSize) { · {{ res.fileSize }} }
                 </p>
@@ -289,13 +274,13 @@
               <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <a routerLink="/admin/resources"
                    class="p-1.5 rounded-full text-outline hover:text-primary
-                          hover:bg-primary/5 transition-colors" title="Ver recurso">
+                          hover:bg-primary/5 transition-colors" [title]="t.detail.viewResource">
                   <span class="material-symbols-outlined text-[16px]">open_in_new</span>
                 </a>
                 <button (click)="removeResource(res.id)"
                         class="p-1.5 rounded-full text-outline hover:text-error
                                hover:bg-error-container transition-colors"
-                        title="Desvincular recurso">
+                        [title]="t.detail.unlinkResource">
                   <span class="material-symbols-outlined text-[16px]">link_off</span>
                 </button>
               </div>
@@ -308,24 +293,22 @@
             perm_media
           </span>
           <p class="text-label-md font-heading text-on-surface-variant mb-2">
-            Sin recursos vinculados
+            {{ t.detail.noResources }}
           </p>
           @if (availableResources().length > 0) {
             <button (click)="isPickerOpen.set(true)"
                     class="text-primary text-label-sm font-heading hover:underline">
-              + Agregar primer recurso
+              {{ t.detail.addFirst }}
             </button>
           }
         </div>
       }
     </div>
 
-
-    <!-- Especificaciones técnicas -->
     @if (p.specs.length) {
       <div class="glass-card rounded-lg overflow-hidden">
         <div class="px-6 py-5 border-b border-outline-variant/20">
-          <h3 class="font-heading text-headline-md text-on-surface">Especificaciones técnicas</h3>
+          <h3 class="font-heading text-headline-md text-on-surface">{{ t.detail.specs }}</h3>
         </div>
         <table class="w-full">
           <tbody class="divide-y divide-outline-variant/20">
@@ -353,20 +336,20 @@
       inventory_2
     </span>
     <p class="font-heading text-headline-md text-on-surface-variant">
-      Producto no encontrado
+      {{ t.detail.notFound }}
     </p>
     <a routerLink="/admin/products"
        class="text-primary font-heading text-label-md hover:underline">
-      ← Volver al catálogo
+      {{ t.detail.backToCatalog }}
     </a>
   </div>
 }
 
 <app-confirm-dialog
   [open]="isConfirmOpen()"
-  title="Eliminar producto"
-  [message]="'¿Eliminar este producto? Esta acción no se puede deshacer.'"
-  confirmText="Sí, eliminar"
+  [title]="t.deleteTitle"
+  [message]="t.detail.deleteMessage"
+  [confirmText]="t.deleteConfirm"
   variant="danger"
   (confirm)="confirmDelete()"
   (cancel)="isConfirmOpen.set(false)">

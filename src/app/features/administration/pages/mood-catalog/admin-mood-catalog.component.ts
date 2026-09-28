@@ -1,6 +1,7 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { MoodCatalogService } from '../../services/mood-catalog.service';
 import { MoodCatalog } from '../../models/mood-catalog.model';
+import { TEXTS } from '../../../../core/i18n/texts';
 import { AdminPageHeaderComponent } from '../../../../shared/components/admin-page-header/admin-page-header.component';
 import { MoodCatalogFormDialogComponent, MoodCatalogFormEvent } from '../../components/mood-catalog-form-dialog/mood-catalog-form-dialog.component';
 
@@ -11,6 +12,8 @@ import { MoodCatalogFormDialogComponent, MoodCatalogFormEvent } from '../../comp
 })
 export class AdminMoodCatalogComponent {
   private readonly svc = inject(MoodCatalogService);
+
+  protected readonly t = TEXTS.admin.moodCatalog;
 
   readonly catalogs = this.svc.catalogs;
   readonly loading  = this.svc.loading;
@@ -66,29 +69,24 @@ export class AdminMoodCatalogComponent {
       }
       this.isModalOpen.set(false);
     } catch (e: unknown) {
-      this.saveError.set(e instanceof Error ? e.message : 'Error al guardar la emoción.');
+      this.saveError.set(e instanceof Error ? e.message : this.t.page.saveError);
     } finally {
       this.saving.set(false);
     }
   }
 
   async toggleActive(item: MoodCatalog): Promise<void> {
-    try {
-      if (item.isActive) {
-        await this.svc.deactivate(item.id);
-      } else {
-        await this.svc.reactivate(item.id, item);
-      }
-    } catch {
-      // Error manejado en el servicio
-    }
+    const request = item.isActive
+      ? this.svc.deactivate(item.id)
+      : this.svc.reactivate(item.id, item);
+    await request.catch(() => undefined);
   }
 
   getMediaBadge(item: MoodCatalog): string {
     if (!item.resourceId) return '';
     const ct = item.resourceContentType ?? '';
-    if (ct.startsWith('video/')) return 'Video';
-    if (ct.startsWith('audio/')) return 'Audio';
-    return 'Media';
+    if (ct.startsWith('video/')) return this.t.mediaTypes.video;
+    if (ct.startsWith('audio/')) return this.t.mediaTypes.audio;
+    return this.t.mediaTypes.media;
   }
 }

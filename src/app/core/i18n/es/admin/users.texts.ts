@@ -1,0 +1,70 @@
+import type { UserRole } from '../../../models/role.model';
+
+export const USERS_TEXTS = {
+  page: {
+    title: 'Usuarios',
+    description: 'Gestiona las cuentas y accesos de los usuarios de la plataforma.',
+    createAdmin: 'Crear administrador',
+    stats: {
+      total: 'Total:',
+      active: (count: number) => `${count} activos`,
+      admins: (count: number) => `${count} admins`,
+      withSubscription: (count: number) => `${count} con suscripción`,
+    },
+    searchPlaceholder: 'Buscar por nombre o email...',
+    found: (count: number) =>
+      `${count} usuario${count !== 1 ? 's' : ''} encontrado${count !== 1 ? 's' : ''}`,
+    createError: 'No se pudo crear el administrador. Intenta de nuevo.',
+    actionError: 'No se pudo completar la acción.',
+    confirm: {
+      blockTitle: 'Bloquear usuario',
+      unblockTitle: 'Desbloquear usuario',
+      blockMessage: (name: string) => `¿Deseas bloquear la cuenta de "${name}"?`,
+      unblockMessage: (name: string) => `¿Deseas desbloquear la cuenta de "${name}"?`,
+      blockConfirm: 'Sí, bloquear',
+      unblockConfirm: 'Sí, desbloquear',
+      deleteTitle: 'Eliminar usuario',
+      deleteMessage: (name: string) =>
+        `¿Eliminar la cuenta de "${name}"? Esta acción no se puede deshacer.`,
+      deleteConfirm: 'Sí, eliminar',
+    },
+  },
+  table: {
+    columns: {
+      user: 'Usuario',
+      role: 'Rol',
+      products: 'Productos',
+      subscription: 'Suscripción',
+      lastLogin: 'Último acceso',
+      status: 'Estado',
+      actions: 'Acciones',
+    },
+    purchased: 'comprados',
+    activated: (count: number) => `${count} activado${count !== 1 ? 's' : ''}`,
+    block: 'Bloquear',
+    unblock: 'Desbloquear',
+    delete: 'Eliminar',
+    empty: 'No se encontraron usuarios',
+    paginationLabel: 'usuarios',
+  },
+  roles: {
+    ADMIN: 'Admin',
+    USER: 'Usuario',
+  } satisfies Record<UserRole, string>,
+  createDialog: {
+    title: 'Crear administrador',
+    subtitle: 'Crea una cuenta con acceso al panel de administración.',
+    name: 'Nombre',
+    namePlaceholder: 'ej. María Rodríguez',
+    nameRequired: 'Ingresa el nombre',
+    email: 'Correo',
+    emailPlaceholder: 'admin@sanatte.com',
+    emailInvalid: 'Ingresa un correo válido',
+    password: 'Contraseña temporal',
+    passwordPlaceholder: 'mínimo 6 caracteres',
+    passwordMin: 'Mínimo 6 caracteres',
+    passwordHint: 'El nuevo admin podrá cambiarla luego desde su perfil.',
+    submitting: 'Creando…',
+    submit: 'Crear administrador',
+  },
+} as const;

@@ -1,21 +1,59 @@
 import { Component, input } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { TEXTS } from '../../core/i18n/texts';
+import type { LegalDocument } from '../../core/i18n/es/public/legal.texts';
 
 @Component({
   selector: 'app-legal-page',
   standalone: true,
+  imports: [RouterLink],
   template: `
     <article class="max-w-3xl mx-auto px-6 md:px-8 py-12 md:py-16">
       <header class="mb-8 pb-6 border-b border-outline-variant/30">
         <h1 class="font-heading font-extrabold text-on-surface text-3xl md:text-4xl leading-tight">
-          {{ title() }}
+          {{ document().title }}
         </h1>
         <p class="mt-3 text-label-md font-heading text-on-surface-variant">
-          Última actualización: {{ lastUpdated() }}
+          {{ t.lastUpdated(document().lastUpdated) }}
         </p>
       </header>
 
       <div class="legal-prose text-on-surface-variant leading-relaxed space-y-4">
-        <ng-content />
+        @for (block of document().blocks; track $index) {
+          @switch (block.kind) {
+            @case ('h2') {
+              <h2>{{ block.text }}</h2>
+            }
+            @case ('p') {
+              <p>
+                @for (seg of block.content; track $index) {
+                  @switch (seg.kind) {
+                    @case ('strong') { <strong>{{ seg.text }}</strong> }
+                    @case ('mail') { <a [href]="seg.href">{{ seg.text }}</a> }
+                    @case ('route') { <a [routerLink]="seg.route">{{ seg.text }}</a> }
+                    @default { <ng-container>{{ seg.text }}</ng-container> }
+                  }
+                }
+              </p>
+            }
+            @case ('ul') {
+              <ul>
+                @for (item of block.items; track $index) {
+                  <li>
+                    @for (seg of item; track $index) {
+                      @switch (seg.kind) {
+                        @case ('strong') { <strong>{{ seg.text }}</strong> }
+                        @case ('mail') { <a [href]="seg.href">{{ seg.text }}</a> }
+                        @case ('route') { <a [routerLink]="seg.route">{{ seg.text }}</a> }
+                        @default { <ng-container>{{ seg.text }}</ng-container> }
+                      }
+                    }
+                  </li>
+                }
+              </ul>
+            }
+          }
+        }
       </div>
     </article>
   `,
@@ -48,6 +86,6 @@ import { Component, input } from '@angular/core';
   `],
 })
 export class LegalPageComponent {
-  readonly title = input.required<string>();
-  readonly lastUpdated = input.required<string>();
+  protected readonly t = TEXTS.public.legal.page;
+  readonly document = input.required<LegalDocument>();
 }

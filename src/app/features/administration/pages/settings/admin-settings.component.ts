@@ -1,12 +1,16 @@
 import { Component } from '@angular/core';
+import { TEXTS } from '../../../../core/i18n/texts';
+import { AdminPageHeaderComponent } from '../../../../shared/components/admin-page-header/admin-page-header.component';
 
 @Component({
   selector: 'app-admin-settings',
+  imports: [AdminPageHeaderComponent],
   template: `
-    <div class="p-8">
-      <h1 class="text-2xl font-bold text-gray-900">Settings</h1>
-      <p class="mt-2 text-gray-500">Próximamente — pendiente de mockup.</p>
-    </div>
+    <section class="px-4 md:px-8 lg:px-container-padding-desktop py-6 max-w-[1400px] mx-auto">
+      <app-admin-page-header [title]="t.title" [description]="t.comingSoon" />
+    </section>
   `,
 })
-export class AdminSettingsComponent {}
+export class AdminSettingsComponent {
+  protected readonly t = TEXTS.admin.settings;
+}
