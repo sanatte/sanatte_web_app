@@ -1,0 +1,201 @@
+<div class="max-w-6xl mx-auto">
+  <header class="flex flex-col md:flex-row md:items-end justify-between gap-gutter mb-8">
+    <div>
+      <h1 class="font-heading text-headline-lg-mobile md:text-headline-lg text-on-surface mb-2">
+        Mis emociones
+      </h1>
+      <p class="font-sans text-body-md md:text-body-lg text-on-surface-variant">{{ subtitle() }}</p>
+    </div>
+
+    <div class="inline-flex self-start md:self-auto p-1 rounded-full bg-surface-container
+                border border-outline-variant/30" role="tablist" aria-label="Periodo">
+      @for (p of periods; track p.key) {
+        <button type="button" role="tab" [attr.aria-selected]="period() === p.key"
+                (click)="selectPeriod(p.key)"
+                class="px-4 sm:px-5 py-2 rounded-full font-heading font-semibold text-label-md
+                       whitespace-nowrap transition-all"
+                [class]="period() === p.key
+                  ? 'bg-primary text-on-primary shadow-primary'
+                  : 'text-on-surface-variant hover:text-primary'">
+          {{ p.label }}
+        </button>
+      }
+    </div>
+  </header>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter items-start">
+    <section class="glass-card rounded-lg p-5 sm:p-6 lg:sticky lg:top-24">
+      <div class="flex items-start justify-between gap-4 mb-6">
+        <div>
+          <h2 class="font-heading text-headline-md text-on-surface">Tu estado de ánimo</h2>
+          @if (summary(); as s) {
+            <p class="text-label-md font-heading text-on-surface-variant mt-1">
+              {{ s.totalEntries }} {{ s.totalEntries === 1 ? 'registro' : 'registros' }}
+              en {{ s.daysInRange }} días
+            </p>
+          }
+        </div>
+        @if (topMood(); as top) {
+          <div class="flex items-center gap-2 px-3 py-2 rounded-full bg-surface-container-low
+                      border border-outline-variant/30">
+            <span class="w-8 h-8 rounded-full flex items-center justify-center text-[18px]"
+                  [class.bg-primary-container]="!tint(top.color)"
+                  [style.background-color]="tint(top.color)">{{ top.emoji }}</span>
+            <div class="leading-tight">
+              <p class="text-[11px] font-heading text-on-surface-variant">Más frecuente</p>
+              <p class="text-label-md font-heading font-bold text-on-surface">{{ top.name }}</p>
+            </div>
+          </div>
+        }
+      </div>
+
+      @if (period() === 'week') {
+        <div class="grid grid-cols-7 gap-1 sm:gap-2 mb-6">
+          @for (day of weekDays(); track day.date) {
+            <div class="flex flex-col items-center gap-2 py-2 rounded-md"
+                 [class.bg-surface-container-low]="day.isToday"
+                 [attr.title]="day.moodName ?? 'Sin registro'">
+              <span class="text-label-sm font-heading"
+                    [class]="day.isToday ? 'text-primary' : 'text-on-surface-variant'">
+                {{ day.label }}
+              </span>
+              @if (day.emoji) {
+                <span class="w-9 h-9 sm:w-11 sm:h-11 rounded-full flex items-center justify-center
+                             text-[18px] sm:text-[22px]"
+                      [class.bg-primary-container]="!day.color"
+                      [style.background-color]="day.color">{{ day.emoji }}</span>
+              } @else {
+                <span class="w-9 h-9 sm:w-11 sm:h-11 rounded-full flex items-center justify-center
+                             border-2 border-dashed border-outline-variant">
+                  <span class="w-1.5 h-1.5 rounded-full bg-outline-variant"></span>
+                </span>
+              }
+              <span class="text-[11px] font-heading text-outline">{{ day.dayNumber }}</span>
+            </div>
+          }
+        </div>
+      }
+
+      @if (summaryLoading() && !summary()) {
+        <div class="flex justify-center py-16">
+          <span class="material-symbols-outlined animate-spin text-primary text-[32px]">progress_activity</span>
+        </div>
+      } @else if (summaryError()) {
+        <div class="rounded-md bg-error-container/40 p-6 text-center">
+          <p class="text-label-md font-heading text-error mb-3">{{ summaryError() }}</p>
+          <button type="button" (click)="retry()"
+                  class="px-4 py-2 rounded-full bg-primary text-on-primary font-heading font-semibold
+                         text-label-md hover:opacity-90 transition-opacity">
+            Reintentar
+          </button>
+        </div>
+      } @else if (hasSummaryData()) {
+        <div class="rounded-md bg-surface-container-low p-4">
+          <h3 class="font-heading text-label-md font-semibold text-on-surface mb-3">
+            Frecuencia por emoción
+          </h3>
+          <div class="relative h-56 sm:h-64">
+            <canvas #moodChart aria-label="Frecuencia de emociones en el periodo" role="img"></canvas>
+          </div>
+        </div>
+      } @else {
+        <div class="rounded-md bg-surface-container-low p-8 text-center">
+          <span class="material-symbols-outlined text-primary text-[40px] mb-2">sentiment_neutral</span>
+          <p class="text-body-md text-on-surface-variant">
+            Aún no tienes emociones registradas en este periodo.
+          </p>
+        </div>
+      }
+    </section>
+
+    <section class="min-w-0">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-heading text-headline-md text-on-surface">Registros</h2>
+        <span class="text-label-md font-heading text-on-surface-variant">
+          {{ total() }} {{ total() === 1 ? 'registro' : 'registros' }}
+        </span>
+      </div>
+
+      <div class="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2 mb-4">
+        <button type="button" (click)="selectMood(null)"
+                class="px-4 py-2 rounded-full font-heading font-semibold text-label-md whitespace-nowrap transition-all"
+                [class]="moodFilter() === null
+                  ? 'bg-primary text-on-primary'
+                  : 'border border-outline-variant text-on-surface-variant hover:bg-surface-container'">
+          Todas
+        </button>
+        @for (mood of catalog(); track mood.id) {
+          <button type="button" (click)="selectMood(mood.id)"
+                  class="flex items-center gap-1.5 px-4 py-2 rounded-full font-heading font-semibold
+                         text-label-md whitespace-nowrap transition-all"
+                  [class]="moodFilter() === mood.id
+                    ? 'bg-primary text-on-primary'
+                    : 'border border-outline-variant text-on-surface-variant hover:bg-surface-container'">
+            <span class="text-[16px] leading-none">{{ mood.emojiCode }}</span>
+            {{ mood.name }}
+          </button>
+        }
+      </div>
+
+      @if (loading() && entries().length === 0) {
+        <div class="flex justify-center py-16">
+          <span class="material-symbols-outlined animate-spin text-primary text-[32px]">progress_activity</span>
+        </div>
+      } @else if (error()) {
+        <div class="glass-card rounded-lg p-8 text-center">
+          <span class="material-symbols-outlined text-error text-[40px] mb-2">error</span>
+          <p class="text-label-md font-heading text-error mb-4">{{ error() }}</p>
+          <button type="button" (click)="retry()"
+                  class="px-5 py-2 rounded-full bg-primary text-on-primary font-heading font-semibold
+                         text-label-md hover:opacity-90 transition-opacity">
+            Reintentar
+          </button>
+        </div>
+      } @else if (entries().length === 0) {
+        <div class="glass-card rounded-lg p-10 text-center">
+          <div class="w-16 h-16 rounded-full bg-primary-container flex items-center justify-center mx-auto mb-4">
+            <span class="material-symbols-outlined text-on-primary-container text-[32px]">mood</span>
+          </div>
+          <h3 class="font-heading text-headline-md text-on-surface mb-1">Sin registros</h3>
+          <p class="text-body-md text-on-surface-variant">
+            {{ activeFilterName()
+              ? 'No registraste "' + activeFilterName() + '" en este periodo.'
+              : 'Registra tu emoción del día desde la app para ver tu historial.' }}
+          </p>
+        </div>
+      } @else {
+        <ul class="space-y-3 transition-opacity" [class.opacity-60]="loading()">
+          @for (entry of entries(); track entry.id) {
+            <li class="glass-card rounded-md p-4 flex items-start gap-4">
+              <span class="shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-[24px]"
+                    [class.bg-primary-container]="!tint(entry.moodColor)"
+                    [style.background-color]="tint(entry.moodColor)">{{ entry.moodEmoji }}</span>
+              <div class="min-w-0 flex-1">
+                <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
+                  <p class="font-heading text-body-md font-bold text-on-surface">{{ entry.moodName }}</p>
+                  <p class="text-label-sm font-heading text-on-surface-variant">
+                    {{ formatLongDate(entry.recordedDate) }}
+                  </p>
+                </div>
+                @if (entry.note) {
+                  <p class="text-body-md text-on-surface-variant mt-1 line-clamp-2 break-words">{{ entry.note }}</p>
+                } @else {
+                  <p class="text-label-md text-outline mt-1 italic">Sin nota</p>
+                }
+              </div>
+            </li>
+          }
+        </ul>
+
+        @if (total() > pageSize) {
+          <app-pagination class="block mt-4"
+                          [currentPage]="currentPage()"
+                          [pageSize]="pageSize"
+                          [total]="total()"
+                          label="registros"
+                          (pageChange)="changePage($event)" />
+        }
+      }
+    </section>
+  </div>
+</div>
