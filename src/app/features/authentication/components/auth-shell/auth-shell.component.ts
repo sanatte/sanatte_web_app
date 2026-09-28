@@ -28,7 +28,7 @@ import { TEXTS } from '../../../../core/i18n/texts';
           <div class="w-2 h-2 rounded-full bg-primary/30"></div>
         </div>
 
-        <p class="text-center text-label-sm font-heading text-outline uppercase tracking-widest mt-6">
+        <p class="text-center text-label-sm font-heading text-outline uppercase tracking-widest mt-6 whitespace-nowrap">
           {{ t.copyright }}
         </p>
       </div>
