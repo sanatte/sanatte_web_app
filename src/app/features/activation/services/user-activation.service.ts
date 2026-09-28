@@ -6,12 +6,12 @@ import { ProductService } from '../../administration/services/product.service';
 import { UserLibraryService } from '../../library/services/user-library.service';
 import { Product } from '../../administration/models/product.model';
 import { environment } from '../../../../environments/environment';
+import { TEXTS } from '../../../core/i18n/texts';
 
 export type ActivationResult =
   | { status: 'success'; product: Product; resourcesUnlocked: number; welcomeResourceSlug: string | null }
   | { status: 'not_found' | 'revoked' | 'already_active' | 'not_activatable'; message: string };
 
-// Espejo de ActivationResultStatus del backend.
 const RESULT_STATUS: Record<number, ActivationResult['status']> = {
   0: 'success',
   1: 'not_found',
@@ -29,14 +29,6 @@ interface ApiActivationResult {
   welcomeResourceSlug: string | null;
 }
 
-/**
- * UserActivationService — activación de productos físicos por código (vista cliente).
- *
- * Solo aplica a productos con `accessType: 'qr_activation'`. Hace POST al endpoint
- * de activación del backend, que valida el código, marca la licencia activa,
- * registra el evento (visible en el admin) y devuelve cuántos recursos se
- * desbloquearon. Luego refresca la biblioteca y el listado admin en memoria.
- */
 @Injectable({ providedIn: 'root' })
 export class UserActivationService {
   private readonly http         = inject(HttpClient);
@@ -57,11 +49,9 @@ export class UserActivationService {
       return { status: status as Exclude<ActivationResult['status'], 'success'>, message: res.message };
     }
 
-    // Recupera el producto completo (para nombre/ruta a la biblioteca).
     const product = this.products.getById(res.productId)
-      ?? ({ id: res.productId, name: res.productName ?? 'Producto' } as Product);
+      ?? ({ id: res.productId, name: res.productName ?? TEXTS.app.activation.fallbackProductName } as Product);
 
-    // Refleja el desbloqueo en la biblioteca y el listado admin en memoria.
     this.library.registerActivated(product.id);
     this.activations.refresh();
 

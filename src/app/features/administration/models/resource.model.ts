@@ -1,27 +1,18 @@
-/**
- * Resource — recurso de contenido digital de Sanatte (audio/video/pdf/artículo).
- *
- * No tiene referencia a productos: el vínculo producto ↔ recurso vive en
- * Product.entitlements[] y se resuelve a través de EntitlementService.
- */
+import { RESOURCES_TEXTS } from '../../../core/i18n/es/admin/resources.texts';
+
 export type ResourceType   = 'audio' | 'video' | 'pdf' | 'article';
 export type ResourceStatus = 'published' | 'draft';
 
-/**
- * Metadata de presentación por tipo de recurso (icono + etiqueta).
- * Fuente ÚNICA usada por cards, tablas, formularios y visores.
- */
 export const RESOURCE_TYPE_META: Record<ResourceType, { icon: string; label: string }> = {
-  audio:   { icon: 'headphones',     label: 'Audio'    },
-  video:   { icon: 'videocam',       label: 'Video'    },
-  pdf:     { icon: 'picture_as_pdf', label: 'PDF'      },
-  article: { icon: 'description',    label: 'Artículo' },
+  audio:   { icon: 'headphones',     label: RESOURCES_TEXTS.types.audio   },
+  video:   { icon: 'videocam',       label: RESOURCES_TEXTS.types.video   },
+  pdf:     { icon: 'picture_as_pdf', label: RESOURCES_TEXTS.types.pdf     },
+  article: { icon: 'description',    label: RESOURCES_TEXTS.types.article },
 };
 
 export interface Resource {
   id: string;
   title: string;
-  /** Código público estable para el QR: sanatte.com/r/{slug}. */
   slug: string;
   description: string;
   type: ResourceType;
@@ -30,11 +21,10 @@ export interface Resource {
   duration?: string;
   fileSize?: string;
   readTime?: string;
-  content?: string | null;   // article: cuerpo HTML del editor
-  thumbnailUrl?: string | null;  // URL real en Firebase Storage
-  thumbnailGradient: string;     // fallback CSS gradient
+  content?: string | null;
+  thumbnailUrl?: string | null;
+  thumbnailGradient: string;
   createdAt: string;
-  /** No-null ⇒ el recurso ya tiene su archivo (audio/video/pdf) subido a R2. */
   mediaContentType?: string | null;
   mediaSizeBytes?: number | null;
 }

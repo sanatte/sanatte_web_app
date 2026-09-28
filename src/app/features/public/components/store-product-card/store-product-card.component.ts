@@ -3,22 +3,14 @@ import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
 import { RouterLink } from '@angular/router';
 import { Product, getPrimaryImage } from '../../../administration/models/product.model';
 import { StoreContextService } from '../../services/store-context.service';
+import { TEXTS } from '../../../../core/i18n/texts';
 
-const TYPE_LABEL: Record<string, string> = {
-  physical: 'Físico', digital: 'Digital', subscription: 'Suscripción',
-};
-
-/**
- * StoreProductCard — tarjeta de producto para el catálogo público.
- * Imagen (gradiente), badge de tipo, nombre, precio y CTA (ver / agregar).
- */
 @Component({
   selector: 'app-store-product-card',
   imports: [MoneyPipe, RouterLink],
   template: `
     <div class="group bg-surface-container-lowest rounded-lg overflow-hidden shadow-card
                 hover:shadow-card-hover transition-all flex flex-col">
-      <!-- Imagen -->
       <a [routerLink]="ctx.productLink(product().id)" class="block relative aspect-[4/3] overflow-hidden">
         @if (imageUrl(); as url) {
           <img [src]="url" [alt]="product().name"
@@ -32,7 +24,6 @@ const TYPE_LABEL: Record<string, string> = {
           {{ typeLabel() }}
         </span>
       </a>
-      <!-- Body -->
       <div class="p-5 flex-1 flex flex-col">
         <a [routerLink]="ctx.productLink(product().id)" class="block">
           <h3 class="font-heading font-bold text-on-surface hover:text-primary transition-colors line-clamp-1">
@@ -47,14 +38,14 @@ const TYPE_LABEL: Record<string, string> = {
             {{ product().price | money }}
             @if (product().type === 'subscription') {
               <span class="text-label-sm text-on-surface-variant font-sans">
-                {{ product().billingPeriod === 'annual' ? '/año' : '/mes' }}
+                {{ product().billingPeriod === 'annual' ? t.perYear : t.perMonth }}
               </span>
             }
           </p>
           <button (click)="add.emit(product())"
                   class="w-10 h-10 rounded-full gradient-primary text-white flex items-center justify-center
                          hover:opacity-90 active:scale-95 transition-all shadow-md"
-                  title="Agregar al carrito">
+                  [title]="t.addToCart">
             <span class="material-symbols-outlined text-[20px]">add_shopping_cart</span>
           </button>
         </div>
@@ -65,10 +56,12 @@ const TYPE_LABEL: Record<string, string> = {
 export class StoreProductCardComponent {
   readonly ctx = inject(StoreContextService);
 
+  protected readonly t = TEXTS.public.catalog.productCard;
+
   readonly product = input.required<Product>();
   readonly add     = output<Product>();
 
   readonly imageUrl  = computed(() => getPrimaryImage(this.product())?.url ?? null);
   readonly gradient  = computed(() => getPrimaryImage(this.product())?.gradient ?? 'from-brand-400 to-brand-800');
-  readonly typeLabel = computed(() => TYPE_LABEL[this.product().type] ?? this.product().type);
+  readonly typeLabel = computed(() => this.t.types[this.product().type] ?? this.product().type);
 }

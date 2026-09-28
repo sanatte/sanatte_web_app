@@ -3,8 +3,8 @@ import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Resource, ResourceType } from '../../models/resource.model';
 import { ResourceService } from '../../services/resource.service';
 import { RichTextEditorComponent } from '../../../../shared/components/rich-text-editor/rich-text-editor.component';
+import { TEXTS } from '../../../../core/i18n/texts';
 
-// Tipos MIME aceptados por tipo de recurso (deben coincidir con los que valida la API).
 const ACCEPT_BY_TYPE: Record<ResourceType, string> = {
   audio:   'audio/mpeg,audio/mp4,audio/aac,audio/wav',
   video:   'video/mp4,video/webm',
@@ -18,6 +18,12 @@ const ACCEPT_BY_TYPE: Record<ResourceType, string> = {
   templateUrl: './resource-form-dialog.component.html',
 })
 export class ResourceFormDialogComponent {
+  protected readonly t = TEXTS.admin.resources.formDialog;
+  protected readonly c = TEXTS.common;
+  protected readonly types = TEXTS.admin.resources.types;
+  protected readonly statuses = TEXTS.admin.resources.statuses;
+  protected readonly productCount = TEXTS.admin.resources.productCount;
+
   private readonly fb = inject(FormBuilder);
   private readonly resourceService = inject(ResourceService);
 
@@ -25,7 +31,6 @@ export class ResourceFormDialogComponent {
   readonly resource          = input<Resource | null>(null);
   readonly linkedProductCount = input(0);
 
-  /** Se emite cuando el recurso (y su archivo, si hay) quedó guardado. */
   readonly saved  = output<void>();
   readonly cancel = output<void>();
 
@@ -44,27 +49,20 @@ export class ResourceFormDialogComponent {
   readonly isEditMode   = computed(() => this.resource() !== null);
   readonly selectedType = signal<ResourceType>('audio');
 
-  // Estado de subida de archivo
   readonly selectedFile   = signal<File | null>(null);
-  readonly uploadProgress = signal<number | null>(null); // 0-100 durante el PUT a R2
+  readonly uploadProgress = signal<number | null>(null);
   readonly isSaving       = signal(false);
   readonly errorMsg       = signal<string | null>(null);
 
-  // Cuerpo del artículo (HTML del editor WYSIWYG)
   readonly articleContent = signal<string>('');
 
-  // Portada (imagen)
   readonly selectedCover = signal<File | null>(null);
-  readonly coverPreview  = signal<string | null>(null); // object URL para vista previa
+  readonly coverPreview  = signal<string | null>(null);
 
-  /** Tipos MIME que acepta el input según el tipo de recurso elegido. */
   readonly acceptAttr = computed(() => ACCEPT_BY_TYPE[this.selectedType()]);
-  /** Los artículos no tienen archivo subible. */
   readonly needsFile  = computed(() => this.selectedType() !== 'article');
-  /** El recurso en edición ya tiene un archivo cargado. */
   readonly hasExistingMedia = computed(() => !!this.resource()?.mediaContentType);
 
-  /** Etiqueta legible del archivo ya subido, ej. "MP3 · 7.8 MB". */
   readonly existingFileLabel = computed(() => {
     const r = this.resource();
     if (!r?.mediaContentType) return '';
@@ -104,7 +102,6 @@ export class ResourceFormDialogComponent {
         this.selectedType.set('audio');
         this.articleContent.set('');
       }
-      // La portada se reinicia siempre (nuevo o editar).
       this.selectedCover.set(null);
       this.coverPreview.set(null);
     });
@@ -112,7 +109,7 @@ export class ResourceFormDialogComponent {
 
   onTypeChange(event: Event): void {
     this.selectedType.set((event.target as HTMLSelectElement).value as ResourceType);
-    this.selectedFile.set(null); // el tipo cambió → el archivo previo ya no aplica
+    this.selectedFile.set(null);
   }
 
   onFileSelected(event: Event): void {
@@ -120,7 +117,7 @@ export class ResourceFormDialogComponent {
     const file = input.files?.[0] ?? null;
     this.errorMsg.set(null);
     if (file && this.acceptAttr() && !this.acceptAttr().split(',').includes(file.type)) {
-      this.errorMsg.set('Formato no válido para este tipo de recurso.');
+      this.errorMsg.set(this.t.invalidFormat);
       this.selectedFile.set(null);
       input.value = '';
       return;
@@ -136,7 +133,7 @@ export class ResourceFormDialogComponent {
     const file = input.files?.[0] ?? null;
     if (!file) return;
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-      this.errorMsg.set('La portada debe ser JPEG, PNG o WebP.');
+      this.errorMsg.set(this.t.invalidCover);
       input.value = '';
       return;
     }
@@ -150,7 +147,6 @@ export class ResourceFormDialogComponent {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   }
 
-  /** Autocompleta peso (todos) y duración (audio/video) desde el archivo elegido. */
   private autofillMeta(file: File): void {
     this.form.patchValue({ fileSize: this.formatBytes(file.size) });
 
@@ -178,7 +174,7 @@ export class ResourceFormDialogComponent {
 
     const rawStatus = this.form.getRawValue().status;
     if (rawStatus === 'published' && this.needsFile() && !this.hasExistingMedia() && !this.selectedFile()) {
-      this.errorMsg.set('Para publicar un recurso debe tener un archivo cargado.');
+      this.errorMsg.set(this.t.fileRequiredToPublish);
       return;
     }
 
@@ -215,26 +211,23 @@ export class ResourceFormDialogComponent {
             onProgress: (p) => this.uploadProgress.set(p),
           });
         } catch (uploadErr) {
-          // Si el recurso es NUEVO y la subida falla, se deshace la creación
-          // para no dejar un recurso huérfano (sin archivo) en la BD.
           if (!editing) await this.resourceService.delete(saved.id).catch(() => {});
           throw uploadErr;
         }
       }
 
-      // Portada (opcional): best-effort — el recurso ya quedó guardado.
       const cover = this.selectedCover();
       if (cover) {
         try { await this.resourceService.uploadThumbnail(saved.id, cover); }
-        catch { this.errorMsg.set('El recurso se guardó, pero no se pudo subir la portada. Inténtalo desde la tarjeta.'); }
+        catch { this.errorMsg.set(this.t.coverUploadFailed); }
       }
 
       this.saved.emit();
     } catch (e: unknown) {
       const msg = (e as { error?: { detail?: string } })?.error?.detail
         ?? (e as Error)?.message
-        ?? 'No se pudo guardar el recurso.';
-      this.errorMsg.set(msg); // ej. "El slug 'x' ya está en uso por otro recurso."
+        ?? this.t.saveError;
+      this.errorMsg.set(msg);
     } finally {
       this.isSaving.set(false);
       this.uploadProgress.set(null);

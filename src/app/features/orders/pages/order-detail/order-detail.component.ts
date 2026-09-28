@@ -9,21 +9,25 @@ import { EntitlementService } from '../../../administration/services/entitlement
 import { getPrimaryImage } from '../../../administration/models/product.model';
 import { RESOURCE_TYPE_META } from '../../../administration/models/resource.model';
 import {
-  Order, DeliveryTone, DELIVERY_STATUS_META,
+  Order, DeliveryTone, DELIVERY_STATUS_META, PaymentStatus,
 } from '../../../administration/models/order.model';
+import { TEXTS } from '../../../../core/i18n/texts';
+
+const T = TEXTS.app.orders.detail;
+const STEP = T.tracker.steps;
+const PAYMENT_LABEL = TEXTS.common.statusBadge;
 
 const TONE_TEXT: Record<DeliveryTone, string> = {
   success: 'text-green-600', info: 'text-primary', accent: 'text-secondary',
   warning: 'text-amber-600', neutral: 'text-on-surface-variant', error: 'text-error',
 };
 
-const PAYMENT_META: Record<string, { label: string; classes: string }> = {
-  paid:      { label: 'Pagado',    classes: 'bg-green-100 text-green-700' },
-  pending:   { label: 'Pendiente', classes: 'bg-amber-100 text-amber-700' },
-  cancelled: { label: 'Cancelado', classes: 'bg-error-container text-error' },
+const PAYMENT_META: Record<PaymentStatus, { label: string; classes: string }> = {
+  paid:      { label: PAYMENT_LABEL.paid,      classes: 'bg-green-100 text-green-700' },
+  pending:   { label: PAYMENT_LABEL.pending,   classes: 'bg-amber-100 text-amber-700' },
+  cancelled: { label: PAYMENT_LABEL.cancelled, classes: 'bg-error-container text-error' },
 };
 
-/** Paso del tracker de progreso del pedido. */
 interface TrackerStep {
   label: string;
   icon: string;
@@ -31,7 +35,6 @@ interface TrackerStep {
   active: boolean;
 }
 
-/** Recurso digital incluido en el pedido (vía entitlements de un producto). */
 interface IncludedResource {
   id: string;
   productId: string;
@@ -53,10 +56,11 @@ export class OrderDetailComponent {
   private readonly products     = inject(ProductService);
   private readonly entitlements = inject(EntitlementService);
 
+  protected readonly orderNumberLabel = TEXTS.app.orders.orderNumber;
+  protected readonly t = T;
+
   private readonly id = toSignal(this.route.paramMap.pipe(map((p) => p.get('id'))), { initialValue: null });
 
-  /** Mientras el servicio no termine su primera carga, mostramos spinner (evita
-   *  el flash "pedido no encontrado" al hacer F5 directo en el detalle). */
   readonly loading = computed(() => !this.userOrders.loaded());
 
   readonly order = computed<Order | null>(() => {
@@ -78,10 +82,8 @@ export class OrderDetailComponent {
 
   readonly isPhysical = computed(() => this.order()?.products.some((p) => p.type === 'physical') ?? false);
 
-  /** ¿El pedido está pendiente de activación por QR? */
   readonly isPendingActivation = computed(() => this.order()?.deliveryStatus === 'pending_activation');
 
-  /** Recursos digitales incluidos (entitlements de los productos comprados). */
   readonly includedResources = computed<IncludedResource[]>(() => {
     const o = this.order();
     if (!o) return [];
@@ -103,12 +105,6 @@ export class OrderDetailComponent {
     return items;
   });
 
-  /**
-   * Tracker de progreso adaptado al tipo de pedido:
-   *  - Físico: Confirmado → Procesando → En Camino → Entregado
-   *  - Digital: Confirmado → Pago confirmado → Acceso activo
-   *  - Suscripción: Confirmado → Pago confirmado → Suscripción activa
-   */
   readonly tracker = computed<TrackerStep[]>(() => {
     const o = this.order();
     if (!o) return [];
@@ -119,23 +115,22 @@ export class OrderDetailComponent {
       const reached =
         s === 'delivered' ? 3 :
         s === 'shipped' ? 2 :
-        s === 'pending_activation' ? 3 : 1; // preparing → 1
+        s === 'pending_activation' ? 3 : 1;
       const steps = [
-        { label: 'Confirmado', icon: 'check_circle' },
-        { label: 'Procesando', icon: 'inventory_2' },
-        { label: 'En camino',  icon: 'local_shipping' },
-        { label: 'Entregado',  icon: 'package_2' },
+        { label: STEP.confirmed,  icon: 'check_circle' },
+        { label: STEP.processing, icon: 'inventory_2' },
+        { label: STEP.onTheWay,   icon: 'local_shipping' },
+        { label: STEP.delivered,  icon: 'package_2' },
       ];
       return steps.map((st, i) => ({ ...st, done: i < reached, active: i === reached && reached < 3 || (i === 3 && reached === 3) }));
     }
 
-    // Digital / Suscripción
-    const finalLabel = s === 'subscription_active' ? 'Suscripción activa' : 'Acceso activo';
+    const finalLabel = s === 'subscription_active' ? STEP.subscriptionActive : STEP.accessActive;
     const finalIcon  = s === 'subscription_active' ? 'autorenew' : 'bolt';
     const active = s === 'digital_active' || s === 'subscription_active';
     return [
-      { label: 'Confirmado',      icon: 'check_circle', done: true, active: false },
-      { label: 'Pago confirmado', icon: 'payments',     done: true, active: false },
+      { label: STEP.confirmed,        icon: 'check_circle', done: true, active: false },
+      { label: STEP.paymentConfirmed, icon: 'payments',     done: true, active: false },
       { label: finalLabel,        icon: finalIcon,      done: active, active: active },
     ];
   });

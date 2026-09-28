@@ -2,19 +2,14 @@ import {
   Component, ElementRef, AfterViewInit, OnDestroy, input, output, viewChild,
 } from '@angular/core';
 import Quill from 'quill';
+import { TEXTS } from '../../../core/i18n/texts';
 
-/**
- * Editor de texto enriquecido (WYSIWYG) basado en Quill. Emite el contenido como
- * HTML. Se usa para escribir el cuerpo de los artículos en el admin.
- */
 @Component({
   selector: 'app-rich-text-editor',
   template: `<div #editor></div>`,
 })
 export class RichTextEditorComponent implements AfterViewInit, OnDestroy {
-  /** HTML inicial (al editar un artículo existente). */
   readonly content = input<string>('');
-  /** HTML actualizado en cada cambio. */
   readonly contentChange = output<string>();
 
   private readonly editorEl = viewChild.required<ElementRef<HTMLDivElement>>('editor');
@@ -23,7 +18,7 @@ export class RichTextEditorComponent implements AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     const quill = new Quill(this.editorEl().nativeElement, {
       theme: 'snow',
-      placeholder: 'Escribe el contenido del artículo…',
+      placeholder: TEXTS.shared.richTextEditor.placeholder,
       modules: {
         toolbar: [
           [{ header: [2, 3, false] }],
@@ -40,7 +35,6 @@ export class RichTextEditorComponent implements AfterViewInit, OnDestroy {
 
     quill.on('text-change', () => {
       const html = quill.getSemanticHTML();
-      // Quill deja "<p></p>" cuando está vacío → lo normalizamos a "".
       this.contentChange.emit(html === '<p></p>' ? '' : html);
     });
 

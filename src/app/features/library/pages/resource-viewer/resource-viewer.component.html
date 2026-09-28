@@ -3,20 +3,17 @@
     <span class="material-symbols-outlined animate-spin text-primary text-[40px]">progress_activity</span>
   </div>
 } @else if (product(); as p) {
-  <!-- Back -->
   <button (click)="back()"
           class="flex items-center gap-2 text-label-md font-heading text-on-surface-variant
                  hover:text-primary transition-colors mb-4 -mt-2">
     <span class="material-symbols-outlined text-[20px]">arrow_back</span>
-    Volver a la biblioteca
+    {{ t.back }}
   </button>
 
   @if (hasResources() && active(); as r) {
     <div class="flex flex-col lg:flex-row gap-gutter">
 
-      <!-- ══ Contenido principal ══════════════════════════════════════════ -->
       <section class="flex-1 min-w-0 space-y-6">
-        <!-- Player según tipo -->
         @switch (r.type) {
           @case ('video')   { <app-media-player [slug]="r.slug" kind="video" /> }
           @case ('audio')   {
@@ -31,7 +28,6 @@
           }
         }
 
-        <!-- Header del recurso -->
         <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
           <div class="min-w-0">
             <h2 class="font-heading text-headline-lg text-on-background mb-2">{{ r.title }}</h2>
@@ -59,7 +55,7 @@
                            font-heading font-bold text-label-md shadow-primary hover:opacity-90
                            active:scale-95 transition-all">
               <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">bookmark</span>
-              Guardar
+              {{ t.save }}
             </button>
             <button class="p-3 bg-surface-container text-on-surface rounded-full
                            hover:bg-surface-container-high transition-colors">
@@ -68,17 +64,14 @@
           </div>
         </div>
 
-        <!-- Descripción -->
         <p class="text-on-surface-variant font-sans text-body-lg leading-relaxed">
           {{ r.description }}
         </p>
       </section>
 
-      <!-- ══ Sidebar: playlist del producto + acerca de ═══════════════════ -->
       <aside class="w-full lg:w-[380px] flex-shrink-0 space-y-6">
-        <!-- Playlist -->
         <div class="glass-card rounded-lg p-5">
-          <h3 class="font-heading text-headline-md text-on-surface mb-4">Contenido del producto</h3>
+          <h3 class="font-heading text-headline-md text-on-surface mb-4">{{ t.playlistTitle }}</h3>
           <div class="space-y-2">
             @for (res of resources(); track res.id) {
               <button (click)="select(res)"
@@ -86,7 +79,6 @@
                       [class]="res.id === r.id
                         ? 'bg-primary-container/10 border border-primary/20'
                         : 'hover:bg-surface-container-low border border-transparent'">
-                <!-- Thumbnail -->
                 <div class="relative w-20 h-14 rounded-md overflow-hidden flex-shrink-0
                             bg-gradient-to-br" [class]="res.thumbnailGradient">
                   <div class="absolute inset-0 flex items-center justify-center"
@@ -97,7 +89,6 @@
                     </span>
                   </div>
                 </div>
-                <!-- Info -->
                 <div class="flex flex-col justify-center min-w-0">
                   <p class="font-heading text-label-md truncate"
                      [class]="res.id === r.id ? 'text-primary font-bold' : 'text-on-surface group-hover:text-primary'">
@@ -112,7 +103,6 @@
           </div>
         </div>
 
-        <!-- Acerca del producto (reemplaza la 'Author card' del mockup) -->
         <div class="glass-card rounded-lg p-6 space-y-4">
           <div class="flex items-center gap-3">
             <div class="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center
@@ -122,7 +112,7 @@
             <div class="min-w-0">
               <p class="font-heading font-bold text-on-surface truncate">{{ p.name }}</p>
               <p class="text-label-sm text-on-surface-variant">
-                {{ resources().length }} recurso{{ resources().length !== 1 ? 's' : '' }} incluido{{ resources().length !== 1 ? 's' : '' }}
+                {{ t.resourcesIncluded(resources().length) }}
               </p>
             </div>
           </div>
@@ -132,37 +122,34 @@
           <a [routerLink]="['/app/library']"
              class="block text-center w-full py-2 border border-primary text-primary rounded-full
                     text-label-sm font-heading font-bold hover:bg-primary/5 transition-colors">
-            Ver mi biblioteca
+            {{ t.viewLibrary }}
           </a>
         </div>
       </aside>
     </div>
   } @else {
-    <!-- Estado: producto sin recursos -->
     <div class="glass-card rounded-lg p-12 text-center max-w-2xl mx-auto mt-8">
       <div class="w-20 h-20 rounded-full bg-primary-fixed flex items-center justify-center mx-auto mb-6">
         <span class="material-symbols-outlined text-primary text-[40px]">hourglass_empty</span>
       </div>
       <h3 class="font-heading text-headline-md text-on-surface mb-2">
-        El contenido de {{ p.name }} está en camino
+        {{ t.empty.title(p.name) }}
       </h3>
       <p class="font-sans text-body-md text-on-surface-variant max-w-md mx-auto mb-8">
-        Aún no hay recursos digitales disponibles para este producto. Te avisaremos cuando
-        estén listos para explorar.
+        {{ t.empty.description }}
       </p>
       <button (click)="back()"
               class="px-8 py-3 rounded-full bg-primary text-white font-heading font-bold
                      hover:bg-primary/90 transition-colors active:scale-95">
-        Volver a la biblioteca
+        {{ t.back }}
       </button>
     </div>
   }
 } @else {
-  <!-- Producto no encontrado -->
   <div class="text-center py-20">
-    <p class="font-heading text-headline-md text-on-surface-variant">Producto no encontrado</p>
+    <p class="font-heading text-headline-md text-on-surface-variant">{{ t.notFound }}</p>
     <button (click)="back()" class="mt-4 text-primary font-heading font-bold hover:underline">
-      Volver a la biblioteca
+      {{ t.back }}
     </button>
   </div>
 }

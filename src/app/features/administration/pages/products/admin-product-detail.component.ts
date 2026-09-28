@@ -10,6 +10,7 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
 import { Product, ProductImage, getPrimaryImage } from '../../models/product.model';
 import { Resource, ResourceType, RESOURCE_TYPE_META } from '../../models/resource.model';
 import { ImageUploadComponent } from '../../../../shared/components/image-upload/image-upload.component';
+import { TEXTS } from '../../../../core/i18n/texts';
 
 @Component({
   selector: 'app-admin-product-detail',
@@ -17,6 +18,9 @@ import { ImageUploadComponent } from '../../../../shared/components/image-upload
   templateUrl: './admin-product-detail.component.html',
 })
 export class AdminProductDetailComponent implements OnInit {
+  protected readonly t = TEXTS.admin.products;
+  protected readonly c = TEXTS.common;
+
   private readonly route              = inject(ActivatedRoute);
   private readonly service            = inject(ProductService);
   private readonly entitlementService = inject(EntitlementService);
@@ -40,12 +44,10 @@ export class AdminProductDetailComponent implements OnInit {
     return p ? this.entitlementService.getContentCount(p) : 0;
   });
 
-  // Recursos disponibles para agregar (los que aún no están vinculados)
   readonly availableResources = computed(() => {
     const linked = new Set(this.linkedResources().map((r) => r.id));
     return this.resourceService.resources().filter((r) => !linked.has(r.id));
   });
-
 
   readonly primaryImage = computed(() =>
     this.product() ? getPrimaryImage(this.product()!) ?? null : null
@@ -55,10 +57,7 @@ export class AdminProductDetailComponent implements OnInit {
     this.selectedImage() ?? this.primaryImage()
   );
 
-  readonly typeLabel = computed(() => {
-    const t = this.product()?.type;
-    return t === 'physical' ? 'Físico' : t === 'subscription' ? 'Suscripción' : 'Digital';
-  });
+  readonly typeLabel = computed(() => this.t.types[this.product()?.type ?? 'digital']);
 
   readonly typeClasses = computed(() => {
     const t = this.product()?.type;
@@ -70,11 +69,11 @@ export class AdminProductDetailComponent implements OnInit {
   });
 
   resourceIcon = (type: string) => RESOURCE_TYPE_META[type as ResourceType]?.icon ?? 'description';
+  resourceTypeLabel = (type: ResourceType) => RESOURCE_TYPE_META[type]?.label ?? type;
 
   async ngOnInit(): Promise<void> {
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) { this.loading.set(false); return; }
-    // fetchById usa la caché o pide a la API (soporta F5 directo en el detalle).
     const p = await this.service.fetchById(id);
     this.product.set(p ?? null);
     this.loading.set(false);
@@ -115,7 +114,7 @@ export class AdminProductDetailComponent implements OnInit {
       await this.service.uploadImage(p.id, file, '', isPrimary || p.images.length === 0);
       this.product.set(this.service.getById(p.id) ?? null);
     } catch {
-      this.uploadError.set('No se pudo subir la imagen. Inténtalo de nuevo.');
+      this.uploadError.set(this.t.detail.uploadError);
     } finally {
       this.uploadingImage.set(false);
     }

@@ -1,18 +1,14 @@
 import { Component, input, output, computed } from '@angular/core';
 import { OwnedProduct } from '../../models/user-library.model';
 import { getPrimaryImage } from '../../../administration/models/product.model';
+import { TEXTS } from '../../../../core/i18n/texts';
 
-/**
- * OwnedProductCard — tarjeta de un producto que el usuario posee. Abre el producto
- * (y sus recursos). El progreso/gamificación llegará con el tracking de consumo.
- */
 @Component({
   selector: 'app-owned-product-card',
   template: `
     <div class="group bg-white rounded-lg overflow-hidden flex flex-col shadow-card
                 hover:shadow-card-hover transition-all cursor-pointer"
          (click)="open.emit(owned())">
-      <!-- Thumbnail: foto real si existe, gradiente como fallback -->
       <div class="relative aspect-video overflow-hidden">
         @if (imageUrl(); as url) {
           <img [src]="url" [alt]="owned().product.name"
@@ -28,7 +24,6 @@ import { getPrimaryImage } from '../../../administration/models/product.model';
         </span>
       </div>
 
-      <!-- Body -->
       <div class="p-5 flex-1 flex flex-col">
         <div class="space-y-1 min-w-0 flex-1">
           <h4 class="font-heading font-semibold text-on-surface line-clamp-1">
@@ -43,7 +38,7 @@ import { getPrimaryImage } from '../../../administration/models/product.model';
           <button class="px-4 py-1.5 rounded-full bg-primary text-white font-heading font-bold
                          text-label-sm hover:bg-primary/90 transition-colors active:scale-95"
                   (click)="open.emit(owned()); $event.stopPropagation()">
-            Abrir
+            {{ t.open }}
           </button>
         </div>
       </div>
@@ -51,6 +46,8 @@ import { getPrimaryImage } from '../../../administration/models/product.model';
   `,
 })
 export class OwnedProductCardComponent {
+  protected readonly t = TEXTS.app.library.card;
+
   readonly owned = input.required<OwnedProduct>();
   readonly open  = output<OwnedProduct>();
 

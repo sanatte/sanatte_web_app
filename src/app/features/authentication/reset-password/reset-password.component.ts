@@ -3,6 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl } from '@
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { AuthShellComponent } from '../components/auth-shell/auth-shell.component';
+import { TEXTS } from '../../../core/i18n/texts';
 
 @Component({
   selector: 'app-reset-password',
@@ -10,9 +11,9 @@ import { AuthShellComponent } from '../components/auth-shell/auth-shell.componen
   template: `
     <app-auth-shell icon="password">
       @if (!done()) {
-        <h1 class="font-heading text-headline-md text-on-surface mb-1">Nueva contraseña</h1>
+        <h1 class="font-heading text-headline-md text-on-surface mb-1">{{ t.form.title }}</h1>
         <p class="font-sans text-label-md text-on-surface-variant mb-6">
-          Define una nueva contraseña para tu cuenta.
+          {{ t.form.subtitle }}
         </p>
 
         @if (!hasCode()) {
@@ -20,10 +21,10 @@ import { AuthShellComponent } from '../components/auth-shell/auth-shell.componen
                       text-label-md font-heading flex items-start gap-2">
             <span class="material-symbols-outlined text-[18px] flex-shrink-0 mt-0.5">error</span>
             <div>
-              El enlace no es válido o ya expiró.
+              {{ t.form.invalidLink }}
               <a routerLink="/auth/forgot"
                  class="block mt-1 text-primary font-bold hover:underline">
-                Solicitar un nuevo enlace
+                {{ t.form.requestNewLink }}
               </a>
             </div>
           </div>
@@ -39,31 +40,31 @@ import { AuthShellComponent } from '../components/auth-shell/auth-shell.componen
 
         <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
           <div>
-            <label class="text-label-md font-heading font-semibold text-on-surface block mb-1.5">Nueva contraseña</label>
+            <label class="text-label-md font-heading font-semibold text-on-surface block mb-1.5">{{ t.form.password }}</label>
             <div class="relative group">
               <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline
                            group-focus-within:text-primary transition-colors text-[20px]">lock</span>
-              <input formControlName="password" [type]="show() ? 'text' : 'password'" placeholder="Mínimo 6 caracteres"
+              <input formControlName="password" [type]="show() ? 'text' : 'password'" [placeholder]="t.form.passwordPlaceholder"
                      class="w-full pl-12 pr-4 py-3.5 bg-surface-container-low border border-transparent focus:border-primary
                             focus:ring-4 focus:ring-primary/10 rounded-full outline-none text-body-md transition-all" />
             </div>
           </div>
           <div>
-            <label class="text-label-md font-heading font-semibold text-on-surface block mb-1.5">Confirmar contraseña</label>
+            <label class="text-label-md font-heading font-semibold text-on-surface block mb-1.5">{{ t.form.confirm }}</label>
             <div class="relative group">
               <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline
                            group-focus-within:text-primary transition-colors text-[20px]">lock</span>
-              <input formControlName="confirm" [type]="show() ? 'text' : 'password'" placeholder="Repite la contraseña"
+              <input formControlName="confirm" [type]="show() ? 'text' : 'password'" [placeholder]="t.form.confirmPlaceholder"
                      class="w-full pl-12 pr-4 py-3.5 bg-surface-container-low border border-transparent focus:border-primary
                             focus:ring-4 focus:ring-primary/10 rounded-full outline-none text-body-md transition-all" />
             </div>
             @if (form.hasError('mismatch') && form.get('confirm')?.touched) {
-              <p class="text-error text-label-sm font-heading mt-1.5">Las contraseñas no coinciden.</p>
+              <p class="text-error text-label-sm font-heading mt-1.5">{{ t.form.mismatch }}</p>
             }
           </div>
           <label class="flex items-center gap-2 cursor-pointer text-label-sm font-heading text-on-surface-variant">
             <input type="checkbox" [checked]="show()" (change)="show.set(!show())" class="accent-primary w-4 h-4" />
-            Mostrar contraseñas
+            {{ t.form.showPasswords }}
           </label>
 
           <button type="submit" [disabled]="loading() || form.invalid || !hasCode()"
@@ -71,8 +72,8 @@ import { AuthShellComponent } from '../components/auth-shell/auth-shell.componen
                          shadow-primary hover:opacity-90 active:scale-95 transition-all
                          flex items-center justify-center gap-2 disabled:opacity-50">
             @if (loading()) {
-              <span class="material-symbols-outlined animate-spin text-[20px]">progress_activity</span> Guardando…
-            } @else { Restablecer contraseña }
+              <span class="material-symbols-outlined animate-spin text-[20px]">progress_activity</span> {{ t.form.submitting }}
+            } @else { {{ t.form.submit }} }
           </button>
         </form>
       } @else {
@@ -80,14 +81,14 @@ import { AuthShellComponent } from '../components/auth-shell/auth-shell.componen
           <div class="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
             <span class="material-symbols-outlined text-green-600 text-[34px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
           </div>
-          <h1 class="font-heading text-headline-md text-on-surface mb-2">Contraseña actualizada</h1>
+          <h1 class="font-heading text-headline-md text-on-surface mb-2">{{ t.done.title }}</h1>
           <p class="font-sans text-body-md text-on-surface-variant mb-6">
-            Ya puedes iniciar sesión con tu nueva contraseña.
+            {{ t.done.message }}
           </p>
           <button (click)="toLogin()"
                   class="w-full py-3.5 rounded-full gradient-primary text-white font-heading font-bold
                          hover:opacity-90 active:scale-95 transition-all">
-            Iniciar sesión
+            {{ t.done.login }}
           </button>
         </div>
       }
@@ -99,6 +100,9 @@ export class ResetPasswordComponent {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+
+  protected readonly t = TEXTS.auth.resetPassword;
+  private readonly errors = TEXTS.auth.errors.resetPassword;
 
   private readonly oobCode = this.route.snapshot.queryParamMap.get('oobCode') ?? '';
 
@@ -129,11 +133,7 @@ export class ResetPasswordComponent {
       this.done.set(true);
     } catch (e) {
       const code = (e as { code?: string })?.code;
-      this.errorMessage.set(
-        code === 'auth/expired-action-code' || code === 'auth/invalid-action-code'
-          ? 'El enlace expiró o ya fue usado. Solicita uno nuevo.'
-          : 'No se pudo restablecer la contraseña. Intenta de nuevo.'
-      );
+      this.errorMessage.set((code && this.errors.codes[code]) || this.errors.fallback);
     }
   }
 

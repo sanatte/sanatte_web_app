@@ -4,22 +4,23 @@ import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { UserRole } from '../../../core/models/role.model';
 import { AuthShellComponent } from '../components/auth-shell/auth-shell.component';
+import { TEXTS } from '../../../core/i18n/texts';
 
 @Component({
   selector: 'app-login',
   imports: [ReactiveFormsModule, RouterLink, AuthShellComponent],
   template: `
     <app-auth-shell icon="lock_open">
-      <h1 class="font-heading text-headline-md text-on-surface mb-1">Inicia sesión</h1>
+      <h1 class="font-heading text-headline-md text-on-surface mb-1">{{ t.title }}</h1>
       <p class="font-sans text-label-md text-on-surface-variant mb-6">
-        Bienvenido de nuevo a tu espacio de bienestar.
+        {{ t.subtitle }}
       </p>
 
       @if (emailVerified()) {
         <div class="mb-4 p-3 rounded-xl bg-green-50 border border-green-200 text-green-700
                     text-label-md font-heading flex items-center gap-2">
           <span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1">check_circle</span>
-          Correo verificado. Ya puedes iniciar sesión.
+          {{ t.emailVerified }}
         </div>
       }
 
@@ -32,50 +33,49 @@ import { AuthShellComponent } from '../components/auth-shell/auth-shell.componen
           </div>
           @if (isCredentialError()) {
             <p class="mt-1.5 ml-7 text-label-sm text-on-surface-variant">
-              ¿No tienes cuenta?
+              {{ t.noAccount }}
               <a routerLink="/auth/register" [queryParams]="{ returnUrl: returnUrl() }"
-                 class="text-primary font-bold hover:underline">Crear cuenta</a>
+                 class="text-primary font-bold hover:underline">{{ t.createAccount }}</a>
             </p>
           }
         </div>
       }
 
-      <!-- Google -->
       <button (click)="withGoogle()" [disabled]="loading()"
               class="w-full py-3 rounded-full border border-outline-variant bg-white font-heading
                      font-semibold text-on-surface flex items-center justify-center gap-2
                      hover:bg-surface-container transition-colors disabled:opacity-50">
         <img src="https://www.google.com/favicon.ico" alt="" class="w-4 h-4" />
-        Continuar con Google
+        {{ t.google }}
       </button>
 
       <div class="flex items-center gap-3 my-5">
         <div class="flex-1 h-px bg-outline-variant/40"></div>
-        <span class="text-label-sm font-heading text-outline">O con tu correo</span>
+        <span class="text-label-sm font-heading text-outline">{{ t.divider }}</span>
         <div class="flex-1 h-px bg-outline-variant/40"></div>
       </div>
 
       <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
         <div>
-          <label class="text-label-md font-heading font-semibold text-on-surface block mb-1.5">Correo electrónico</label>
+          <label class="text-label-md font-heading font-semibold text-on-surface block mb-1.5">{{ t.form.email }}</label>
           <div class="relative group">
             <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline
                          group-focus-within:text-primary transition-colors text-[20px]">mail</span>
-            <input formControlName="email" type="email" placeholder="ejemplo@sanatte.com"
+            <input formControlName="email" type="email" [placeholder]="t.form.emailPlaceholder"
                    class="w-full pl-12 pr-4 py-3.5 bg-surface-container-low border border-transparent focus:border-primary
                           focus:ring-4 focus:ring-primary/10 rounded-full outline-none text-body-md transition-all" />
           </div>
         </div>
         <div>
           <div class="flex items-center justify-between mb-1.5">
-            <label class="text-label-md font-heading font-semibold text-on-surface">Contraseña</label>
+            <label class="text-label-md font-heading font-semibold text-on-surface">{{ t.form.password }}</label>
             <a routerLink="/auth/forgot" [queryParams]="{ returnUrl: returnUrl() }"
-               class="text-label-sm font-heading text-primary hover:underline">¿Olvidaste tu contraseña?</a>
+               class="text-label-sm font-heading text-primary hover:underline">{{ t.form.forgotPassword }}</a>
           </div>
           <div class="relative group">
             <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline
                          group-focus-within:text-primary transition-colors text-[20px]">lock</span>
-            <input formControlName="password" [type]="showPassword() ? 'text' : 'password'" placeholder="••••••••"
+            <input formControlName="password" [type]="showPassword() ? 'text' : 'password'" [placeholder]="t.form.passwordPlaceholder"
                    class="w-full pl-12 pr-11 py-3.5 bg-surface-container-low border border-transparent focus:border-primary
                           focus:ring-4 focus:ring-primary/10 rounded-full outline-none text-body-md transition-all" />
             <button type="button" (click)="showPassword.set(!showPassword())"
@@ -90,24 +90,24 @@ import { AuthShellComponent } from '../components/auth-shell/auth-shell.componen
                        shadow-primary-lg hover:opacity-95 active:scale-[0.98] transition-all
                        flex items-center justify-center gap-2 disabled:opacity-50">
           @if (loading()) {
-            <span class="material-symbols-outlined animate-spin text-[20px]">progress_activity</span> Ingresando…
+            <span class="material-symbols-outlined animate-spin text-[20px]">progress_activity</span> {{ t.submitting }}
           } @else {
-            Iniciar sesión
+            {{ t.submit }}
             <span class="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
           }
         </button>
       </form>
 
       <p class="text-center text-label-md font-heading text-on-surface-variant mt-6">
-        ¿No tienes cuenta?
+        {{ t.noAccount }}
         <a routerLink="/auth/register" [queryParams]="{ returnUrl: returnUrl() }"
-           class="text-primary font-bold hover:underline">Crear cuenta</a>
+           class="text-primary font-bold hover:underline">{{ t.createAccount }}</a>
       </p>
 
       <p class="text-center text-label-sm font-heading text-on-surface-variant mt-4">
-        Al continuar, aceptas nuestra
+        {{ t.privacy.prefix }}
         <a routerLink="/legal/privacidad" target="_blank"
-           class="text-primary hover:underline">Política de Privacidad</a>.
+           class="text-primary hover:underline">{{ t.privacy.link }}</a>.
       </p>
     </app-auth-shell>
   `,
@@ -117,6 +117,9 @@ export class LoginComponent {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+
+  protected readonly t = TEXTS.auth.login;
+  private readonly errors = TEXTS.auth.errors;
 
   readonly form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -128,7 +131,7 @@ export class LoginComponent {
   readonly showPassword = signal(false);
   readonly returnUrl = signal(this.route.snapshot.queryParamMap.get('returnUrl') ?? '');
   readonly emailVerified = signal(this.route.snapshot.queryParamMap.get('emailVerified') === 'true');
-  readonly isCredentialError = computed(() => this.errorMessage() === 'Credenciales inválidas. Intenta de nuevo.');
+  readonly isCredentialError = computed(() => this.errorMessage() === this.t.errors.invalidCredentials);
 
   async onSubmit(): Promise<void> {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
@@ -143,10 +146,10 @@ export class LoginComponent {
         return;
       }
       if (e instanceof Error && e.message === 'backend-unreachable') {
-        this.errorMessage.set('No pudimos conectar con el servidor. Intenta más tarde.');
+        this.errorMessage.set(this.errors.backendUnreachable);
         return;
       }
-      this.errorMessage.set('Credenciales inválidas. Intenta de nuevo.');
+      this.errorMessage.set(this.t.errors.invalidCredentials);
     }
   }
 
@@ -158,8 +161,8 @@ export class LoginComponent {
     } catch (e) {
       this.errorMessage.set(
         e instanceof Error && e.message === 'backend-unreachable'
-          ? 'No pudimos conectar con el servidor. Intenta más tarde.'
-          : 'No se pudo iniciar sesión con Google.'
+          ? this.errors.backendUnreachable
+          : this.t.errors.google
       );
     }
   }

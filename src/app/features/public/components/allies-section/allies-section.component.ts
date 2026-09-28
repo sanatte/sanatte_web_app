@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
+import { TEXTS } from '../../../../core/i18n/texts';
 
 interface PublicAlly {
   id: string;
@@ -15,10 +16,6 @@ interface PublicAlly {
   benefitDescription?: string | null;
 }
 
-/**
- * Sección "Aliados" de la landing (pública). Muestra los aliados activos como
- * gancho: al activar un producto Sanatte se desbloquean sus convenios.
- */
 @Component({
   selector: 'app-public-allies-section',
   imports: [RouterLink],
@@ -29,17 +26,16 @@ interface PublicAlly {
           <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-fixed
                        text-on-primary-fixed-variant text-label-sm font-heading font-semibold mb-3">
             <span class="material-symbols-outlined text-[14px]">handshake</span>
-            Aliados de bienestar
+            {{ t.badge }}
           </span>
           <h2 class="font-heading text-headline-lg text-on-surface mb-3">
-            {{ variant() === 'app' ? 'Tus aliados' : 'Beneficios con nuestros aliados' }}
+            {{ variant() === 'app' ? t.titleApp : t.titleLanding }}
           </h2>
           <p class="font-sans text-body-md text-on-surface-variant">
             @if (variant() === 'app') {
-              Especialistas en cada pilar de tu bienestar. Contáctalos para usar tu convenio.
+              {{ t.descriptionApp }}
             } @else {
-              Especialistas en cada pilar de tu bienestar. Al activar un producto Sanatte
-              desbloqueas sus convenios exclusivos.
+              {{ t.descriptionLanding }}
             }
           </p>
         </div>
@@ -51,7 +47,6 @@ interface PublicAlly {
                class="group bg-white rounded-2xl border border-transparent hover:border-primary/20
                       overflow-hidden flex flex-col transition-all"
                style="box-shadow: 0px 10px 30px rgb(var(--color-shadow) / 0.05)">
-              <!-- Cover -->
               <div class="relative aspect-video overflow-hidden" [style.background-color]="a.brandColor">
                 @if (a.logoUrl) {
                   <img [src]="a.logoUrl" [alt]="a.name"
@@ -70,7 +65,7 @@ interface PublicAlly {
               </div>
 
               <div class="p-5 flex-1 flex flex-col">
-                <h3 class="font-heading text-headline-sm font-bold text-on-surface truncate">{{ a.name }}</h3>
+                <h3 class="font-heading text-body-lg font-bold text-on-surface truncate">{{ a.name }}</h3>
                 <p class="font-heading text-label-md text-primary mt-0.5 truncate">🎁 {{ a.benefitTitle }}</p>
                 @if (a.description) {
                   <p class="text-label-sm text-on-surface-variant mt-2 line-clamp-2 flex-1">{{ a.description }}</p>
@@ -78,7 +73,7 @@ interface PublicAlly {
                 @if (variant() === 'landing') {
                   <span class="mt-4 pt-3 border-t border-outline-variant/20 inline-flex items-center gap-1
                                text-label-md font-heading font-bold text-primary group-hover:gap-2 transition-all">
-                    Ver convenio
+                    {{ t.viewBenefit }}
                     <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
                   </span>
                 }
@@ -90,22 +85,22 @@ interface PublicAlly {
         @if (variant() !== 'app') {
           <p class="text-center text-label-md font-heading text-on-surface-variant mt-8">
             <span class="material-symbols-outlined text-[18px] text-primary align-middle">lock_open</span>
-            Los convenios se activan con tu producto Sanatte.
+            {{ t.unlockNote }}
           </p>
         }
       </section>
     } @else if (variant() === 'app' && loaded()) {
       <div class="max-w-6xl mx-auto py-16 text-center">
         <span class="material-symbols-outlined text-primary-light text-[48px] mb-3">handshake</span>
-        <h3 class="font-heading text-headline-md text-on-surface mb-1">Aún no hay aliados disponibles</h3>
-        <p class="text-body-md text-on-surface-variant">Pronto sumaremos especialistas con convenios para ti.</p>
+        <h3 class="font-heading text-headline-md text-on-surface mb-1">{{ t.empty.title }}</h3>
+        <p class="text-body-md text-on-surface-variant">{{ t.empty.description }}</p>
       </div>
     }
   `,
 })
 export class AlliesSectionComponent {
   private readonly http = inject(HttpClient);
-  /** 'landing' (pública, con gancho) | 'app' (usuario autenticado). */
+  protected readonly t = TEXTS.public.allies.section;
   readonly variant = input<'landing' | 'app'>('landing');
   readonly allies = signal<PublicAlly[]>([]);
   readonly loaded = signal(false);

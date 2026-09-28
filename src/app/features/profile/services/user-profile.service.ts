@@ -3,14 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 import { environment } from '../../../../environments/environment';
+import { TEXTS } from '../../../core/i18n/texts';
 
-/**
- * Perfil editable del usuario (vista cliente).
- *
- * Consume `GET/PUT /api/me/profile`. Mientras carga, se muestra un perfil base
- * derivado de la sesión (nombre/email). Los campos extra (fecha de nacimiento,
- * ubicación, newsletter) se persisten en el backend contra el usuario.
- */
 export interface UserProfile {
   fullName: string;
   email: string;
@@ -42,12 +36,11 @@ export class UserProfileService {
 
   async load(): Promise<void> {
     await this.auth.whenReady();
-    if (!this.auth.currentUser()) return; // sin sesión no hay perfil que cargar
+    if (!this.auth.currentUser()) return;
     const raw = await firstValueFrom(this.http.get<ApiProfile>(this.base));
     this._profile.set(this.fromApi(raw));
   }
 
-  /** Actualiza campos editables del perfil y persiste en el backend. */
   async save(changes: Partial<UserProfile>): Promise<void> {
     const next = { ...this._profile(), ...changes };
     this._profile.set(next);
@@ -66,7 +59,6 @@ export class UserProfileService {
     this.save({ newsletterSubscribed: subscribed });
   }
 
-  /** Sube o reemplaza el avatar del usuario autenticado. */
   async uploadAvatar(file: File): Promise<void> {
     const fd = new FormData();
     fd.append('file', file, file.name);
@@ -87,12 +79,11 @@ export class UserProfileService {
     };
   }
 
-  /** Perfil base inmediato desde la sesión, hasta que responde el backend. */
   private seed(): UserProfile {
     const user = this.auth.currentUser();
     return {
-      fullName: user?.displayName ?? 'Usuario Sanatte',
-      email: user?.email ?? 'usuario@sanatte.com',
+      fullName: user?.displayName ?? TEXTS.app.profile.seed.fullName,
+      email: user?.email ?? TEXTS.app.profile.seed.email,
       avatarUrl: user?.avatarUrl ?? null,
       dateOfBirth: '',
       location: '',

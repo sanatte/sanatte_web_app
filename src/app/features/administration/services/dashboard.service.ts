@@ -5,6 +5,7 @@ import { KpiMetric } from '../models/kpi-metric.model';
 import { DashboardOrder, OrderStatus } from '../models/dashboard-order.model';
 import { CurrencyService } from '../../../shared/services/currency.service';
 import { environment } from '../../../../environments/environment';
+import { TEXTS } from '../../../core/i18n/texts';
 
 interface ApiDashboard {
   totalSales: number;
@@ -23,12 +24,11 @@ interface ApiDashboardOrder {
   status: string;
 }
 
-// Presentación de cada tarjeta KPI (icono/colores). El valor llega de la API.
 const KPI_PRESENTATION = [
-  { id: 'sales',         label: 'Total Ventas',          icon: 'payments', iconBgClass: 'bg-primary-fixed',      iconColorClass: 'text-on-primary-fixed' },
-  { id: 'users',         label: 'Usuarios Activos',      icon: 'person',   iconBgClass: 'bg-secondary-fixed',    iconColorClass: 'text-on-secondary-fixed' },
-  { id: 'activations',   label: 'Activaciones',          icon: 'bolt',     iconBgClass: 'bg-tertiary-fixed',     iconColorClass: 'text-on-tertiary-fixed' },
-  { id: 'subscriptions', label: 'Suscripciones Activas', icon: 'autorenew', iconBgClass: 'bg-primary-container', iconColorClass: 'text-on-primary-container' },
+  { id: 'sales',         label: TEXTS.admin.dashboard.kpis.sales, icon: 'payments', iconBgClass: 'bg-primary-fixed',      iconColorClass: 'text-on-primary-fixed' },
+  { id: 'users',         label: TEXTS.admin.dashboard.kpis.users, icon: 'person',   iconBgClass: 'bg-secondary-fixed',    iconColorClass: 'text-on-secondary-fixed' },
+  { id: 'activations',   label: TEXTS.admin.dashboard.kpis.activations, icon: 'bolt',     iconBgClass: 'bg-tertiary-fixed',     iconColorClass: 'text-on-tertiary-fixed' },
+  { id: 'subscriptions', label: TEXTS.admin.dashboard.kpis.subscriptions, icon: 'autorenew', iconBgClass: 'bg-primary-container', iconColorClass: 'text-on-primary-container' },
 ] as const;
 
 const ORDER_BG = [
@@ -36,11 +36,6 @@ const ORDER_BG = [
   'bg-secondary-fixed-dim/50', 'bg-tertiary-fixed/50',
 ];
 
-/**
- * DashboardService — KPIs y pedidos recientes del panel admin, desde
- * `GET /api/admin/dashboard` (datos reales). Las tendencias (%) de los KPIs no se
- * muestran porque aún no se calcula histórico por periodo (trend=0 → oculto).
- */
 @Injectable({ providedIn: 'root' })
 export class DashboardService {
   private readonly http     = inject(HttpClient);

@@ -4,6 +4,7 @@ import { Product, ProductType, getPrimaryImage } from '../../models/product.mode
 import { Resource, ResourceType, RESOURCE_TYPE_META } from '../../models/resource.model';
 import { ResourceService } from '../../services/resource.service';
 import { ThousandsSeparatorDirective } from '../../../../shared/directives/thousands-separator.directive';
+import { TEXTS } from '../../../../core/i18n/texts';
 
 export interface ProductFormSaveEvent {
   data: Partial<Product>;
@@ -16,6 +17,10 @@ export interface ProductFormSaveEvent {
   templateUrl: './product-form-dialog.component.html',
 })
 export class ProductFormDialogComponent {
+  protected readonly t = TEXTS.admin.products.formDialog;
+  protected readonly c = TEXTS.common;
+  protected readonly types = TEXTS.admin.products.types;
+
   private readonly fb              = inject(FormBuilder);
   private readonly resourceService = inject(ResourceService);
 
@@ -50,8 +55,8 @@ export class ProductFormDialogComponent {
   readonly selectedResourceIds = signal<Set<string>>(new Set());
   readonly allResources        = this.resourceService.resources;
   readonly resourceIcon        = (type: ResourceType) => RESOURCE_TYPE_META[type].icon;
+  readonly resourceTypeLabel   = (type: ResourceType) => RESOURCE_TYPE_META[type].label;
 
-  /** Solo recursos publicados pueden asociarse a un producto. */
   readonly publishedResources = computed(() =>
     this.allResources().filter((r) => r.status === 'published')
   );
@@ -132,9 +137,6 @@ export class ProductFormDialogComponent {
     const raw  = this.form.getRawValue();
     const type = raw.type as ProductType;
 
-    // Las imágenes NO se gestionan aquí: se suben/eliminan en el detalle del
-    // producto (endpoints dedicados de Firebase Storage). Este form solo maneja
-    // los datos; así editar nunca pisa las fotos ya subidas.
     this.save.emit({
       data: {
         name: raw.name, sku: raw.sku, type,

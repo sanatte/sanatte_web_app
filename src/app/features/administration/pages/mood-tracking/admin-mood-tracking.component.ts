@@ -9,6 +9,7 @@ import { MoodEntryAdmin } from '../../models/mood-catalog.model';
 import { AdminPageHeaderComponent } from '../../../../shared/components/admin-page-header/admin-page-header.component';
 import { Chart, registerables } from 'chart.js';
 import { themeHex } from '../../../../shared/utils/theme-color';
+import { TEXTS } from '../../../../core/i18n/texts';
 
 Chart.register(...registerables);
 
@@ -25,25 +26,24 @@ export class AdminMoodTrackingComponent implements AfterViewInit, OnDestroy {
   private readonly trackingSvc = inject(MoodTrackingService);
   private readonly catalogSvc  = inject(MoodCatalogService);
 
+  protected readonly t = TEXTS.admin.moodTracking;
+
   readonly entries  = this.trackingSvc.entries;
   readonly total    = this.trackingSvc.total;
   readonly loading  = this.trackingSvc.loading;
   readonly error    = this.trackingSvc.error;
   readonly catalogs = this.catalogSvc.catalogs;
 
-  // Filtros
   readonly searchUser       = signal('');
   readonly selectedCatalog  = signal('');
   readonly selectedPeriod   = signal('30d');
   readonly currentPage      = signal(1);
   readonly pageSize         = 20;
 
-  // Vista seleccionada de usuario
   readonly focusedUser = signal<{ id: string; name: string; email: string } | null>(null);
 
   readonly totalPages = computed(() => Math.ceil(this.total() / this.pageSize));
 
-  // Charts
   @ViewChild('barChart')  private barChartRef!:  ElementRef<HTMLCanvasElement>;
   @ViewChild('donutChart') private donutChartRef!: ElementRef<HTMLCanvasElement>;
   private barChart?:   Chart;
@@ -106,7 +106,6 @@ export class AdminMoodTrackingComponent implements AfterViewInit, OnDestroy {
     const entries = this.entries();
     if (!entries.length) return;
 
-    // Conteo por emoción
     const counts: Record<string, { name: string; emoji: string; count: number }> = {};
     for (const e of entries) {
       if (!counts[e.moodCatalogId]) {
@@ -118,11 +117,9 @@ export class AdminMoodTrackingComponent implements AfterViewInit, OnDestroy {
     const data    = Object.values(counts).map((c) => c.count);
     const colors  = ['primary', 'secondary', 'success', 'warning', 'info', 'error'].map(themeHex);
 
-    // Destruir anteriores si existen
     this.barChart?.destroy();
     this.donutChart?.destroy();
 
-    // Barra
     if (this.barChartRef?.nativeElement) {
       this.barChart = new Chart(this.barChartRef.nativeElement, {
         type: 'bar',
@@ -135,7 +132,6 @@ export class AdminMoodTrackingComponent implements AfterViewInit, OnDestroy {
       });
     }
 
-    // Dona
     if (this.donutChartRef?.nativeElement) {
       this.donutChart = new Chart(this.donutChartRef.nativeElement, {
         type: 'doughnut',

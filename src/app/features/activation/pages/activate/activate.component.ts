@@ -4,6 +4,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { UserActivationService, ActivationResult } from '../../services/user-activation.service';
+import { TEXTS } from '../../../../core/i18n/texts';
 
 @Component({
   selector: 'app-activate',
@@ -14,6 +15,8 @@ export class ActivateComponent {
   private readonly route      = inject(ActivatedRoute);
   private readonly router     = inject(Router);
   private readonly activation = inject(UserActivationService);
+
+  protected readonly t = TEXTS.app.activation;
 
   private readonly codeParam = toSignal(
     this.route.queryParamMap.pipe(map((p) => p.get('code') ?? '')),
@@ -35,7 +38,6 @@ export class ActivateComponent {
   });
 
   constructor() {
-    // Precarga el código si viene del QR (?code=).
     const c = this.codeParam();
     if (c) this.code = c;
   }
@@ -48,7 +50,6 @@ export class ActivateComponent {
       const res = await this.activation.activate(code);
       this.result.set(res);
       if (res.status === 'success' && res.welcomeResourceSlug) {
-        // Pequeña pausa para que el usuario vea el check de éxito antes de redirigir.
         setTimeout(() => this.router.navigate(['/app/welcome', res.welcomeResourceSlug]), 1200);
       }
     } finally {

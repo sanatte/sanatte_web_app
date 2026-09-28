@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { MoodCatalog } from '../models/mood-catalog.model';
 import { environment } from '../../../../environments/environment';
+import { TEXTS } from '../../../core/i18n/texts';
 
 export interface CreateMoodCatalogBody {
   name: string;
@@ -39,7 +40,7 @@ export class MoodCatalogService {
       const items = await firstValueFrom(this.http.get<MoodCatalog[]>(this.base));
       this._catalogs.set(items);
     } catch {
-      this._error.set('No se pudo cargar el catálogo de emociones.');
+      this._error.set(TEXTS.admin.moodCatalog.page.loadError);
     } finally {
       this._loading.set(false);
     }

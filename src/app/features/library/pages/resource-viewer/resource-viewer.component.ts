@@ -7,6 +7,7 @@ import { EntitlementService } from '../../../administration/services/entitlement
 import { Resource, ResourceType, RESOURCE_TYPE_META } from '../../../administration/models/resource.model';
 import { MediaPlayerComponent } from '../../../../shared/components/resource-viewers/media-player.component';
 import { ArticleReaderComponent } from '../../../../shared/components/resource-viewers/article-reader.component';
+import { TEXTS } from '../../../../core/i18n/texts';
 
 @Component({
   selector: 'app-resource-viewer',
@@ -28,6 +29,8 @@ export class ResourceViewerComponent {
     { initialValue: { productId: null, resourceId: null } }
   );
 
+  protected readonly t = TEXTS.app.library.viewer;
+
   readonly loading = signal(true);
 
   readonly product = computed(() => {
@@ -36,7 +39,6 @@ export class ResourceViewerComponent {
   });
 
   constructor() {
-    // F5 directo: asegura cargar el producto desde la API si no está en caché.
     this.route.paramMap.pipe(takeUntilDestroyed()).subscribe(async (pm) => {
       const id = pm.get('productId');
       if (!id) { this.loading.set(false); return; }

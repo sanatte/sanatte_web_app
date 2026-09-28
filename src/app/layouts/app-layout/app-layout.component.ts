@@ -2,6 +2,7 @@ import { Component, inject, computed, signal } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { CartService } from '../../features/public/services/cart.service';
+import { TEXTS } from '../../core/i18n/texts';
 
 interface NavItem {
   label: string;
@@ -9,11 +10,6 @@ interface NavItem {
   icon: string;
 }
 
-/**
- * AppLayout — shell del cliente autenticado.
- * Alineado con AdminLayout: sidebar (rounded-lg + indicador border-r),
- * hamburguesa + backdrop en móvil, topbar con título de página y offset lg:ml-64.
- */
 @Component({
   selector: 'app-app-layout',
   imports: [RouterOutlet, RouterLink, RouterLinkActive],
@@ -24,17 +20,19 @@ export class AppLayoutComponent {
   private readonly router = inject(Router);
   private readonly cart   = inject(CartService);
 
-  readonly displayName = computed(() => this.auth.currentUser()?.displayName ?? 'Usuario');
+  protected readonly t = TEXTS.app.layout;
+
+  readonly displayName = computed(() => this.auth.currentUser()?.displayName ?? this.t.account.defaultName);
   readonly userEmail   = computed(() => this.auth.currentUser()?.email ?? '');
   readonly userInitial = computed(() => this.displayName().charAt(0).toUpperCase());
   readonly isAdmin     = computed(() => this.auth.isAdmin());
-  readonly roleLabel   = computed(() => (this.isAdmin() ? 'Administrador' : 'Cliente'));
+  readonly roleLabel   = computed(() => (this.isAdmin() ? this.t.account.roles.admin : this.t.account.roles.client));
   readonly cartCount   = this.cart.count;
 
-  readonly pageTitle   = signal('Mi Biblioteca');
+  readonly pageTitle   = signal<string>(this.t.defaultTitle);
   readonly sidebarOpen = signal(false);
-  readonly menuOpen       = signal(false); // dropdown de cuenta (topbar)
-  readonly footerMenuOpen = signal(false); // dropdown de cuenta (sidebar)
+  readonly menuOpen       = signal(false);
+  readonly footerMenuOpen = signal(false);
 
   toggleSidebar(): void { this.sidebarOpen.update((v) => !v); }
   closeSidebar():  void { this.sidebarOpen.set(false); }
@@ -47,32 +45,22 @@ export class AppLayoutComponent {
       if (e instanceof NavigationEnd) {
         this.closeSidebar();
         this.closeMenus();
-        const titles: Record<string, string> = {
-          '/app/library':       'Mi Biblioteca',
-          '/app/products':      'Tienda',
-          '/app/cart':          'Carrito',
-          '/app/checkout':      'Finalizar compra',
-          '/app/activate':      'Activar producto',
-          '/app/orders':        'Mis Pedidos',
-          '/app/moods':         'Mis emociones',
-          '/app/subscriptions': 'Suscripciones',
-          '/app/profile':       'Perfil',
-        };
+        const titles = this.t.routeTitles;
         const match = Object.keys(titles).find((k) => e.urlAfterRedirects.startsWith(k));
-        this.pageTitle.set(match ? titles[match] : 'Mi Biblioteca');
+        this.pageTitle.set(match ? titles[match] : this.t.defaultTitle);
       }
     });
   }
 
   readonly mainNav: NavItem[] = [
-    { label: 'Biblioteca',      route: '/app/library',       icon: 'subscriptions' },
-    { label: 'Activar producto', route: '/app/activate',      icon: 'qr_code_scanner' },
-    { label: 'Tienda',          route: '/app/products',      icon: 'storefront' },
-    { label: 'Aliados',         route: '/app/allies',        icon: 'handshake' },
-    { label: 'Mis pedidos',     route: '/app/orders',        icon: 'receipt_long' },
-    { label: 'Mis emociones',   route: '/app/moods',         icon: 'mood' },
-    { label: 'Suscripciones',   route: '/app/subscriptions', icon: 'workspace_premium' },
-    { label: 'Perfil',          route: '/app/profile',       icon: 'person' },
+    { label: this.t.nav.library,       route: '/app/library',       icon: 'subscriptions' },
+    { label: this.t.nav.activate,      route: '/app/activate',      icon: 'qr_code_scanner' },
+    { label: this.t.nav.products,      route: '/app/products',      icon: 'storefront' },
+    { label: this.t.nav.allies,        route: '/app/allies',        icon: 'handshake' },
+    { label: this.t.nav.orders,        route: '/app/orders',        icon: 'receipt_long' },
+    { label: this.t.nav.moods,         route: '/app/moods',         icon: 'mood' },
+    { label: this.t.nav.subscriptions, route: '/app/subscriptions', icon: 'workspace_premium' },
+    { label: this.t.nav.profile,       route: '/app/profile',       icon: 'person' },
   ];
 
   logout(): void { this.closeMenus(); this.auth.logout(); }

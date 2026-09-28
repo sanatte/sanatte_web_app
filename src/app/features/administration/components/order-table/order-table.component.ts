@@ -4,8 +4,8 @@ import { StatusBadgeComponent } from '../../../../shared/components/status-badge
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
 import { Order, DeliveryStatus, DeliveryTone, DELIVERY_STATUS_META } from '../../models/order.model';
 import { ProductType } from '../../models/product.model';
+import { TEXTS } from '../../../../core/i18n/texts';
 
-// Tono semántico → clases de chip (estilo admin). El label/icon vienen de la fuente única.
 const TONE_CHIP: Record<DeliveryTone, string> = {
   success: 'bg-green-100 text-green-700',
   info:    'bg-primary/10 text-primary',
@@ -33,6 +33,8 @@ const PRODUCT_CLASSES: Record<ProductType, string> = {
   templateUrl: './order-table.component.html',
 })
 export class OrderTableComponent {
+  protected readonly t = TEXTS.admin.orders.table;
+
   readonly orders      = input.required<Order[]>();
   readonly totalItems  = input.required<number>();
   readonly currentPage = input.required<number>();

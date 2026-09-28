@@ -1,22 +1,19 @@
 @if (isOpen()) {
-  <!-- Backdrop -->
   <div class="fixed inset-0 z-50 bg-on-background/40 backdrop-blur-sm
               flex items-center justify-center p-4"
        (click)="cancel.emit()">
 
-    <!-- Dialog -->
     <div class="bg-white w-full max-w-2xl max-h-[100dvh] sm:max-h-[90vh]
                 rounded-none sm:rounded-lg shadow-2xl flex flex-col overflow-hidden"
          (click)="$event.stopPropagation()">
 
-      <!-- Header -->
       <div class="px-8 py-6 border-b border-outline-variant/20 flex justify-between items-start">
         <div>
           <h2 class="font-heading text-headline-md font-bold text-on-surface">
-            {{ isEditMode() ? 'Editar producto' : 'Crear nuevo producto' }}
+            {{ isEditMode() ? t.editTitle : t.createTitle }}
           </h2>
           <p class="text-label-md font-heading text-on-surface-variant mt-0.5">
-            {{ isEditMode() ? 'Modifica los datos del producto.' : 'Completa los datos del nuevo producto.' }}
+            {{ isEditMode() ? t.editSubtitle : t.createSubtitle }}
           </p>
         </div>
         <button (click)="cancel.emit()"
@@ -25,67 +22,64 @@
         </button>
       </div>
 
-      <!-- Body -->
       <form [formGroup]="form" (ngSubmit)="onSubmit()"
             class="flex-1 overflow-y-auto p-8 space-y-6">
 
-        <!-- Nombre y SKU -->
         <div class="grid grid-cols-2 gap-6">
           <div class="space-y-2">
             <label class="text-label-md font-heading font-semibold text-on-surface">
-              Nombre del producto <span class="text-error">*</span>
+              {{ t.name }} <span class="text-error">*</span>
             </label>
             <input formControlName="name" type="text"
-                   placeholder="ej. Plena Agenda 2025"
+                   [placeholder]="t.namePlaceholder"
                    class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3
                           focus:ring-2 focus:ring-primary/50 outline-none text-label-md
                           font-heading transition-all"/>
             @if (form.controls.name.touched && form.controls.name.errors) {
-              <p class="text-label-sm text-error">Campo requerido</p>
+              <p class="text-label-sm text-error">{{ t.required }}</p>
             }
           </div>
 
           <div class="space-y-2">
             <label class="text-label-md font-heading font-semibold text-on-surface">
-              SKU <span class="text-error">*</span>
+              {{ t.sku }} <span class="text-error">*</span>
             </label>
             <div class="flex gap-2">
-              <input formControlName="sku" type="text" placeholder="WLN-001"
+              <input formControlName="sku" type="text" [placeholder]="t.skuPlaceholder"
                      class="flex-1 bg-surface-container-low border-none rounded-lg px-4 py-3
                             focus:ring-2 focus:ring-primary/50 outline-none text-label-md
                             font-heading transition-all"/>
               <button type="button" (click)="generateSku()"
                       class="px-3 py-2 rounded-lg bg-primary-fixed text-primary text-label-sm
                              font-heading font-semibold hover:bg-primary-fixed-dim transition-colors"
-                      title="Generar SKU automático">
+                      [title]="t.generateSku">
                 <span class="material-symbols-outlined text-[18px]">auto_awesome</span>
               </button>
             </div>
             @if (form.controls.sku.touched && form.controls.sku.errors) {
-              <p class="text-label-sm text-error">Campo requerido</p>
+              <p class="text-label-sm text-error">{{ t.required }}</p>
             }
           </div>
         </div>
 
-        <!-- Tipo y Precio -->
         <div class="grid grid-cols-2 gap-6">
           <div class="space-y-2">
             <label class="text-label-md font-heading font-semibold text-on-surface">
-              Tipo <span class="text-error">*</span>
+              {{ t.type }} <span class="text-error">*</span>
             </label>
             <select formControlName="type" (change)="onTypeChange($event)"
                     class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3
                            focus:ring-2 focus:ring-primary/50 outline-none text-label-md
                            font-heading transition-all cursor-pointer">
-              <option value="physical">Físico</option>
-              <option value="digital">Digital</option>
-              <option value="subscription">Suscripción</option>
+              <option value="physical">{{ types.physical }}</option>
+              <option value="digital">{{ types.digital }}</option>
+              <option value="subscription">{{ types.subscription }}</option>
             </select>
           </div>
 
           <div class="space-y-2">
             <label class="text-label-md font-heading font-semibold text-on-surface">
-              Precio ($) <span class="text-error">*</span>
+              {{ t.price }} <span class="text-error">*</span>
             </label>
             <div class="flex gap-2">
               <input formControlName="price" type="text" inputmode="numeric" appThousandsSeparator
@@ -98,57 +92,54 @@
                         class="bg-surface-container-low border-none rounded-lg px-3 py-3
                                focus:ring-2 focus:ring-primary/50 outline-none text-label-md
                                font-heading cursor-pointer">
-                  <option value="monthly">/ mes</option>
-                  <option value="annual">/ año</option>
+                  <option value="monthly">{{ t.billingOptions.monthly }}</option>
+                  <option value="annual">{{ t.billingOptions.annual }}</option>
                 </select>
               }
             </div>
             @if (form.controls.price.touched && form.controls.price.errors) {
-              <p class="text-label-sm text-error">Ingresa un precio mayor a 0</p>
+              <p class="text-label-sm text-error">{{ t.priceError }}</p>
             }
           </div>
         </div>
 
-        <!-- IVA -->
         <div class="space-y-2">
           <label class="text-label-md font-heading font-semibold text-on-surface">
-            IVA <span class="text-error">*</span>
+            {{ t.tax }} <span class="text-error">*</span>
           </label>
           <select formControlName="taxRate"
                   class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3
                          focus:ring-2 focus:ring-primary/50 outline-none text-label-md
                          font-heading transition-all cursor-pointer">
-            <option [ngValue]="19">Gravado 19% (general)</option>
-            <option [ngValue]="5">Gravado 5% (reducido)</option>
-            <option [ngValue]="0">Exento / Excluido (0%)</option>
+            <option [ngValue]="19">{{ t.taxOptions.general }}</option>
+            <option [ngValue]="5">{{ t.taxOptions.reduced }}</option>
+            <option [ngValue]="0">{{ t.taxOptions.exempt }}</option>
           </select>
           <p class="text-label-sm text-on-surface-variant">
-            El IVA va <span class="font-semibold">incluido</span> en el precio; en el carrito se muestra discriminado.
+            {{ t.taxHintPrefix }} <span class="font-semibold">{{ t.taxHintEmphasis }}</span> {{ t.taxHintSuffix }}
           </p>
         </div>
 
-        <!-- Stock / Límite licencias -->
         @if (selectedType() !== 'subscription') {
           <div class="space-y-2">
             <label class="text-label-md font-heading font-semibold text-on-surface">
-              {{ selectedType() === 'physical' ? 'Stock disponible' : 'Límite de licencias' }}
+              {{ selectedType() === 'physical' ? t.stockPhysical : t.stockLimit }}
             </label>
             <input formControlName="stock" type="text" inputmode="numeric" appThousandsSeparator
-                   placeholder="Dejar vacío para ilimitado"
+                   [placeholder]="t.stockPlaceholder"
                    class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3
                           focus:ring-2 focus:ring-primary/50 outline-none text-label-md
                           font-heading transition-all"/>
           </div>
         }
 
-        <!-- Activación y Estado -->
         <div class="space-y-3">
           @if (selectedType() === 'physical') {
             <div class="flex items-center justify-between p-4 bg-surface-container rounded-lg">
               <div>
-                <p class="text-label-md font-heading font-bold text-on-surface">Requiere activación por QR</p>
+                <p class="text-label-md font-heading font-bold text-on-surface">{{ t.requiresActivation }}</p>
                 <p class="text-label-sm font-heading text-on-surface-variant">
-                  El usuario debe registrarse y activar el producto para acceder a los recursos
+                  {{ t.requiresActivationHint }}
                 </p>
               </div>
               <label class="relative inline-flex items-center cursor-pointer">
@@ -164,9 +155,9 @@
 
           <div class="flex items-center justify-between p-4 bg-surface-container rounded-lg">
             <div>
-              <p class="text-label-md font-heading font-bold text-on-surface">Producto activo</p>
+              <p class="text-label-md font-heading font-bold text-on-surface">{{ t.active }}</p>
               <p class="text-label-sm font-heading text-on-surface-variant">
-                Visible en la tienda inmediatamente
+                {{ t.activeHint }}
               </p>
             </div>
             <label class="relative inline-flex items-center cursor-pointer">
@@ -183,29 +174,27 @@
           </div>
         </div>
 
-        <!-- Descripción -->
         <div class="space-y-2">
           <label class="text-label-md font-heading font-semibold text-on-surface">
-            Descripción <span class="text-error">*</span>
+            {{ t.description }} <span class="text-error">*</span>
           </label>
           <textarea formControlName="description" rows="3"
-                    placeholder="Describe los beneficios y características del producto..."
+                    [placeholder]="t.descriptionPlaceholder"
                     class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3
                            focus:ring-2 focus:ring-primary/50 outline-none text-label-md
                            font-heading resize-none transition-all"></textarea>
           @if (form.controls.description.touched && form.controls.description.errors) {
-            <p class="text-label-sm text-error">Campo requerido</p>
+            <p class="text-label-sm text-error">{{ t.required }}</p>
           }
         </div>
 
-        <!-- Recursos incluidos -->
         <div class="space-y-3">
           <div>
             <label class="text-label-md font-heading font-semibold text-on-surface block mb-0.5">
-              Recursos incluidos
+              {{ t.resources }}
             </label>
             <p class="text-label-sm font-heading text-on-surface-variant">
-              Selecciona los recursos que el usuario recibirá al adquirir este producto.
+              {{ t.resourcesHint }}
             </p>
           </div>
 
@@ -255,7 +244,7 @@
                     {{ resource.title }}
                   </p>
                   <p class="text-label-sm font-heading text-outline capitalize">
-                    {{ resource.type }}
+                    {{ resourceTypeLabel(resource.type) }}
                     @if (resource.duration) { · {{ resource.duration }} }
                     @if (resource.fileSize) { · {{ resource.fileSize }} }
                     @if (resource.readTime) { · {{ resource.readTime }} }
@@ -263,28 +252,27 @@
                 </div>
                 <span class="text-[11px] font-heading flex-shrink-0"
                       [class]="resource.status === 'published' ? 'text-green-600' : 'text-outline'">
-                  {{ resource.status === 'published' ? '● Publicado' : '○ Borrador' }}
+                  {{ resource.status === 'published' ? t.published : t.draft }}
                 </span>
               </button>
             }
           </div>
         </div>
 
-        <!-- Recurso de bienvenida -->
         @if (selectedResources().length > 0) {
           <div class="space-y-2">
             <label class="text-label-md font-heading font-semibold text-on-surface flex items-center gap-2">
               <span class="material-symbols-outlined text-primary text-[18px]">waving_hand</span>
-              Recurso de bienvenida
+              {{ t.welcome }}
             </label>
             <p class="text-label-sm font-heading text-on-surface-variant">
-              Se muestra al usuario justo después de activar el producto.
+              {{ t.welcomeHint }}
             </p>
             <select formControlName="welcomeResourceId"
                     class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3
                            focus:ring-2 focus:ring-primary/50 outline-none text-label-md
                            font-heading cursor-pointer">
-              <option value="">Sin página de bienvenida</option>
+              <option value="">{{ t.welcomeNone }}</option>
               @for (r of selectedResources(); track r.id) {
                 <option [value]="r.id">{{ r.title }}</option>
               }
@@ -292,21 +280,19 @@
           </div>
         }
 
-        <!-- Tags -->
         <div class="space-y-2">
           <label class="text-label-md font-heading font-semibold text-on-surface">
-            Tags <span class="text-outline font-normal ml-1">(separados por coma)</span>
+            {{ t.tags }} <span class="text-outline font-normal ml-1">{{ t.tagsHint }}</span>
           </label>
           <input formControlName="tags" type="text"
-                 placeholder="ej. QR Sync, Cuero vegano, 120gsm"
+                 [placeholder]="t.tagsPlaceholder"
                  class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3
                         focus:ring-2 focus:ring-primary/50 outline-none text-label-md
                         font-heading transition-all"/>
         </div>
 
-        <!-- Imagen de portada -->
         <div class="space-y-2">
-          <label class="text-label-md font-heading font-semibold text-on-surface">Imagen de portada</label>
+          <label class="text-label-md font-heading font-semibold text-on-surface">{{ t.cover }}</label>
           <input #coverInput type="file" class="hidden"
                  accept="image/jpeg,image/png,image/webp" (change)="onCoverSelected($event)"/>
           <button type="button" (click)="coverInput.click()"
@@ -324,10 +310,10 @@
             </div>
             <div class="flex-1 min-w-0">
               <p class="text-label-md font-heading font-semibold text-on-surface group-hover:text-primary transition-colors">
-                {{ (coverPreview() || existingCoverUrl()) ? 'Cambiar imagen' : 'Subir portada' }}
+                {{ (coverPreview() || existingCoverUrl()) ? t.changeCover : t.uploadCover }}
               </p>
               <p class="text-label-sm font-heading text-on-surface-variant mt-0.5">
-                JPEG, PNG o WebP · más fotos en el detalle del producto
+                {{ t.coverHint }}
               </p>
             </div>
             <span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors text-[20px] flex-shrink-0">upload</span>
@@ -336,7 +322,6 @@
 
       </form>
 
-      <!-- Footer -->
       <div class="px-8 py-5 border-t border-outline-variant/20 bg-white">
         @if (errorMessage()) {
           <div class="mb-3 p-3 rounded-xl bg-error-container/50 border border-error/20 text-error
@@ -350,7 +335,7 @@
                   class="px-6 py-3 rounded-full text-label-md font-heading font-bold
                          text-on-surface-variant hover:bg-surface-container-low transition-colors
                          disabled:opacity-50">
-            Cancelar
+            {{ c.actions.cancel }}
           </button>
           <button type="button" (click)="onSubmit()" [disabled]="saving()"
                   class="px-8 py-3 gradient-primary text-white rounded-full text-label-md
@@ -360,7 +345,7 @@
             @if (saving()) {
               <span class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span>
             }
-            {{ isEditMode() ? 'Guardar cambios' : 'Crear producto' }}
+            {{ isEditMode() ? t.saveChanges : t.create }}
           </button>
         </div>
       </div>

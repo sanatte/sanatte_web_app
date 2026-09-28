@@ -12,6 +12,7 @@ import { SearchInputComponent } from '../../../../shared/components/search-input
 import { Resource, ResourceType } from '../../models/resource.model';
 import { QrService } from '../../../../shared/services/qr.service';
 import { environment } from '../../../../../environments/environment';
+import { TEXTS } from '../../../../core/i18n/texts';
 
 type TabFilter = 'all' | ResourceType | 'exercise';
 
@@ -27,6 +28,9 @@ const PAGE_SIZE = 8;
   templateUrl: './admin-resources.component.html',
 })
 export class AdminResourcesComponent {
+  protected readonly t = TEXTS.admin.resources;
+  protected readonly c = TEXTS.common;
+
   private readonly resourceService    = inject(ResourceService);
   private readonly productService     = inject(ProductService);
   private readonly entitlementService = inject(EntitlementService);
@@ -48,11 +52,11 @@ export class AdminResourcesComponent {
   readonly uploadingThumbnailId = signal<string | null>(null);
 
   readonly tabs: { key: TabFilter; label: string }[] = [
-    { key: 'all',      label: 'Todos'      },
-    { key: 'audio',    label: 'Audio'      },
-    { key: 'video',    label: 'Video'      },
-    { key: 'pdf',      label: 'PDF'        },
-    { key: 'exercise', label: 'Ejercicios' },
+    { key: 'all',      label: this.t.page.tabs.all      },
+    { key: 'audio',    label: this.t.types.audio        },
+    { key: 'video',    label: this.t.types.video        },
+    { key: 'pdf',      label: this.t.types.pdf          },
+    { key: 'exercise', label: this.t.page.tabs.exercise },
   ];
 
   readonly filtered = computed(() => {
@@ -74,7 +78,7 @@ export class AdminResourcesComponent {
 
   readonly deleteMessage = computed(() => {
     const r = this.resourceToDelete();
-    return r ? `¿Eliminar "${r.title}"? Esta acción no se puede deshacer.` : '';
+    return r ? this.t.page.deleteMessage(r.title) : '';
   });
 
   readonly deleteBlockedMessage = signal<string | null>(null);
@@ -100,7 +104,6 @@ export class AdminResourcesComponent {
   openCreate(): void { this.editingResource.set(null); this.isModalOpen.set(true); }
   openEdit(r: Resource): void { this.editingResource.set(r); this.isModalOpen.set(true); }
 
-  /** Descarga el QR (PNG) que apunta al recurso: {publicBaseUrl}/r/{slug}. */
   onDownloadQr(r: Resource): void {
     if (!r.slug) return;
     const url = `${environment.publicBaseUrl}/r/${r.slug}`;
@@ -111,9 +114,7 @@ export class AdminResourcesComponent {
   requestDelete(r: Resource): void {
     const linked = this.linkedCountMap()[r.id] ?? 0;
     if (linked > 0) {
-      this.deleteBlockedMessage.set(
-        `"${r.title}" está vinculado a ${linked} producto${linked !== 1 ? 's' : ''}. Desvincula el recurso antes de eliminarlo.`
-      );
+      this.deleteBlockedMessage.set(this.t.page.deleteBlocked(r.title, linked));
       return;
     }
     this.deleteBlockedMessage.set(null);
@@ -135,7 +136,7 @@ export class AdminResourcesComponent {
     try {
       await this.resourceService.uploadThumbnail(event.resource.id, event.file);
     } catch {
-      alert('No se pudo subir el thumbnail. Inténtalo de nuevo.');
+      alert(this.t.page.thumbnailError);
     } finally {
       this.uploadingThumbnailId.set(null);
     }

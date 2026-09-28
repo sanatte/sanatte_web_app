@@ -1,20 +1,18 @@
+import { TEXTS } from '../../../core/i18n/texts';
 import { Component, input, output, computed } from '@angular/core';
 
 @Component({
   selector: 'app-confirm-dialog',
   template: `
     @if (open()) {
-      <!-- Backdrop -->
       <div class="fixed inset-0 z-[60] bg-on-background/40 backdrop-blur-sm
                   flex items-center justify-center p-4"
            (click)="cancel.emit()">
 
-        <!-- Card -->
         <div class="bg-white rounded-lg w-full max-w-md mx-4 shadow-2xl"
              style="box-shadow: 0px 20px 50px rgb(var(--color-shadow) / 0.12)"
              (click)="$event.stopPropagation()">
 
-          <!-- Icon + Header -->
           <div class="px-8 pt-8 pb-6">
             <div class="w-12 h-12 rounded-full flex items-center justify-center mb-4"
                  [class]="iconBgClass()">
@@ -37,7 +35,6 @@ import { Component, input, output, computed } from '@angular/core';
             }
           </div>
 
-          <!-- Actions -->
           <div class="px-8 pb-8 flex justify-end gap-3">
             <button (click)="cancel.emit()"
                     class="px-6 py-2.5 rounded-full text-label-md font-heading font-bold
@@ -60,11 +57,11 @@ import { Component, input, output, computed } from '@angular/core';
 })
 export class ConfirmDialogComponent {
   readonly open         = input(false);
-  readonly title        = input('¿Confirmar acción?');
-  readonly message      = input('¿Estás seguro de que deseas continuar?');
+  readonly title        = input<string>(TEXTS.common.confirmDialog.title);
+  readonly message      = input<string>(TEXTS.common.confirmDialog.message);
   readonly errorMessage = input('');
-  readonly confirmText  = input('Confirmar');
-  readonly cancelText   = input('Cancelar');
+  readonly confirmText  = input<string>(TEXTS.common.actions.confirm);
+  readonly cancelText   = input<string>(TEXTS.common.actions.cancel);
   readonly variant      = input<'danger' | 'primary'>('danger');
 
   readonly confirm = output<void>();

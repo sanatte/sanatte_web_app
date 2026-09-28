@@ -7,6 +7,7 @@ import { SearchInputComponent } from '../../../../shared/components/search-input
 import { CreateAdminDialogComponent, CreateAdminInput } from '../../components/create-admin-dialog/create-admin-dialog.component';
 import { AdminUser } from '../../models/user-admin.model';
 import { UserRole } from '../../../../core/models/role.model';
+import { TEXTS } from '../../../../core/i18n/texts';
 
 const PAGE_SIZE = 10;
 
@@ -18,6 +19,8 @@ const PAGE_SIZE = 10;
 export class AdminUsersComponent {
   private readonly userService = inject(UserAdminService);
   private readonly createDialog = viewChild(CreateAdminDialogComponent);
+
+  protected readonly t = TEXTS.admin.users;
 
   readonly searchTerm    = signal('');
   readonly currentPage   = signal(1);
@@ -48,7 +51,6 @@ export class AdminUsersComponent {
 
   onSearch(term: string): void { this.searchTerm.set(term); this.currentPage.set(1); }
 
-  // ─── Crear administrador ──────────────────────────────────────────────────
   openCreate(): void { this.isCreateOpen.set(true); }
   onCreateCancel(): void { this.isCreateOpen.set(false); }
 
@@ -61,19 +63,20 @@ export class AdminUsersComponent {
       this.isCreateOpen.set(false);
     } catch (e: unknown) {
       const msg = (e as { error?: { detail?: string } })?.error?.detail
-        ?? 'No se pudo crear el administrador. Intenta de nuevo.';
+        ?? this.t.page.createError;
       dialog?.setError(msg);
     }
   }
 
   onToggleStatus(user: AdminUser): void {
-    const action = user.status === 'active' ? 'bloquear' : 'desbloquear';
+    const blocking = user.status === 'active';
+    const confirm = this.t.page.confirm;
     this.userToDelete.set(user);
     this.confirmConfig.set({
-      title: `${user.status === 'active' ? 'Bloquear' : 'Desbloquear'} usuario`,
-      message: `¿Deseas ${action} la cuenta de "${user.displayName}"?`,
-      confirmText: `Sí, ${action}`,
-      variant: user.status === 'active' ? 'danger' : 'primary',
+      title: blocking ? confirm.blockTitle : confirm.unblockTitle,
+      message: blocking ? confirm.blockMessage(user.displayName) : confirm.unblockMessage(user.displayName),
+      confirmText: blocking ? confirm.blockConfirm : confirm.unblockConfirm,
+      variant: blocking ? 'danger' : 'primary',
       action: 'status',
     });
     this.isConfirmOpen.set(true);
@@ -82,9 +85,9 @@ export class AdminUsersComponent {
   onDeleteUser(user: AdminUser): void {
     this.userToDelete.set(user);
     this.confirmConfig.set({
-      title: 'Eliminar usuario',
-      message: `¿Eliminar la cuenta de "${user.displayName}"? Esta acción no se puede deshacer.`,
-      confirmText: 'Sí, eliminar',
+      title: this.t.page.confirm.deleteTitle,
+      message: this.t.page.confirm.deleteMessage(user.displayName),
+      confirmText: this.t.page.confirm.deleteConfirm,
       variant: 'danger',
       action: 'delete',
     });
@@ -102,7 +105,7 @@ export class AdminUsersComponent {
       }
     } catch (e: unknown) {
       const msg = (e as { error?: { detail?: string } })?.error?.detail
-        ?? 'No se pudo completar la acción.';
+        ?? this.t.page.actionError;
       alert(msg);
     } finally {
       this.isConfirmOpen.set(false);

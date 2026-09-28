@@ -1,4 +1,5 @@
 import { Component, input, output, computed } from '@angular/core';
+import { TEXTS } from '../../../../core/i18n/texts';
 import { DashboardOrder, OrderStatus } from '../../models/dashboard-order.model';
 
 interface StatusConfig {
@@ -7,22 +8,21 @@ interface StatusConfig {
 }
 
 const STATUS_CONFIG: Record<OrderStatus, StatusConfig> = {
-  paid:      { label: 'Pagado',    classes: 'bg-green-100 text-green-700' },
-  pending:   { label: 'Pendiente', classes: 'bg-amber-100 text-amber-700' },
-  shipped:   { label: 'Enviado',   classes: 'bg-blue-100 text-blue-700' },
-  cancelled: { label: 'Cancelado', classes: 'bg-red-100 text-red-700' },
+  paid:      { label: TEXTS.admin.dashboard.recentOrders.statuses.paid,      classes: 'bg-green-100 text-green-700' },
+  pending:   { label: TEXTS.admin.dashboard.recentOrders.statuses.pending,   classes: 'bg-amber-100 text-amber-700' },
+  shipped:   { label: TEXTS.admin.dashboard.recentOrders.statuses.shipped,   classes: 'bg-blue-100 text-blue-700' },
+  cancelled: { label: TEXTS.admin.dashboard.recentOrders.statuses.cancelled, classes: 'bg-red-100 text-red-700' },
 };
 
 @Component({
   selector: 'app-recent-orders-table',
   template: `
     <div class="glass-card rounded-lg overflow-hidden">
-      <!-- Header -->
       <div class="px-8 py-6 border-b border-outline-variant/30 flex justify-between items-center">
         <div>
-          <h4 class="font-heading text-headline-md text-on-surface">Pedidos Recientes</h4>
+          <h4 class="font-heading text-headline-md text-on-surface">{{ t.title }}</h4>
           <p class="text-on-surface-variant text-label-sm mt-0.5">
-            Últimas {{ orders().length }} transacciones.
+            {{ t.subtitle(orders().length) }}
           </p>
         </div>
         <div class="flex gap-2">
@@ -31,27 +31,26 @@ const STATUS_CONFIG: Record<OrderStatus, StatusConfig> = {
                          text-label-md font-heading hover:bg-surface-variant transition-colors
                          flex items-center gap-2">
             <span class="material-symbols-outlined text-[18px]">filter_list</span>
-            Filtrar
+            {{ t.filter }}
           </button>
           <button (click)="exportClick.emit()"
                   class="px-4 py-2 gradient-primary text-white rounded-lg text-label-md
                          font-heading hover:shadow-primary transition-all flex items-center gap-2">
             <span class="material-symbols-outlined text-[18px]">download</span>
-            Exportar
+            {{ c.actions.export }}
           </button>
         </div>
       </div>
 
-      <!-- Table -->
       <div class="overflow-x-auto">
         <table class="w-full text-left">
           <thead>
             <tr class="bg-surface-container-low border-b border-outline-variant/30">
-              <th class="px-8 py-4 text-label-md font-heading text-on-surface-variant">Order ID</th>
-              <th class="px-8 py-4 text-label-md font-heading text-on-surface-variant">Cliente</th>
-              <th class="px-8 py-4 text-label-md font-heading text-on-surface-variant">Monto</th>
-              <th class="px-8 py-4 text-label-md font-heading text-on-surface-variant">Estado</th>
-              <th class="px-8 py-4 text-label-md font-heading text-on-surface-variant text-right">Acción</th>
+              <th class="px-8 py-4 text-label-md font-heading text-on-surface-variant">{{ t.columns.orderId }}</th>
+              <th class="px-8 py-4 text-label-md font-heading text-on-surface-variant">{{ t.columns.customer }}</th>
+              <th class="px-8 py-4 text-label-md font-heading text-on-surface-variant">{{ t.columns.amount }}</th>
+              <th class="px-8 py-4 text-label-md font-heading text-on-surface-variant">{{ t.columns.status }}</th>
+              <th class="px-8 py-4 text-label-md font-heading text-on-surface-variant text-right">{{ t.columns.action }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-outline-variant/20">
@@ -92,16 +91,18 @@ const STATUS_CONFIG: Record<OrderStatus, StatusConfig> = {
         </table>
       </div>
 
-      <!-- Footer -->
       <div class="px-8 py-4 border-t border-outline-variant/30 flex justify-center">
         <button class="text-primary text-label-md font-heading hover:underline py-2">
-          Cargar más transacciones
+          {{ t.loadMore }}
         </button>
       </div>
     </div>
   `,
 })
 export class RecentOrdersTableComponent {
+  protected readonly t = TEXTS.admin.dashboard.recentOrders;
+  protected readonly c = TEXTS.common;
+
   readonly orders = input.required<DashboardOrder[]>();
   readonly filterClick = output<void>();
   readonly exportClick = output<void>();

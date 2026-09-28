@@ -5,14 +5,13 @@
     <div class="bg-white w-full max-w-xl max-h-[100dvh] sm:max-h-[90vh]
                 rounded-none sm:rounded-lg shadow-2xl flex flex-col overflow-hidden">
 
-      <!-- Header -->
       <div class="px-8 py-6 border-b border-outline-variant/20 flex justify-between items-start">
         <div>
           <h2 class="font-heading text-headline-md font-bold text-on-surface">
-            {{ isEditMode() ? 'Editar recurso' : 'Subir nuevo recurso' }}
+            {{ isEditMode() ? t.editTitle : t.createTitle }}
           </h2>
           <p class="text-label-md font-heading text-on-surface-variant mt-0.5">
-            Audios, videos, PDFs y artículos del catálogo de bienestar.
+            {{ t.subtitle }}
           </p>
         </div>
         <button (click)="cancel.emit()"
@@ -21,94 +20,86 @@
         </button>
       </div>
 
-      <!-- Body -->
       <form [formGroup]="form" (ngSubmit)="onSubmit()"
             class="flex-1 overflow-y-auto p-8 space-y-5">
 
-        <!-- Título y Tipo -->
         <div class="grid grid-cols-2 gap-5">
           <div class="col-span-2 space-y-2">
             <label class="text-label-md font-heading font-semibold text-on-surface">
-              Título <span class="text-error">*</span>
+              {{ t.title }} <span class="text-error">*</span>
             </label>
             <input formControlName="title" type="text"
-                   placeholder="ej. Meditación guiada de inicio"
+                   [placeholder]="t.titlePlaceholder"
                    class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3
                           focus:ring-2 focus:ring-primary/50 outline-none text-label-md
                           font-heading transition-all"/>
             @if (form.controls.title.touched && form.controls.title.errors) {
-              <p class="text-label-sm text-error">Campo requerido</p>
+              <p class="text-label-sm text-error">{{ t.required }}</p>
             }
           </div>
 
-          <!-- Slug (código del QR) -->
           <div class="col-span-2 space-y-2">
             <label class="text-label-md font-heading font-semibold text-on-surface">
-              Slug del QR
+              {{ t.slug }}
             </label>
             <input formControlName="slug" type="text"
-                   placeholder="se genera del título si lo dejas vacío"
+                   [placeholder]="t.slugPlaceholder"
                    class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3
                           focus:ring-2 focus:ring-primary/50 outline-none text-label-md
                           font-heading transition-all"/>
-            <!-- URL resultante del QR impreso (siempre apunta a producción) -->
             <div class="flex items-center gap-2 px-1">
               <span class="material-symbols-outlined text-[15px] text-primary shrink-0">qr_code_2</span>
               <p class="text-label-sm font-heading text-on-surface-variant truncate">
-                URL del QR impreso:
+                {{ t.qrUrl }}
                 <span class="text-on-surface font-semibold">
-                  sanatte.com/r/{{ form.controls.slug.value || '(se genera del título)' }}
+                  sanatte.com/r/{{ form.controls.slug.value || t.qrUrlFallback }}
                 </span>
               </p>
             </div>
             <p class="text-label-sm text-on-surface-variant px-1">
-              El slug no cambia al renombrar el recurso — edítalo aquí si necesitas actualizarlo.
+              {{ t.slugHint }}
             </p>
           </div>
 
           <div class="space-y-2">
             <label class="text-label-md font-heading font-semibold text-on-surface">
-              Tipo <span class="text-error">*</span>
+              {{ t.type }} <span class="text-error">*</span>
             </label>
             <select formControlName="type" (change)="onTypeChange($event)"
                     class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3
                            focus:ring-2 focus:ring-primary/50 outline-none text-label-md
                            font-heading cursor-pointer">
-              <option value="audio">Audio</option>
-              <option value="video">Video</option>
-              <option value="pdf">PDF</option>
+              <option value="audio">{{ types.audio }}</option>
+              <option value="video">{{ types.video }}</option>
+              <option value="pdf">{{ types.pdf }}</option>
             </select>
           </div>
 
           <div class="space-y-2">
-            <label class="text-label-md font-heading font-semibold text-on-surface">Estado</label>
+            <label class="text-label-md font-heading font-semibold text-on-surface">{{ t.status }}</label>
             <select formControlName="status"
                     class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3
                            focus:ring-2 focus:ring-primary/50 outline-none text-label-md
                            font-heading cursor-pointer">
-              <option value="draft">Borrador</option>
-              <option value="published">Publicado</option>
+              <option value="draft">{{ statuses.draft }}</option>
+              <option value="published">{{ statuses.published }}</option>
             </select>
           </div>
         </div>
 
-        <!-- Advertencia: despublicar recurso vinculado a productos -->
         @if (isEditMode() && linkedProductCount() > 0 && form.controls.status.value === 'draft') {
           <div class="flex items-start gap-3 bg-warning-container/40 border border-warning/30
                       rounded-xl px-4 py-3">
             <span class="material-symbols-outlined text-warning text-[20px] shrink-0 mt-0.5">warning</span>
             <p class="text-label-sm font-heading text-on-surface">
-              Este recurso está vinculado a
-              <span class="font-semibold">{{ linkedProductCount() }} producto{{ linkedProductCount() !== 1 ? 's' : '' }}</span>.
-              Al guardarlo como borrador dejará de estar disponible para los usuarios.
-              Considera desvincularlo del producto antes de despublicarlo.
+              {{ t.unpublishWarningPrefix }}
+              <span class="font-semibold">{{ productCount(linkedProductCount()) }}</span>{{ t.unpublishWarningSuffix }}
             </p>
           </div>
         }
 
-        <!-- Portada -->
         <div class="space-y-2">
-          <label class="text-label-md font-heading font-semibold text-on-surface">Portada</label>
+          <label class="text-label-md font-heading font-semibold text-on-surface">{{ t.cover }}</label>
           <input #coverInput type="file" class="hidden"
                  accept="image/jpeg,image/png,image/webp" (change)="onCoverSelected($event)"/>
           <button type="button" (click)="coverInput.click()"
@@ -130,86 +121,82 @@
                            bg-white/90 text-on-surface text-label-sm font-heading font-bold
                            flex items-center gap-1">
                 <span class="material-symbols-outlined text-[16px]">upload</span>
-                {{ coverPreview() || resource()?.thumbnailUrl ? 'Cambiar portada' : 'Subir portada' }}
+                {{ coverPreview() || resource()?.thumbnailUrl ? t.changeCover : t.uploadCover }}
               </span>
             </div>
           </button>
-          <p class="text-label-sm text-on-surface-variant">JPEG, PNG o WebP — se usa como portada del recurso.</p>
+          <p class="text-label-sm text-on-surface-variant">{{ t.coverHint }}</p>
         </div>
 
-        <!-- Meta según tipo -->
         @if (selectedType() === 'audio' || selectedType() === 'video') {
           <div class="space-y-2">
             <label class="text-label-md font-heading font-semibold text-on-surface">
-              Duración (mm:ss)
+              {{ t.duration }}
             </label>
             <div class="w-full bg-surface-container-low rounded-lg px-4 py-3 text-label-md
                         font-heading text-on-surface select-none"
                  [class.text-outline]="!form.controls.duration.value">
-              {{ form.controls.duration.value || 'Se calcula al elegir el archivo' }}
+              {{ form.controls.duration.value || t.autoPlaceholder }}
             </div>
             <p class="text-label-sm text-on-surface-variant flex items-center gap-1">
               <span class="material-symbols-outlined text-base text-primary">auto_awesome</span>
-              Se completa automáticamente con el archivo.
+              {{ t.autoHint }}
             </p>
           </div>
         }
         @if (selectedType() === 'pdf') {
           <div class="space-y-2">
             <label class="text-label-md font-heading font-semibold text-on-surface">
-              Tamaño del archivo
+              {{ t.fileSize }}
             </label>
             <div class="w-full bg-surface-container-low rounded-lg px-4 py-3 text-label-md
                         font-heading text-on-surface select-none"
                  [class.text-outline]="!form.controls.fileSize.value">
-              {{ form.controls.fileSize.value || 'Se calcula al elegir el archivo' }}
+              {{ form.controls.fileSize.value || t.autoPlaceholder }}
             </div>
             <p class="text-label-sm text-on-surface-variant flex items-center gap-1">
               <span class="material-symbols-outlined text-base text-primary">auto_awesome</span>
-              Se completa automáticamente con el archivo.
+              {{ t.autoHint }}
             </p>
           </div>
         }
         @if (selectedType() === 'article') {
           <div class="space-y-2">
             <label class="text-label-md font-heading font-semibold text-on-surface">
-              Tiempo de lectura
+              {{ t.readTime }}
             </label>
-            <input formControlName="readTime" type="text" placeholder="8 min"
+            <input formControlName="readTime" type="text" [placeholder]="t.readTimePlaceholder"
                    class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3
                           focus:ring-2 focus:ring-primary/50 outline-none text-label-md
                           font-heading transition-all"/>
           </div>
         }
 
-        <!-- Descripción -->
         <div class="space-y-2">
-          <label class="text-label-md font-heading font-semibold text-on-surface">Descripción</label>
+          <label class="text-label-md font-heading font-semibold text-on-surface">{{ t.description }}</label>
           <textarea formControlName="description" rows="3"
-                    placeholder="Describe el contenido y beneficios del recurso..."
+                    [placeholder]="t.descriptionPlaceholder"
                     class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3
                            focus:ring-2 focus:ring-primary/50 outline-none text-label-md
                            font-heading resize-none transition-all"></textarea>
         </div>
 
-        <!-- Tags -->
         <div class="space-y-2">
           <label class="text-label-md font-heading font-semibold text-on-surface">
-            Tags
-            <span class="text-outline font-normal ml-1">(separados por coma)</span>
+            {{ t.tags }}
+            <span class="text-outline font-normal ml-1">{{ t.tagsHint }}</span>
           </label>
           <input formControlName="tags" type="text"
-                 placeholder="exercise, meditation, sleep"
+                 [placeholder]="t.tagsPlaceholder"
                  class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3
                         focus:ring-2 focus:ring-primary/50 outline-none text-label-md
                         font-heading transition-all"/>
         </div>
 
-        <!-- Contenido del artículo (editor WYSIWYG) -->
         @if (selectedType() === 'article') {
           <div class="space-y-2">
             <label class="text-label-md font-heading font-semibold text-on-surface">
-              Contenido del artículo
+              {{ t.articleContent }}
             </label>
             <app-rich-text-editor
               [content]="articleContent()"
@@ -217,16 +204,14 @@
           </div>
         }
 
-        <!-- Subida de archivo (no aplica a artículos) -->
         @if (needsFile()) {
           <div class="space-y-2">
-            <label class="text-label-md font-heading font-semibold text-on-surface">Archivo</label>
+            <label class="text-label-md font-heading font-semibold text-on-surface">{{ t.file }}</label>
 
             <input #fileInput type="file" class="hidden"
                    [accept]="acceptAttr()" (change)="onFileSelected($event)"/>
 
             @if (selectedFile(); as file) {
-              <!-- Archivo elegido -->
               <div class="border border-outline-variant/40 rounded-lg p-4 flex items-center gap-3">
                 <div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center
                             justify-center text-primary shrink-0">
@@ -244,7 +229,6 @@
                 }
               </div>
             } @else {
-              <!-- Dropzone / selector -->
               <button type="button" (click)="fileInput.click()"
                       class="w-full border-2 border-dashed border-outline-variant rounded-lg p-8
                              flex flex-col items-center justify-center gap-3
@@ -255,14 +239,10 @@
                 </div>
                 <div class="text-center">
                   <p class="text-label-md font-heading font-bold text-on-surface">
-                    <span class="text-primary underline">Selecciona un archivo</span>
+                    <span class="text-primary underline">{{ t.selectFile }}</span>
                   </p>
                   <p class="text-label-sm font-heading text-outline mt-0.5">
-                    @switch (selectedType()) {
-                      @case ('audio') { MP3, M4A, AAC o WAV }
-                      @case ('video') { MP4 o WebM (recomendado 720p) }
-                      @case ('pdf')   { PDF }
-                    }
+                    {{ t.acceptedFormats[selectedType()] }}
                   </p>
                 </div>
               </button>
@@ -270,14 +250,13 @@
                 <div class="flex items-center gap-2 px-1">
                   <span class="material-symbols-outlined text-base text-primary shrink-0">check_circle</span>
                   <p class="text-label-sm font-heading text-on-surface-variant">
-                    Archivo actual: <span class="font-semibold text-on-surface">{{ existingFileLabel() }}</span>
-                    — Selecciona uno nuevo solo si quieres reemplazarlo.
+                    {{ t.currentFile }} <span class="font-semibold text-on-surface">{{ existingFileLabel() }}</span>
+                    {{ t.replaceHint }}
                   </p>
                 </div>
               }
             }
 
-            <!-- Barra de progreso durante la subida a R2 -->
             @if (uploadProgress() !== null) {
               <div class="space-y-1">
                 <div class="h-2 bg-surface-container-low rounded-full overflow-hidden">
@@ -285,14 +264,13 @@
                        [style.width.%]="uploadProgress()"></div>
                 </div>
                 <p class="text-label-sm font-heading text-on-surface-variant text-right">
-                  Subiendo… {{ uploadProgress() }}%
+                  {{ t.uploadingProgress(uploadProgress()!) }}
                 </p>
               </div>
             }
           </div>
         }
 
-        <!-- Error -->
         @if (errorMsg(); as msg) {
           <div class="bg-error-container/40 border border-error/30 rounded-lg px-4 py-3
                       flex items-start gap-2">
@@ -303,13 +281,12 @@
 
       </form>
 
-      <!-- Footer -->
       <div class="px-8 py-5 border-t border-outline-variant/20 flex justify-end gap-3 bg-white">
         <button type="button" (click)="cancel.emit()" [disabled]="isSaving()"
                 class="px-6 py-3 rounded-full text-label-md font-heading font-bold
                        text-on-surface-variant hover:bg-surface-container-low transition-colors
                        disabled:opacity-40 disabled:cursor-not-allowed">
-          Cancelar
+          {{ c.actions.cancel }}
         </button>
         <button type="button" (click)="onSubmit()" [disabled]="isSaving()"
                 class="px-8 py-3 gradient-primary text-white rounded-full text-label-md
@@ -318,9 +295,9 @@
                 style="box-shadow: 0 4px 14px 0 rgb(var(--color-primary) / 0.39)">
           @if (isSaving()) {
             <span class="material-symbols-outlined animate-spin text-lg">progress_activity</span>
-            {{ uploadProgress() !== null ? 'Subiendo…' : 'Guardando…' }}
+            {{ uploadProgress() !== null ? t.uploading : t.saving }}
           } @else {
-            {{ isEditMode() ? 'Guardar cambios' : 'Subir recurso' }}
+            {{ isEditMode() ? t.saveChanges : t.create }}
           }
         </button>
       </div>

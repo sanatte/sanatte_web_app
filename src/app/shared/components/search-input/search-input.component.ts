@@ -1,3 +1,4 @@
+import { TEXTS } from '../../../core/i18n/texts';
 import { Component, input, output, signal, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
@@ -20,7 +21,7 @@ import { FormsModule } from '@angular/forms';
   `,
 })
 export class SearchInputComponent {
-  readonly placeholder = input('Search...');
+  readonly placeholder = input<string>(TEXTS.common.search.placeholder);
   readonly search = output<string>();
 
   protected value = '';

@@ -6,16 +6,12 @@ import { AuthService } from '../../../core/services/auth.service';
 import { Product } from '../../administration/models/product.model';
 import { OwnedProduct } from '../models/user-library.model';
 import { environment } from '../../../../environments/environment';
+import { TEXTS } from '../../../core/i18n/texts';
+
+const CATEGORY = TEXTS.app.library.categories;
 
 interface ApiLibraryItem { productId: string; sku: string; resourcesIncluded: number; }
 
-/**
- * UserLibraryService — datos de la Biblioteca del usuario autenticado.
- *
- * La propiedad de productos proviene de `GET /api/me/library` (compras de
- * digital/suscripción ∪ productos físicos activados por QR). El `Product` completo
- * se hidrata desde el catálogo ya cargado en ProductService.
- */
 @Injectable({ providedIn: 'root' })
 export class UserLibraryService {
   private readonly http           = inject(HttpClient);
@@ -42,7 +38,6 @@ export class UserLibraryService {
     }
   }
 
-  /** Productos que el usuario posee/activó. */
   readonly ownedProducts = computed<OwnedProduct[]>(() => {
     const catalog = this.productService.products();
     return this._owned()
@@ -56,7 +51,6 @@ export class UserLibraryService {
 
   readonly hasProducts = computed(() => this.ownedProducts().length > 0);
 
-  /** Tras activar un producto, refresca la biblioteca desde el backend. */
   registerActivated(_productId: string): void {
     this.load();
   }
@@ -65,14 +59,12 @@ export class UserLibraryService {
     return this._owned().some((o) => o.productId === productId);
   }
 
-  /** Etiqueta de categoría derivada del tipo/tags del producto. */
   private categoryOf(product: Product): { label: string; tone: 'primary' | 'secondary' } {
-    if (product.type === 'subscription') return { label: 'Suscripción', tone: 'secondary' };
-    if (product.type === 'physical')     return { label: 'Agenda', tone: 'primary' };
-    // digital → afinar por tags
-    if (product.tags.some((t) => /ebook|pdf/i.test(t))) return { label: 'Ebook', tone: 'secondary' };
-    if (product.tags.some((t) => /curso|course/i.test(t))) return { label: 'Curso', tone: 'primary' };
-    if (product.tags.some((t) => /audio/i.test(t))) return { label: 'Audio', tone: 'primary' };
-    return { label: 'Digital', tone: 'primary' };
+    if (product.type === 'subscription') return { label: CATEGORY.subscription, tone: 'secondary' };
+    if (product.type === 'physical')     return { label: CATEGORY.physical, tone: 'primary' };
+    if (product.tags.some((t) => /ebook|pdf/i.test(t))) return { label: CATEGORY.ebook, tone: 'secondary' };
+    if (product.tags.some((t) => /curso|course/i.test(t))) return { label: CATEGORY.course, tone: 'primary' };
+    if (product.tags.some((t) => /audio/i.test(t))) return { label: CATEGORY.audio, tone: 'primary' };
+    return { label: CATEGORY.digital, tone: 'primary' };
   }
 }

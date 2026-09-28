@@ -1,4 +1,5 @@
 import { Component, input } from '@angular/core';
+import { TEXTS } from '../../../core/i18n/texts';
 
 @Component({
   selector: 'app-header',
@@ -7,7 +8,6 @@ import { Component, input } from '@angular/core';
       <h1 class="text-2xl font-bold text-gray-900">{{ title() }}</h1>
 
       <div class="flex items-center gap-3">
-        <!-- Notifications -->
         <button class="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round"
@@ -16,7 +16,6 @@ import { Component, input } from '@angular/core';
           </svg>
         </button>
 
-        <!-- Dark mode toggle (placeholder) -->
         <button class="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round"
@@ -29,5 +28,7 @@ import { Component, input } from '@angular/core';
   `,
 })
 export class HeaderComponent {
-  readonly title = input('Dashboard');
+  protected readonly t = TEXTS.shared.header;
+
+  readonly title = input<string>(this.t.defaultTitle);
 }

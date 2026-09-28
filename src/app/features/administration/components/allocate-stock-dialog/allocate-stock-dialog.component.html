@@ -1,0 +1,93 @@
+@if (location(); as target) {
+  <div class="fixed inset-0 z-[60] bg-on-background/40 backdrop-blur-sm flex items-center justify-center p-4"
+       (click)="cancel.emit()">
+
+    <div class="bg-white w-full max-w-md rounded-lg shadow-2xl flex flex-col overflow-hidden"
+         (click)="$event.stopPropagation()">
+
+      <div class="px-8 py-6 border-b border-outline-variant/20">
+        <div class="flex items-center gap-3 mb-1">
+          <div class="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+            <span class="material-symbols-outlined text-primary">{{ isReturn() ? 'undo' : 'move_to_inbox' }}</span>
+          </div>
+          <h2 class="font-heading text-headline-md font-bold text-on-surface">
+            {{ isReturn() ? t.returnTitle : t.assignTitle }}
+          </h2>
+        </div>
+        <p class="text-label-md font-heading text-on-surface-variant mt-1">
+          {{ isReturn() ? t.returnTarget : t.assignTarget }} <strong>{{ target.name }}</strong>
+        </p>
+      </div>
+
+      <form id="allocate-form" [formGroup]="form" (ngSubmit)="onSubmit()" class="p-8 space-y-5">
+
+        <div class="space-y-2">
+          <label for="allocate-product" class="text-label-md font-heading font-semibold text-on-surface">
+            {{ t.product }} <span class="text-error">{{ c.form.required }}</span>
+          </label>
+          <select id="allocate-product" formControlName="productId"
+                  class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 outline-none
+                         focus:ring-2 focus:ring-primary/50 text-label-md font-heading cursor-pointer">
+            <option value="" disabled>{{ t.productPlaceholder }}</option>
+            @for (p of activeProducts(); track p.id) {
+              <option [value]="p.id">{{ p.name }}</option>
+            }
+          </select>
+
+          @if (hasProduct()) {
+            @if (maxUnits() === 0) {
+              <p class="text-label-sm font-heading text-error">
+                {{ isReturn() ? t.noAssigned : t.noAvailable }}
+              </p>
+            } @else {
+              <p class="text-label-sm font-heading text-on-surface-variant">
+                {{ isReturn() ? t.assignedHere : t.availableInWarehouse }}
+                <strong>{{ maxUnits() }}</strong> {{ t.units }}
+              </p>
+            }
+          }
+        </div>
+
+        <div class="space-y-2">
+          <label for="allocate-quantity" class="text-label-md font-heading font-semibold text-on-surface">{{ t.quantity }}</label>
+          <input id="allocate-quantity" formControlName="quantity" type="text" inputmode="numeric" appThousandsSeparator
+                 class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 outline-none
+                        focus:ring-2 focus:ring-primary/50 text-label-md font-heading"
+                 [class.ring-2]="quantityExceedsStock()"
+                 [class.ring-error]="quantityExceedsStock()"/>
+
+          @if (quantityExceedsStock()) {
+            <p class="text-label-sm font-heading text-error">
+              {{ isReturn() ? t.exceedsAssigned(maxUnits()) : t.exceedsAvailable(maxUnits()) }}
+            </p>
+          } @else {
+            <p class="text-label-sm font-heading text-on-surface-variant">
+              {{ isReturn() ? t.returnHint : t.assignHint }}
+            </p>
+          }
+        </div>
+
+        @if (message()) {
+          <div class="p-4 bg-surface-container-low rounded-lg border border-outline-variant/30
+                      text-label-md font-heading text-on-surface">
+            {{ message() }}
+          </div>
+        }
+      </form>
+
+      <div class="px-8 py-5 border-t border-outline-variant/20 flex justify-end gap-3 bg-white">
+        <button type="button" (click)="cancel.emit()"
+                class="px-6 py-3 rounded-full text-label-md font-heading font-bold
+                       text-on-surface-variant hover:bg-surface-container-low transition-colors">
+          {{ c.actions.close }}
+        </button>
+        <button type="submit" form="allocate-form" [disabled]="!canSubmit()"
+                class="px-8 py-3 gradient-primary text-white rounded-full text-label-md font-heading font-bold
+                       hover:opacity-90 active:scale-95 transition-all shadow-primary
+                       disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100">
+          {{ busy() ? c.actions.processing : (isReturn() ? c.actions.return : c.actions.assign) }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

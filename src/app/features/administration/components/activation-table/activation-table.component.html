@@ -5,33 +5,26 @@
     <table class="w-full text-left border-collapse">
       <thead class="bg-surface-container-low border-b border-outline-variant/30">
         <tr>
-          <!-- Siempre -->
           <th class="px-4 md:px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
-            Código
+            {{ t.columns.code }}
           </th>
-          <!-- sm+ -->
           <th class="hidden sm:table-cell px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
-            Usuario
+            {{ t.columns.user }}
           </th>
-          <!-- md+ -->
           <th class="hidden md:table-cell px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
-            Producto
+            {{ t.columns.product }}
           </th>
-          <!-- lg+ -->
           <th class="hidden lg:table-cell px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
-            Fecha
+            {{ t.columns.date }}
           </th>
-          <!-- Siempre -->
           <th class="px-4 md:px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
-            Estado
+            {{ t.columns.status }}
           </th>
-          <!-- lg+ -->
           <th class="hidden lg:table-cell px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider">
-            Dispositivo
+            {{ t.columns.device }}
           </th>
-          <!-- Siempre -->
           <th class="px-4 md:px-6 py-4 text-label-md font-heading text-on-surface-variant uppercase tracking-wider text-right">
-            Acciones
+            {{ t.columns.actions }}
           </th>
         </tr>
       </thead>
@@ -40,7 +33,6 @@
         @for (act of activations(); track act.id) {
           <tr class="hover:bg-surface-bright transition-colors">
 
-            <!-- Código — siempre -->
             <td class="px-4 md:px-6 py-4 md:py-5">
               <span class="font-heading font-bold text-primary bg-primary/5 px-2 py-1
                            rounded-md border border-primary/10 text-label-sm whitespace-nowrap">
@@ -54,12 +46,11 @@
               @if (act.status === 'success' && act.resourcesUnlocked > 0) {
                 <p class="text-label-sm font-heading text-primary mt-0.5">
                   <span class="material-symbols-outlined text-[12px] align-middle">lock_open</span>
-                  {{ act.resourcesUnlocked }} recurso{{ act.resourcesUnlocked !== 1 ? 's' : '' }}
+                  {{ t.resourcesUnlocked(act.resourcesUnlocked) }}
                 </p>
               }
             </td>
 
-            <!-- Usuario — sm+ -->
             <td class="hidden sm:table-cell px-6 py-5">
               @if (act.userName) {
                 <div class="flex items-center gap-3">
@@ -78,11 +69,10 @@
                   </div>
                 </div>
               } @else {
-                <span class="text-outline italic text-label-md font-heading">Anónimo</span>
+                <span class="text-outline italic text-label-md font-heading">{{ t.anonymous }}</span>
               }
             </td>
 
-            <!-- Producto — md+ -->
             <td class="hidden md:table-cell px-6 py-5">
               <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center
@@ -97,20 +87,17 @@
               </div>
             </td>
 
-            <!-- Fecha — lg+ -->
             <td class="hidden lg:table-cell px-6 py-5">
               <p class="text-label-md font-heading text-on-surface">{{ act.date }}</p>
-              <p class="text-label-sm font-heading text-outline mt-0.5">{{ act.time }}h</p>
+              <p class="text-label-sm font-heading text-outline mt-0.5">{{ act.time }}{{ t.timeSuffix }}</p>
             </td>
 
-            <!-- Estado — siempre -->
             <td class="px-4 md:px-6 py-4 md:py-5">
               <app-status-badge
                 [status]="statusBadge(act.status)"
                 [label]="statusLabel(act.status)" />
             </td>
 
-            <!-- Dispositivo — lg+ -->
             <td class="hidden lg:table-cell px-6 py-5">
               <p class="text-label-sm font-heading text-on-surface font-medium">
                 {{ act.ipAddress }}
@@ -120,20 +107,19 @@
               </p>
             </td>
 
-            <!-- Acciones — siempre -->
             <td class="px-4 md:px-6 py-4 md:py-5 text-right">
               <div class="flex items-center justify-end gap-1">
                 <button (click)="viewDetail.emit(act)"
                         class="p-2 text-outline hover:text-primary hover:bg-primary/5
                                rounded-full transition-colors"
-                        title="Ver detalle">
+                        [title]="t.viewDetail">
                   <span class="material-symbols-outlined text-[18px]">visibility</span>
                 </button>
                 @if (canRevoke(act)) {
                   <button (click)="revoke.emit(act)"
                           class="p-2 text-outline hover:text-error hover:bg-error-container
                                  rounded-full transition-colors"
-                          title="Revocar activación">
+                          [title]="t.revoke">
                     <span class="material-symbols-outlined text-[18px]">cancel</span>
                   </button>
                 }
@@ -150,7 +136,7 @@
                 qr_code_scanner
               </span>
               <p class="text-label-md font-heading text-on-surface-variant">
-                No se encontraron activaciones
+                {{ t.empty }}
               </p>
             </td>
           </tr>
@@ -159,13 +145,12 @@
     </table>
   </div>
 
-  <!-- Pagination -->
   <div class="px-4 md:px-6 border-t border-outline-variant/20 bg-surface-container-lowest">
     <app-pagination
       [currentPage]="currentPage()"
       [pageSize]="pageSize()"
       [total]="totalItems()"
-      label="activaciones"
+      [label]="t.paginationLabel"
       (pageChange)="pageChange.emit($event)" />
   </div>
 

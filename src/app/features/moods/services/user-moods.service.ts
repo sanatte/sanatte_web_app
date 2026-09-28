@@ -10,6 +10,9 @@ import {
   PagedResult,
 } from '../models/mood.model';
 import { environment } from '../../../../environments/environment';
+import { TEXTS } from '../../../core/i18n/texts';
+
+const ERRORS = TEXTS.app.moods.errors;
 
 @Injectable({ providedIn: 'root' })
 export class UserMoodsService {
@@ -61,7 +64,7 @@ export class UserMoodsService {
       if (request !== this.historyRequest) return;
       this._entries.set([]);
       this._total.set(0);
-      this._error.set('No se pudo cargar tu historial de emociones.');
+      this._error.set(ERRORS.history);
     } finally {
       if (request === this.historyRequest) this._loading.set(false);
     }
@@ -82,7 +85,7 @@ export class UserMoodsService {
     } catch {
       if (request !== this.summaryRequest) return;
       this._summary.set(null);
-      this._summaryError.set('No se pudo cargar el resumen de tus emociones.');
+      this._summaryError.set(ERRORS.summary);
     } finally {
       if (request === this.summaryRequest) this._summaryLoading.set(false);
     }

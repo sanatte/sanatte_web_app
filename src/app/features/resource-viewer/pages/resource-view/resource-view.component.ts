@@ -5,6 +5,8 @@ import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
 import { MediaPlayerComponent } from '../../../../shared/components/resource-viewers/media-player.component';
 import { ArticleReaderComponent } from '../../../../shared/components/resource-viewers/article-reader.component';
+import { RESOURCE_TYPE_META, ResourceType } from '../../../administration/models/resource.model';
+import { TEXTS } from '../../../../core/i18n/texts';
 
 type ViewState = 'loading' | 'ok' | 'no_access' | 'not_found' | 'error';
 
@@ -13,7 +15,7 @@ interface MyResource {
   slug: string;
   title: string;
   description: string;
-  type: number; // 0 audio · 1 video · 2 pdf · 3 article
+  type: number;
   duration?: string;
   readTime?: string | null;
   content?: string | null;
@@ -21,23 +23,13 @@ interface MyResource {
   thumbnailGradient: string;
 }
 
-const TYPE_META: Record<number, { icon: string; label: string }> = {
-  0: { icon: 'headphones',     label: 'Audio'    },
-  1: { icon: 'videocam',       label: 'Video'    },
-  2: { icon: 'picture_as_pdf', label: 'PDF'      },
-  3: { icon: 'description',    label: 'Artículo' },
+const TYPE_BY_CODE: Record<number, ResourceType> = {
+  0: 'audio',
+  1: 'video',
+  2: 'pdf',
+  3: 'article',
 };
 
-/**
- * ResourceView — destino del QR de un recurso (`/app/r/:slug`).
- *
- * 1) Valida acceso con `GET /api/me/resources/{slug}` (200 ok · 403 sin acceso ·
- *    404 no existe).
- * 2) Si hay acceso y el recurso tiene archivo, pide una URL firmada temporal con
- *    `GET /api/me/resources/{slug}/stream` y reproduce con player nativo
- *    (audio/video) o incrusta el PDF. R2 sirve Range/206 → seek y arranque directo.
- * La sesión ya la garantiza el guard del shell privado.
- */
 @Component({
   selector: 'app-resource-view',
   imports: [RouterLink, MediaPlayerComponent, ArticleReaderComponent],
@@ -47,7 +39,7 @@ const TYPE_META: Record<number, { icon: string; label: string }> = {
         @case ('loading') {
           <div class="flex flex-col items-center justify-center py-24 text-center">
             <span class="material-symbols-outlined animate-spin text-primary text-[32px] mb-3">progress_activity</span>
-            <p class="font-heading text-on-surface-variant">Abriendo tu recurso…</p>
+            <p class="font-heading text-on-surface-variant">{{ t.opening }}</p>
           </div>
         }
         @case ('ok') {
@@ -71,7 +63,6 @@ const TYPE_META: Record<number, { icon: string; label: string }> = {
               </div>
             </div>
           } @else {
-            <!-- Artículo: lector a página completa -->
             <app-article-reader [title]="resource()!.title"
                                 [readTime]="resource()!.readTime ?? null"
                                 [content]="resource()!.content ?? null"
@@ -82,31 +73,31 @@ const TYPE_META: Record<number, { icon: string; label: string }> = {
         @case ('no_access') {
           <div class="glass-card rounded-lg p-8 text-center">
             <span class="material-symbols-outlined text-primary text-[48px] mb-3">lock</span>
-            <h1 class="font-heading text-headline-md text-on-surface mb-2">Activa tu Plena para acceder</h1>
+            <h1 class="font-heading text-headline-md text-on-surface mb-2">{{ t.noAccess.title }}</h1>
             <p class="text-body-md text-on-surface-variant mb-6">
-              Este recurso es parte de Plena. Activa tu producto con el código que viene bajo el QR de tu planeador.
+              {{ t.noAccess.description }}
             </p>
             <a routerLink="/app/activate"
                class="inline-flex items-center gap-2 gradient-primary text-white px-6 py-3 rounded-full
                       text-label-md font-heading font-bold hover:opacity-90 active:scale-95 transition-all"
                style="box-shadow: 0 4px 14px 0 rgb(var(--color-primary) / 0.39)">
               <span class="material-symbols-outlined text-[18px]">bolt</span>
-              Activar producto
+              {{ t.noAccess.cta }}
             </a>
           </div>
         }
         @case ('not_found') {
           <div class="glass-card rounded-lg p-8 text-center">
             <span class="material-symbols-outlined text-on-surface-variant text-[48px] mb-3">search_off</span>
-            <h1 class="font-heading text-headline-md text-on-surface mb-2">Recurso no encontrado</h1>
-            <p class="text-body-md text-on-surface-variant">Verifica el código bajo el QR o contacta a soporte.</p>
+            <h1 class="font-heading text-headline-md text-on-surface mb-2">{{ t.notFound.title }}</h1>
+            <p class="text-body-md text-on-surface-variant">{{ t.notFound.description }}</p>
           </div>
         }
         @default {
           <div class="glass-card rounded-lg p-8 text-center">
             <span class="material-symbols-outlined text-error text-[48px] mb-3">error</span>
-            <h1 class="font-heading text-headline-md text-on-surface mb-2">Algo salió mal</h1>
-            <p class="text-body-md text-on-surface-variant">Intenta de nuevo en unos momentos.</p>
+            <h1 class="font-heading text-headline-md text-on-surface mb-2">{{ t.error.title }}</h1>
+            <p class="text-body-md text-on-surface-variant">{{ t.error.description }}</p>
           </div>
         }
       }
@@ -114,14 +105,15 @@ const TYPE_META: Record<number, { icon: string; label: string }> = {
   `,
 })
 export class ResourceViewComponent {
+  protected readonly t = TEXTS.app.resourceViewer;
+
   private readonly route = inject(ActivatedRoute);
   private readonly http  = inject(HttpClient);
 
   readonly state    = signal<ViewState>('loading');
   readonly resource = signal<MyResource | null>(null);
-  readonly meta     = signal({ icon: 'headphones', label: 'Audio' });
+  readonly meta     = signal(RESOURCE_TYPE_META.audio);
 
-  /** Tipo de media para el player (los artículos no tienen archivo). */
   readonly mediaKind = computed<'audio' | 'video' | 'pdf' | null>(() => {
     switch (this.resource()?.type) {
       case 0:  return 'audio';
@@ -143,7 +135,7 @@ export class ResourceViewComponent {
         this.http.get<MyResource>(`${environment.apiUrl}/me/resources/${slug}`)
       );
       this.resource.set(r);
-      this.meta.set(TYPE_META[r.type] ?? TYPE_META[0]);
+      this.meta.set(RESOURCE_TYPE_META[TYPE_BY_CODE[r.type] ?? 'audio']);
       this.state.set('ok');
     } catch (e) {
       const status = e instanceof HttpErrorResponse ? e.status : 0;

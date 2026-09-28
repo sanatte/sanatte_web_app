@@ -1,0 +1,56 @@
+export const COMMON_TEXTS = {
+  actions: {
+    cancel: 'Cancelar',
+    close: 'Cerrar',
+    confirm: 'Confirmar',
+    create: 'Crear',
+    save: 'Guardar',
+    edit: 'Editar',
+    delete: 'Eliminar',
+    assign: 'Asignar',
+    return: 'Devolver',
+    export: 'Exportar',
+    viewAll: 'Ver todo',
+    processing: 'Procesando…',
+  },
+  form: {
+    required: '*',
+    optional: 'Opcional',
+  },
+  confirmDialog: {
+    title: '¿Confirmar acción?',
+    message: '¿Estás seguro de que deseas continuar?',
+  },
+  pagination: {
+    showing: 'Mostrando',
+    of: 'de',
+    results: 'resultados',
+  },
+  search: {
+    placeholder: 'Buscar...',
+  },
+  errors: {
+    generic: 'No se pudo completar la operación.',
+  },
+  statusBadge: {
+    active: 'Activo',
+    inactive: 'Inactivo',
+    blocked: 'Bloqueado',
+    published: 'Publicado',
+    draft: 'Borrador',
+    pending: 'Pendiente',
+    paid: 'Pagado',
+    shipped: 'Enviado',
+    cancelled: 'Cancelado',
+  },
+  imageUpload: {
+    alt: 'Imagen',
+    change: 'Cambiar imagen',
+    upload: 'Subir imagen',
+    dropOr: 'Arrastra o',
+    select: 'selecciona',
+    formats: (maxMb: number) => `JPG, PNG o WebP — máx. ${maxMb} MB`,
+    invalidType: 'Tipo no permitido. Usa JPG, PNG o WebP.',
+    tooLarge: (maxMb: number) => `El archivo supera ${maxMb} MB.`,
+  },
+} as const;

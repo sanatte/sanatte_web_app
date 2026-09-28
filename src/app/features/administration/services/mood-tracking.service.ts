@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { MoodEntryAdmin, PagedResult } from '../models/mood-catalog.model';
 import { environment } from '../../../../environments/environment';
+import { TEXTS } from '../../../core/i18n/texts';
 
 export interface MoodTrackingFilter {
   userId?: string;
@@ -46,7 +47,7 @@ export class MoodTrackingService {
       this._entries.set(res.items);
       this._total.set(res.totalItems);
     } catch {
-      this._error.set('No se pudo cargar el tracking de emociones.');
+      this._error.set(TEXTS.admin.moodTracking.page.loadError);
     } finally {
       this._loading.set(false);
     }

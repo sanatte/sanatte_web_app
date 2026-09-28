@@ -3,6 +3,9 @@ import { Router } from '@angular/router';
 import { UserOrdersService } from '../../services/user-orders.service';
 import { OrderCardComponent } from '../../components/order-card/order-card.component';
 import { Order, DeliveryStatus } from '../../../administration/models/order.model';
+import { TEXTS } from '../../../../core/i18n/texts';
+
+const T = TEXTS.app.orders.list;
 
 type FilterKey = 'all' | 'in_progress' | 'shipped' | 'delivered' | 'active';
 
@@ -13,11 +16,11 @@ interface FilterTab {
 }
 
 const FILTERS: FilterTab[] = [
-  { key: 'all',         label: 'Todos',     match: () => true },
-  { key: 'in_progress', label: 'En proceso', match: (s) => s === 'preparing' || s === 'pending_activation' },
-  { key: 'shipped',     label: 'Enviado',   match: (s) => s === 'shipped' },
-  { key: 'delivered',   label: 'Entregado', match: (s) => s === 'delivered' },
-  { key: 'active',      label: 'Activo',    match: (s) => s === 'digital_active' || s === 'subscription_active' },
+  { key: 'all',         label: T.filters.all,         match: () => true },
+  { key: 'in_progress', label: T.filters.in_progress, match: (s) => s === 'preparing' || s === 'pending_activation' },
+  { key: 'shipped',     label: T.filters.shipped,     match: (s) => s === 'shipped' },
+  { key: 'delivered',   label: T.filters.delivered,   match: (s) => s === 'delivered' },
+  { key: 'active',      label: T.filters.active,      match: (s) => s === 'digital_active' || s === 'subscription_active' },
 ];
 
 @Component({
@@ -25,21 +28,19 @@ const FILTERS: FilterTab[] = [
   imports: [OrderCardComponent],
   template: `
     <div class="max-w-5xl mx-auto">
-      <!-- Header -->
       <header class="mb-8">
-        <h1 class="font-heading text-headline-lg text-on-surface mb-2">Historial de Pedidos</h1>
+        <h1 class="font-heading text-headline-lg text-on-surface mb-2">{{ t.title }}</h1>
         <p class="font-sans text-body-lg text-on-surface-variant">
-          Revisa el estado de tus compras y accede a tus productos de bienestar.
+          {{ t.description }}
         </p>
       </header>
 
-      <!-- Búsqueda + filtros -->
       <div class="flex flex-col md:flex-row gap-gutter md:items-center justify-between mb-8">
         <div class="relative w-full md:w-96 group">
           <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline
                        group-focus-within:text-primary transition-colors">search</span>
           <input type="text" [value]="query()" (input)="query.set($any($event.target).value)"
-                 placeholder="Buscar por ID o producto..."
+                 [placeholder]="t.searchPlaceholder"
                  class="w-full pl-12 pr-4 py-3 bg-surface-container-low border border-transparent
                         focus:border-primary focus:ring-0 rounded-xl transition-all text-body-md
                         placeholder:text-outline-variant outline-none" />
@@ -57,7 +58,6 @@ const FILTERS: FilterTab[] = [
         </div>
       </div>
 
-      <!-- Lista -->
       @if (filtered().length > 0) {
         <div class="space-y-4">
           @for (order of filtered(); track order.id) {
@@ -65,21 +65,20 @@ const FILTERS: FilterTab[] = [
           }
         </div>
         <p class="text-label-md font-heading text-on-surface-variant mt-6">
-          Mostrando {{ filtered().length }} de {{ total() }} pedido{{ total() !== 1 ? 's' : '' }}
+          {{ t.showing(filtered().length, total()) }}
         </p>
       } @else {
-        <!-- Estado vacío -->
         <div class="glass-card rounded-lg p-12 text-center mt-4">
           <div class="w-20 h-20 rounded-full bg-primary-fixed flex items-center justify-center mx-auto mb-6">
             <span class="material-symbols-outlined text-primary text-[40px]">shopping_bag</span>
           </div>
           <h3 class="font-heading text-headline-md text-on-surface mb-2">
-            {{ total() === 0 ? 'Aún no tienes pedidos' : 'Sin resultados' }}
+            {{ total() === 0 ? t.empty.noOrdersTitle : t.empty.noResultsTitle }}
           </h3>
           <p class="font-sans text-body-md text-on-surface-variant max-w-md mx-auto">
             {{ total() === 0
-              ? 'Cuando realices una compra aparecerá aquí tu historial.'
-              : 'Prueba con otro término o filtro de búsqueda.' }}
+              ? t.empty.noOrdersDescription
+              : t.empty.noResultsDescription }}
           </p>
         </div>
       }
@@ -89,6 +88,8 @@ const FILTERS: FilterTab[] = [
 export class OrderListComponent {
   private readonly userOrders = inject(UserOrdersService);
   private readonly router     = inject(Router);
+
+  protected readonly t = T;
 
   readonly filters = FILTERS;
   readonly query        = signal('');

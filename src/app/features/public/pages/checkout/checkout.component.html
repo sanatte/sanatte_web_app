@@ -1,69 +1,64 @@
 <div class="max-w-5xl mx-auto">
 
   @if (placed()) {
-    <!-- Confirmación -->
     <div class="glass-card rounded-lg p-12 text-center max-w-2xl mx-auto">
       <div class="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
         <span class="material-symbols-outlined text-green-600 text-[44px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
       </div>
-      <h1 class="font-heading text-headline-lg text-on-surface mb-2">¡Gracias por tu compra!</h1>
+      <h1 class="font-heading text-headline-lg text-on-surface mb-2">{{ t.placed.title }}</h1>
       <p class="font-sans text-body-md text-on-surface-variant max-w-md mx-auto mb-2">
-        Tu pedido <span class="font-bold text-primary">{{ orderNumber() }}</span> fue confirmado.
-        Te enviamos el detalle a {{ userEmail() }}.
+        {{ t.placed.orderBefore }}<span class="font-bold text-primary">{{ orderNumber() }}</span>{{ t.placed.orderAfter(userEmail()) }}
       </p>
       <p class="font-sans text-label-md text-on-surface-variant mb-8">
-        Los productos digitales ya están disponibles en tu biblioteca. Los físicos serán despachados pronto.
+        {{ t.placed.description }}
       </p>
       <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
         <a routerLink="/app/library"
            class="px-8 py-3 rounded-full gradient-primary text-white font-heading font-bold hover:opacity-90 transition-opacity">
-          Ir a mi biblioteca
+          {{ t.placed.goToLibrary }}
         </a>
         <a routerLink="/app/orders"
            class="px-8 py-3 rounded-full border border-primary text-primary font-heading font-bold hover:bg-primary/5 transition-colors">
-          Ver mis pedidos
+          {{ t.placed.viewOrders }}
         </a>
       </div>
     </div>
   } @else if (lines().length === 0) {
-    <!-- Sin items -->
     <div class="text-center py-20">
-      <p class="font-heading text-headline-md text-on-surface-variant mb-4">No hay productos para pagar</p>
-      <a [routerLink]="ctx.productsLink()" class="text-primary font-heading font-bold hover:underline">Ver catálogo</a>
+      <p class="font-heading text-headline-md text-on-surface-variant mb-4">{{ t.empty.title }}</p>
+      <a [routerLink]="ctx.productsLink()" class="text-primary font-heading font-bold hover:underline">{{ t.empty.viewCatalog }}</a>
     </div>
   } @else {
     <header class="mb-8">
-      <h1 class="font-heading text-headline-lg text-on-surface mb-2">Finalizar compra</h1>
+      <h1 class="font-heading text-headline-lg text-on-surface mb-2">{{ t.header.title }}</h1>
       <p class="font-sans text-body-md text-on-surface-variant">
-        Comprando como <span class="font-semibold text-on-surface">{{ userName() }}</span> ({{ userEmail() }})
+        {{ t.header.buyingAs }}<span class="font-semibold text-on-surface">{{ userName() }}</span>{{ t.header.email(userEmail()) }}
       </p>
     </header>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
-      <!-- Formularios -->
       <div class="lg:col-span-2 space-y-gutter">
-        <!-- Envío (solo físicos) -->
         @if (hasPhysical()) {
           <section class="glass-card rounded-lg p-6">
             <div class="flex items-center gap-2 mb-5">
               <span class="material-symbols-outlined text-primary">local_shipping</span>
-              <h2 class="font-heading text-headline-md text-on-surface">Datos de envío</h2>
+              <h2 class="font-heading text-headline-md text-on-surface">{{ t.shipping.title }}</h2>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="md:col-span-2">
-                <label class="text-label-md font-heading font-semibold text-on-surface block mb-1.5">Nombre completo</label>
+                <label class="text-label-md font-heading font-semibold text-on-surface block mb-1.5">{{ t.shipping.fullName }}</label>
                 <input [(ngModel)]="shipName" type="text"
                        class="w-full px-4 py-3 bg-surface-container-low border border-transparent focus:border-primary
                               focus:ring-0 rounded-xl outline-none text-body-md transition-colors" />
               </div>
               <div class="md:col-span-2">
-                <label class="text-label-md font-heading font-semibold text-on-surface block mb-1.5">Dirección</label>
-                <input [(ngModel)]="shipAddress" type="text" placeholder="Calle, número, apto"
+                <label class="text-label-md font-heading font-semibold text-on-surface block mb-1.5">{{ t.shipping.address }}</label>
+                <input [(ngModel)]="shipAddress" type="text" [placeholder]="t.shipping.addressPlaceholder"
                        class="w-full px-4 py-3 bg-surface-container-low border border-transparent focus:border-primary
                               focus:ring-0 rounded-xl outline-none text-body-md placeholder:text-outline-variant transition-colors" />
               </div>
               <div>
-                <label class="text-label-md font-heading font-semibold text-on-surface block mb-1.5">Ciudad</label>
+                <label class="text-label-md font-heading font-semibold text-on-surface block mb-1.5">{{ t.shipping.city }}</label>
                 <input [(ngModel)]="shipCity" type="text"
                        class="w-full px-4 py-3 bg-surface-container-low border border-transparent focus:border-primary
                               focus:ring-0 rounded-xl outline-none text-body-md transition-colors" />
@@ -74,26 +69,23 @@
           <section class="glass-card rounded-lg p-6 flex items-start gap-3">
             <span class="material-symbols-outlined text-primary">bolt</span>
             <div>
-              <h2 class="font-heading font-bold text-on-surface">Entrega digital inmediata</h2>
+              <h2 class="font-heading font-bold text-on-surface">{{ t.digital.title }}</h2>
               <p class="font-sans text-label-md text-on-surface-variant mt-0.5">
-                Tu compra estará disponible al instante en tu biblioteca. No requiere envío.
+                {{ t.digital.description }}
               </p>
             </div>
           </section>
         }
 
-        <!-- Pago con Mercado Pago (Checkout Pro) -->
         <section class="glass-card rounded-lg p-6">
           <div class="flex items-center gap-2 mb-4">
             <span class="material-symbols-outlined text-primary">shield</span>
-            <h2 class="font-heading text-headline-md text-on-surface">Pago seguro</h2>
+            <h2 class="font-heading text-headline-md text-on-surface">{{ t.payment.title }}</h2>
           </div>
           <div class="flex items-start gap-3 p-4 rounded-xl bg-surface-container-low">
             <span class="material-symbols-outlined text-primary">lock</span>
             <p class="text-body-md text-on-surface-variant">
-              Al continuar te llevaremos a <strong class="text-on-surface">Mercado Pago</strong> para
-              completar el pago de forma segura (tarjeta, PSE, Efecty o saldo en cuenta).
-              Volverás a Sanatte automáticamente al terminar.
+              {{ t.payment.before }}<strong class="text-on-surface">{{ t.payment.provider }}</strong>{{ t.payment.after }}
             </p>
           </div>
           @if (errorMessage()) {
@@ -104,10 +96,9 @@
         </section>
       </div>
 
-      <!-- Resumen -->
       <aside class="lg:col-span-1">
         <div class="glass-card rounded-lg p-6 sticky top-24">
-          <h3 class="font-heading text-headline-md text-on-surface mb-4">Tu pedido</h3>
+          <h3 class="font-heading text-headline-md text-on-surface mb-4">{{ t.summary.title }}</h3>
           <div class="divide-y divide-outline-variant/20 mb-4">
             @for (line of lines(); track line.product.id) {
               <div class="flex items-center gap-3 py-2.5">
@@ -120,7 +111,7 @@
                 </div>
                 <div class="flex-1 min-w-0">
                   <p class="font-heading font-semibold text-on-surface text-label-md truncate">{{ line.product.name }}</p>
-                  <p class="text-label-sm font-heading text-on-surface-variant">x{{ line.quantity }}</p>
+                  <p class="text-label-sm font-heading text-on-surface-variant">{{ t.summary.quantity(line.quantity) }}</p>
                 </div>
                 <span class="font-heading font-bold text-on-surface text-label-md">
                   {{ line.lineTotal | money }}
@@ -128,7 +119,6 @@
               </div>
             }
           </div>
-          <!-- Código de descuento -->
           <div class="border-t border-outline-variant/30 pt-3">
             @if (appliedCode()) {
               <div class="flex items-center justify-between bg-green-50 border border-green-200
@@ -137,10 +127,10 @@
                   <span class="material-symbols-outlined text-green-600 text-[18px]">check_circle</span>
                   <div>
                     <p class="text-label-sm font-heading font-semibold text-green-700">
-                      {{ appliedCode() }} — {{ discountInfo()?.discountPercentage }}% de descuento
+                      {{ t.summary.discountApplied(appliedCode(), discountInfo()?.discountPercentage) }}
                     </p>
                     <p class="text-label-sm font-heading text-green-600">
-                      Aliado: {{ discountInfo()?.allyName }}
+                      {{ t.summary.ally(discountInfo()?.allyName) }}
                     </p>
                   </div>
                 </div>
@@ -157,11 +147,11 @@
                   <span class="material-symbols-outlined text-[16px] group-open:rotate-90 transition-transform">
                     chevron_right
                   </span>
-                  ¿Tienes un código de aliado?
+                  {{ t.summary.hasCode }}
                 </summary>
                 <div class="mt-2 flex gap-2">
                   <input [(ngModel)]="discountCodeInput"
-                         placeholder="Ej. KAYLA"
+                         [placeholder]="t.summary.codePlaceholder"
                          (keydown.enter)="applyDiscountCode()"
                          class="flex-1 bg-surface-container-low border-none rounded-lg px-3 py-2
                                 text-label-md font-heading outline-none focus:ring-2 focus:ring-primary/50
@@ -170,7 +160,7 @@
                           [disabled]="validatingCode() || !discountCodeInput.trim()"
                           class="px-4 py-2 rounded-lg bg-primary text-white text-label-sm font-heading
                                  font-bold hover:opacity-90 disabled:opacity-50 transition-all">
-                    {{ validatingCode() ? '…' : 'Aplicar' }}
+                    {{ validatingCode() ? t.summary.applying : t.summary.apply }}
                   </button>
                 </div>
                 @if (discountError()) {
@@ -185,26 +175,26 @@
 
           <div class="space-y-2 font-sans text-label-md border-t border-outline-variant/30 pt-3">
             <div class="flex justify-between text-on-surface-variant">
-              <span>Subtotal</span><span>{{ subtotal() | money }}</span>
+              <span>{{ t.summary.subtotal }}</span><span>{{ subtotal() | money }}</span>
             </div>
             @if (hasPhysical()) {
               <div class="flex justify-between text-on-surface-variant">
-                <span>Envío</span><span>Gratis</span>
+                <span>{{ t.summary.shipping }}</span><span>{{ t.summary.free }}</span>
               </div>
             }
             @if (discountAmount() > 0) {
               <div class="flex justify-between text-green-600 font-heading font-semibold">
-                <span>Descuento ({{ discountInfo()?.discountPercentage }}%)</span>
+                <span>{{ t.summary.discount(discountInfo()?.discountPercentage) }}</span>
                 <span>− {{ discountAmount() | money }}</span>
               </div>
             }
             @if (taxes() > 0) {
               <div class="flex justify-between text-on-surface-variant">
-                <span>IVA incluido</span><span>{{ taxes() | money }}</span>
+                <span>{{ t.summary.taxIncluded }}</span><span>{{ taxes() | money }}</span>
               </div>
             }
             <div class="flex justify-between font-heading text-headline-md text-on-surface pt-2 border-t border-outline-variant/30">
-              <span>Total</span><span class="text-primary">{{ total() | money }}</span>
+              <span>{{ t.summary.total }}</span><span class="text-primary">{{ total() | money }}</span>
             </div>
           </div>
 
@@ -213,10 +203,10 @@
                          shadow-primary hover:opacity-90 active:scale-95 transition-all
                          flex items-center justify-center gap-2 disabled:opacity-50">
             <span class="material-symbols-outlined text-[20px]">{{ paying() ? 'progress_activity' : 'lock' }}</span>
-            {{ paying() ? 'Redirigiendo a Mercado Pago…' : 'Pagar ' + (total() | money) }}
+            {{ paying() ? t.summary.redirecting : t.summary.pay(total() | money) }}
           </button>
           <a [routerLink]="ctx.cartLink()" class="block text-center text-label-md font-heading text-on-surface-variant
-                    hover:text-primary transition-colors mt-3">Volver al carrito</a>
+                    hover:text-primary transition-colors mt-3">{{ t.summary.backToCart }}</a>
         </div>
       </aside>
     </div>

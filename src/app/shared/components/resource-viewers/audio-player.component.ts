@@ -1,20 +1,15 @@
 import { Component, input, signal } from '@angular/core';
 import { Resource } from '../../../features/administration/models/resource.model';
+import { TEXTS } from '../../../core/i18n/texts';
 
-/**
- * AudioPlayer — visor de audio inmersivo con waveform animado.
- * Reutiliza el patrón visual del ResourcePreviewModal admin, a pantalla completa.
- */
 @Component({
   selector: 'app-audio-player',
   template: `
     <div class="w-full aspect-video player-gradient rounded-xl relative overflow-hidden
                 shadow-2xl flex flex-col justify-between p-6 md:p-10">
-      <!-- Glow atmosférico -->
       <div class="absolute -bottom-20 -left-20 w-72 h-72 bg-primary/25 rounded-full
                   blur-[90px] pointer-events-none"></div>
 
-      <!-- Top -->
       <div class="relative z-10 flex justify-between items-start">
         <span class="bg-primary/20 backdrop-blur-md text-white px-3 py-1 rounded-full
                      text-label-sm font-heading uppercase tracking-wider">
@@ -23,7 +18,6 @@ import { Resource } from '../../../features/administration/models/resource.model
         <span class="material-symbols-outlined text-white/70">graphic_eq</span>
       </div>
 
-      <!-- Waveform -->
       <div class="relative z-10 flex items-center justify-center gap-1.5 h-24">
         @for (h of bars; track $index) {
           <div class="wave-bar w-1.5 md:w-2 bg-primary-fixed-dim rounded-full flex-shrink-0"
@@ -33,7 +27,6 @@ import { Resource } from '../../../features/administration/models/resource.model
         }
       </div>
 
-      <!-- Controles -->
       <div class="relative z-10">
         <div class="flex items-center justify-between mb-2 text-white/70 text-label-sm font-heading">
           <span>08:45</span>
@@ -73,7 +66,7 @@ import { Resource } from '../../../features/administration/models/resource.model
 })
 export class AudioPlayerComponent {
   readonly resource   = input.required<Resource>();
-  readonly collection = input('Sanatte Audio');
+  readonly collection = input<string>(TEXTS.shared.resourceViewers.audio.defaultCollection);
   readonly playing    = signal(false);
 
   readonly bars = [32, 48, 64, 96, 72, 56, 40, 84, 104, 64, 48, 88, 56, 72, 40, 96, 64, 44];

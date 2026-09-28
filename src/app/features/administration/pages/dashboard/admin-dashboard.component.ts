@@ -14,11 +14,7 @@ export class AdminDashboardComponent {
   readonly kpiMetrics = this.dashboardService.kpiMetrics;
   readonly recentOrders = this.dashboardService.recentOrders;
 
-  onFilter(): void {
-    // Filtro de pedidos recientes — pendiente
-  }
+  onFilter(): void {}
 
-  onExport(): void {
-    // Exportar — pendiente
-  }
+  onExport(): void {}
 }
