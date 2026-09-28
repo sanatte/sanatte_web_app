@@ -127,6 +127,18 @@
           }
         </div>
 
+        <!-- Recursos del módulo -->
+        <div class="border border-outline-variant/30 rounded-xl p-4">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="material-symbols-outlined text-primary text-[20px]">library_music</span>
+            <h3 class="font-heading text-label-md font-semibold text-on-surface">{{ t.resourcesTitle }}</h3>
+          </div>
+          <app-linked-resources-editor
+            [resources]="linkedModuleResources()"
+            [available]="availableResources()"
+            (orderChange)="onModuleResourcesChange($event)" />
+        </div>
+
         <div class="flex justify-end gap-3 pt-2">
           <button type="button" (click)="onClose()"
                   [disabled]="isSaving()"

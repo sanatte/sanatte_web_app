@@ -29,6 +29,7 @@
             <th class="px-4 py-3 text-left font-heading text-label-sm text-on-surface-variant font-semibold">{{ t.table.columns.key }}</th>
             <th class="px-4 py-3 text-left font-heading text-label-sm text-on-surface-variant font-semibold">{{ t.table.columns.title }}</th>
             <th class="px-4 py-3 text-center font-heading text-label-sm text-on-surface-variant font-semibold hidden sm:table-cell">{{ t.table.columns.intro }}</th>
+            <th class="px-4 py-3 text-center font-heading text-label-sm text-on-surface-variant font-semibold hidden md:table-cell">{{ t.table.columns.resources }}</th>
             <th class="px-4 py-3 text-center font-heading text-label-sm text-on-surface-variant font-semibold">{{ t.table.columns.order }}</th>
             <th class="px-4 py-3 text-center font-heading text-label-sm text-on-surface-variant font-semibold">{{ t.table.columns.status }}</th>
             <th class="px-4 py-3 text-right font-heading text-label-sm text-on-surface-variant font-semibold">{{ t.table.columns.actions }}</th>
@@ -58,6 +59,9 @@
                 } @else {
                   <span class="text-on-surface-variant text-label-sm">—</span>
                 }
+              </td>
+              <td class="px-4 py-3 text-center hidden md:table-cell">
+                <span class="text-label-sm text-on-surface-variant">{{ item.resources.length || '—' }}</span>
               </td>
               <td class="px-4 py-3 text-center">
                 <span class="text-label-sm text-on-surface-variant">{{ item.sortOrder }}</span>

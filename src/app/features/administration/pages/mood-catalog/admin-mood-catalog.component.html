@@ -6,6 +6,66 @@
     actionIcon="add"
     (action)="openCreate()" />
 
+  <!-- Tarjeta: Video introductorio de la guía de emociones -->
+  <div class="glass-card rounded-xl p-5 mb-8 border border-outline-variant/20">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="material-symbols-outlined text-primary text-[20px]">play_circle</span>
+      <h3 class="font-heading text-label-md font-semibold text-on-surface">Video introductorio de la guía</h3>
+      <span class="text-label-sm text-on-surface-variant">(opcional)</span>
+    </div>
+    <p class="text-label-md text-on-surface-variant mb-4">
+      Se muestra en la app antes del listado de emociones. Sube aquí el video o audio introductorio de la guía completa.
+    </p>
+
+    @if (introLinkedId()) {
+      <div class="flex items-center gap-3 p-3 bg-secondary-container/30 rounded-xl mb-3">
+        <span class="material-symbols-outlined text-primary text-[24px]">{{ getIntroIcon() }}</span>
+        <div class="flex-1 min-w-0">
+          <p class="text-label-sm font-semibold text-on-surface truncate">{{ introLinkedTitle() }}</p>
+          <p class="text-label-sm text-on-surface-variant">{{ getIntroTypeLabel() }}</p>
+        </div>
+        @if (introSaving()) {
+          <span class="material-symbols-outlined animate-spin text-outline-variant text-[18px]">progress_activity</span>
+        } @else {
+          <button (click)="unlinkIntro()"
+                  class="p-1.5 rounded-lg hover:bg-error-container transition-colors" title="Quitar intro">
+            <span class="material-symbols-outlined text-error text-[18px]">link_off</span>
+          </button>
+        }
+      </div>
+    } @else {
+      <label class="flex flex-col items-center justify-center gap-2 p-6 rounded-xl border-2 border-dashed
+                    border-outline-variant/40 cursor-pointer hover:border-primary/40 hover:bg-primary/5
+                    transition-all group mb-2">
+        <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary text-[32px] transition-colors">
+          upload_file
+        </span>
+        <p class="text-label-sm font-heading text-on-surface-variant group-hover:text-primary transition-colors">
+          Seleccionar video o audio
+        </p>
+        <p class="text-label-sm text-on-surface-variant">MP4, WebM, MP3, AAC, WAV</p>
+        <input type="file" accept="video/mp4,video/webm,audio/mpeg,audio/mp4,audio/aac,audio/wav"
+               class="hidden" (change)="onIntroMediaSelected($event)" />
+      </label>
+    }
+
+    @if (introUploadProgress() !== null && introUploadProgress()! < 100) {
+      <div class="mt-2">
+        <div class="flex justify-between text-label-sm text-on-surface-variant mb-1">
+          <span>Subiendo...</span><span>{{ introUploadProgress() }}%</span>
+        </div>
+        <div class="h-1.5 bg-surface-container rounded-full overflow-hidden">
+          <div class="h-full bg-primary transition-all rounded-full" [style.width.%]="introUploadProgress()"></div>
+        </div>
+      </div>
+    }
+    @if (introError()) {
+      <p class="text-label-sm text-error flex items-center gap-1 mt-2">
+        <span class="material-symbols-outlined text-[14px]">error_outline</span> {{ introError() }}
+      </p>
+    }
+  </div>
+
   @if (loading()) {
     <div class="flex justify-center py-24">
       <span class="material-symbols-outlined animate-spin text-primary text-[32px]">progress_activity</span>

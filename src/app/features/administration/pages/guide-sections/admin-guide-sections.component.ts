@@ -1,6 +1,8 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { GuideSectionService } from '../../services/guide-section.service';
 import { GuideSection } from '../../models/guide-section.model';
+import { ResourceService } from '../../services/resource.service';
+import { Resource } from '../../models/resource.model';
 import { TEXTS } from '../../../../core/i18n/texts';
 import { AdminPageHeaderComponent } from '../../../../shared/components/admin-page-header/admin-page-header.component';
 import { GuideSectionFormDialogComponent, GuideSectionFormEvent } from '../../components/guide-section-form-dialog/guide-section-form-dialog.component';
@@ -12,10 +14,12 @@ import { GuideSectionFormDialogComponent, GuideSectionFormEvent } from '../../co
 })
 export class AdminGuideSectionsComponent {
   private readonly svc = inject(GuideSectionService);
+  private readonly resourceSvc = inject(ResourceService);
 
   protected readonly t = TEXTS.admin.guideSections;
 
-  readonly sections  = this.svc.sections;
+  /** Solo módulos no-system (emotions se gestiona en su propia pantalla). */
+  readonly sections  = computed(() => this.svc.sections().filter(s => !s.isSystem));
   readonly loading   = this.svc.loading;
   readonly error     = this.svc.error;
 
@@ -23,6 +27,9 @@ export class AdminGuideSectionsComponent {
   readonly editing     = signal<GuideSection | null>(null);
   readonly saving      = signal(false);
   readonly saveError   = signal<string | null>(null);
+
+  /** Recursos disponibles para el picker del editor de recursos. */
+  readonly allResources = computed<Resource[]>(() => this.resourceSvc.resources());
 
   readonly isEditMode = computed(() => this.editing() !== null);
 
@@ -47,8 +54,9 @@ export class AdminGuideSectionsComponent {
     this.saveError.set(null);
     try {
       const editingItem = this.editing();
+      let section: GuideSection;
       if (editingItem) {
-        await this.svc.update(editingItem.id, {
+        section = await this.svc.update(editingItem.id, {
           key:             event.key,
           title:           event.title,
           sortOrder:       event.sortOrder,
@@ -56,12 +64,16 @@ export class AdminGuideSectionsComponent {
           introResourceId: event.introResourceId,
         });
       } else {
-        await this.svc.create({
+        section = await this.svc.create({
           key:             event.key,
           title:           event.title,
           sortOrder:       event.sortOrder,
           introResourceId: event.introResourceId,
         });
+      }
+      // Sincronizar recursos si cambiaron
+      if (event.resourceIds !== undefined) {
+        await this.svc.syncResources(section.id, event.resourceIds);
       }
       this.isModalOpen.set(false);
     } catch (e: unknown) {
