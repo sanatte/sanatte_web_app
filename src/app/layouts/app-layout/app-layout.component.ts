@@ -54,6 +54,7 @@ export class AppLayoutComponent {
           '/app/checkout':      'Finalizar compra',
           '/app/activate':      'Activar producto',
           '/app/orders':        'Mis Pedidos',
+          '/app/moods':         'Mis emociones',
           '/app/subscriptions': 'Suscripciones',
           '/app/profile':       'Perfil',
         };
@@ -69,6 +70,7 @@ export class AppLayoutComponent {
     { label: 'Tienda',          route: '/app/products',      icon: 'storefront' },
     { label: 'Aliados',         route: '/app/allies',        icon: 'handshake' },
     { label: 'Mis pedidos',     route: '/app/orders',        icon: 'receipt_long' },
+    { label: 'Mis emociones',   route: '/app/moods',         icon: 'mood' },
     { label: 'Suscripciones',   route: '/app/subscriptions', icon: 'workspace_premium' },
     { label: 'Perfil',          route: '/app/profile',       icon: 'person' },
   ];
