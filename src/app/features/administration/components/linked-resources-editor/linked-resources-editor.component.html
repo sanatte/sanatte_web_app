@@ -1,0 +1,129 @@
+<div>
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-4">
+    <span class="text-label-sm font-heading text-on-surface-variant">
+      {{ t.resourceCount(resources().length) }}
+    </span>
+    @if (available().length > 0) {
+      <button (click)="isPickerOpen.set(!isPickerOpen())"
+              class="flex items-center gap-1 px-2.5 py-1 rounded-full text-label-sm
+                     font-heading font-semibold transition-colors"
+              [class]="isPickerOpen()
+                ? 'bg-primary text-white'
+                : 'bg-primary-fixed text-primary hover:bg-primary hover:text-white'">
+        <span class="material-symbols-outlined text-[14px]">
+          {{ isPickerOpen() ? 'close' : 'add' }}
+        </span>
+        {{ isPickerOpen() ? c.actions.close : t.add }}
+      </button>
+    }
+  </div>
+
+  <!-- Picker -->
+  @if (isPickerOpen()) {
+    <div class="mb-4 border border-primary/20 rounded-lg overflow-hidden">
+      <div class="px-4 py-2.5 bg-primary-fixed border-b border-primary/10">
+        <p class="text-label-sm font-heading font-semibold text-primary">{{ t.pickerTitle }}</p>
+      </div>
+      <div class="max-h-48 overflow-y-auto divide-y divide-outline-variant/20">
+        @for (resource of available(); track resource.id) {
+          <button (click)="add(resource)"
+                  class="w-full flex items-center gap-3 px-4 py-3 text-left
+                         hover:bg-primary-fixed/40 transition-colors group">
+            <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center
+                        justify-center flex-shrink-0 group-hover:bg-primary/10 transition-colors">
+              <span class="material-symbols-outlined text-[16px] text-on-surface-variant
+                           group-hover:text-primary transition-colors">
+                {{ resourceIcon(resource.type) }}
+              </span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-label-md font-heading font-semibold text-on-surface truncate">{{ resource.title }}</p>
+              <p class="text-label-sm font-heading text-outline capitalize">
+                {{ resourceTypeLabel(resource.type) }}
+                @if (resource.duration) { · {{ resource.duration }} }
+                @if (resource.fileSize) { · {{ resource.fileSize }} }
+              </p>
+            </div>
+            <span class="material-symbols-outlined text-[18px] text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+              add_circle
+            </span>
+          </button>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Lista ordenable -->
+  @if (resources().length > 0) {
+    <div class="space-y-1.5">
+      @for (res of resources(); track res.id; let i = $index; let last = $last) {
+        <div class="flex items-center gap-2 p-2.5 bg-surface-container-low rounded-lg
+                    hover:bg-surface-container transition-colors group cursor-grab active:cursor-grabbing"
+             draggable="true"
+             (dragstart)="onDragStart(i)"
+             (dragover)="onDragOver($event, i)"
+             (dragend)="onDragEnd()">
+
+          <!-- Drag handle -->
+          <span class="material-symbols-outlined text-[18px] text-outline-variant select-none">
+            drag_indicator
+          </span>
+
+          <!-- Orden -->
+          <span class="text-label-sm text-outline-variant w-5 text-center select-none">{{ i + 1 }}</span>
+
+          <!-- Icono tipo -->
+          <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-primary text-[16px]">{{ resourceIcon(res.type) }}</span>
+          </div>
+
+          <!-- Info -->
+          <div class="flex-1 min-w-0">
+            <p class="text-label-md font-heading font-semibold text-on-surface truncate">{{ res.title }}</p>
+            <p class="text-label-sm font-heading text-outline capitalize mt-0.5">
+              {{ resourceTypeLabel(res.type) }}
+              @if (res.duration) { · {{ res.duration }} }
+            </p>
+          </div>
+
+          <!-- Acciones -->
+          <div class="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button (click)="moveUp(i)" [disabled]="i === 0"
+                    class="p-1 rounded text-outline hover:text-primary hover:bg-primary/5
+                           transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    [title]="t.moveUp">
+              <span class="material-symbols-outlined text-[16px]">arrow_upward</span>
+            </button>
+            <button (click)="moveDown(i)" [disabled]="last"
+                    class="p-1 rounded text-outline hover:text-primary hover:bg-primary/5
+                           transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    [title]="t.moveDown">
+              <span class="material-symbols-outlined text-[16px]">arrow_downward</span>
+            </button>
+            <a routerLink="/admin/resources"
+               class="p-1 rounded text-outline hover:text-primary hover:bg-primary/5 transition-colors"
+               [title]="t.viewResource">
+              <span class="material-symbols-outlined text-[16px]">open_in_new</span>
+            </a>
+            <button (click)="remove(res.id)"
+                    class="p-1 rounded text-outline hover:text-error hover:bg-error-container transition-colors"
+                    [title]="t.unlink">
+              <span class="material-symbols-outlined text-[16px]">link_off</span>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="text-center py-8">
+      <span class="material-symbols-outlined text-[40px] text-outline-variant block mb-2">perm_media</span>
+      <p class="text-label-md font-heading text-on-surface-variant mb-2">{{ t.empty }}</p>
+      @if (available().length > 0) {
+        <button (click)="isPickerOpen.set(true)" class="text-primary text-label-sm font-heading hover:underline">
+          {{ t.addFirst }}
+        </button>
+      }
+    </div>
+  }
+</div>

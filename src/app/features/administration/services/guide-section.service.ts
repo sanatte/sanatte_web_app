@@ -56,6 +56,14 @@ export class GuideSectionService {
     return updated;
   }
 
+  async syncResources(id: string, resourceIds: string[]): Promise<GuideSection> {
+    const updated = await firstValueFrom(
+      this.http.put<GuideSection>(`${this.base}/${id}/resources`, { resourceIds })
+    );
+    this._sections.update((list) => list.map((s) => (s.id === id ? updated : s)));
+    return updated;
+  }
+
   async deactivate(id: string): Promise<void> {
     await firstValueFrom(this.http.delete(`${this.base}/${id}`));
     this._sections.update((list) =>
@@ -65,11 +73,16 @@ export class GuideSectionService {
 
   async reactivate(id: string, item: GuideSection): Promise<void> {
     await this.update(id, {
-      key:               item.key,
-      title:             item.title,
-      sortOrder:         item.sortOrder,
-      isActive:          true,
-      introResourceId:   item.introResourceId,
+      key:             item.key,
+      title:           item.title,
+      sortOrder:       item.sortOrder,
+      isActive:        true,
+      introResourceId: item.introResourceId,
     });
+  }
+
+  /** Retorna el ID de la sección del sistema "emotions" (para el admin de Emociones). */
+  getEmotionsSectionId(): string | undefined {
+    return this._sections().find(s => s.key === 'emotions')?.id;
   }
 }

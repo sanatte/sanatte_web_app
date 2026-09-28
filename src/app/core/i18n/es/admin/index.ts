@@ -5,6 +5,7 @@ import { LAYOUT_TEXTS } from './layout.texts';
 import { LICENSES_TEXTS } from './licenses.texts';
 import { LOCATIONS_TEXTS } from './locations.texts';
 import { GUIDE_SECTIONS_TEXTS } from './guide-sections.texts';
+import { LINKED_RESOURCES_EDITOR_TEXTS } from './linked-resources-editor.texts';
 import { MOOD_CATALOG_TEXTS } from './mood-catalog.texts';
 import { MOOD_TRACKING_TEXTS } from './mood-tracking.texts';
 import { ORDERS_TEXTS } from './orders.texts';
@@ -26,6 +27,7 @@ export const ADMIN_TEXTS = {
   locations: LOCATIONS_TEXTS,
   activations: ACTIVATIONS_TEXTS,
   guideSections: GUIDE_SECTIONS_TEXTS,
+  linkedResourcesEditor: LINKED_RESOURCES_EDITOR_TEXTS,
   moodCatalog: MOOD_CATALOG_TEXTS,
   moodTracking: MOOD_TRACKING_TEXTS,
   reports: REPORTS_TEXTS,

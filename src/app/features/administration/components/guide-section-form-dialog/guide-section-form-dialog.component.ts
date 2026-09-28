@@ -5,6 +5,9 @@ import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { GuideSection } from '../../models/guide-section.model';
+import { Resource } from '../../models/resource.model';
+import { ResourceService } from '../../services/resource.service';
+import { LinkedResourcesEditorComponent } from '../linked-resources-editor/linked-resources-editor.component';
 import { environment } from '../../../../../environments/environment';
 import { TEXTS } from '../../../../core/i18n/texts';
 
@@ -14,16 +17,18 @@ export interface GuideSectionFormEvent {
   sortOrder: number;
   isActive: boolean;
   introResourceId: string | null;
+  resourceIds: string[];
 }
 
 @Component({
   selector: 'app-guide-section-form-dialog',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, LinkedResourcesEditorComponent],
   templateUrl: './guide-section-form-dialog.component.html',
 })
 export class GuideSectionFormDialogComponent {
   private readonly fb   = inject(FormBuilder);
-  private readonly http = inject(HttpClient);
+  private readonly http         = inject(HttpClient);
+  private readonly resourceSvc  = inject(ResourceService);
 
   protected readonly t = TEXTS.admin.guideSections.formDialog;
   protected readonly c = TEXTS.common;
@@ -42,8 +47,16 @@ export class GuideSectionFormDialogComponent {
   readonly linkedResourceTitle = signal<string | null>(null);
   readonly linkedResourceType  = signal<string | null>(null);
 
+  /** Recursos vinculados al módulo en su orden actual. */
+  readonly linkedModuleResources = signal<Resource[]>([]);
+
   readonly isEditMode = computed(() => this.editingItem() !== null);
   readonly title      = computed(() => this.isEditMode() ? this.t.editTitle : this.t.createTitle);
+
+  readonly availableResources = computed(() => {
+    const linked = new Set(this.linkedModuleResources().map(r => r.id));
+    return this.resourceSvc.resources().filter(r => !linked.has(r.id));
+  });
 
   readonly form = this.fb.nonNullable.group({
     key:       ['', [Validators.required, Validators.maxLength(80), Validators.pattern(/^[a-z0-9-]+$/)]],
@@ -67,12 +80,22 @@ export class GuideSectionFormDialogComponent {
         this.linkedResourceId.set(item.introResourceId ?? null);
         this.linkedResourceTitle.set(item.introResourceTitle ?? null);
         this.linkedResourceType.set(item.introResourceContentType ?? null);
+        // Convertir GuideSectionResource[] → Resource[] para el editor
+        this.linkedModuleResources.set(
+          item.resources.map(r => this.resourceSvc.resources().find(res => res.id === r.id) ?? ({
+            id: r.id, title: r.title, slug: r.slug, description: r.description,
+            type: r.type as any, status: 'published', tags: [],
+            duration: r.duration ?? undefined, thumbnailUrl: r.thumbnailUrl,
+            thumbnailGradient: r.thumbnailGradient, createdAt: '',
+          }))
+        );
       } else {
         this.form.reset({ key: '', title: '', sortOrder: 0, isActive: true });
         this.form.get('key')?.enable();
         this.linkedResourceId.set(null);
         this.linkedResourceTitle.set(null);
         this.linkedResourceType.set(null);
+        this.linkedModuleResources.set([]);
       }
       this.uploadProgress.set(null);
       this.uploadError.set(null);
@@ -80,6 +103,13 @@ export class GuideSectionFormDialogComponent {
   }
 
   onClose(): void { this.close.emit(); }
+
+  onModuleResourcesChange(orderedIds: string[]): void {
+    const all = this.resourceSvc.resources();
+    this.linkedModuleResources.set(
+      orderedIds.map(id => all.find(r => r.id === id)).filter(Boolean) as Resource[]
+    );
+  }
 
   onSubmit(): void {
     if (this.form.invalid || this.isSaving()) return;
@@ -90,6 +120,7 @@ export class GuideSectionFormDialogComponent {
       sortOrder:       v.sortOrder,
       isActive:        v.isActive,
       introResourceId: this.linkedResourceId(),
+      resourceIds:     this.linkedModuleResources().map(r => r.id),
     });
   }
 

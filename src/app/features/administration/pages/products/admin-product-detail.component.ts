@@ -10,11 +10,12 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
 import { Product, ProductImage, getPrimaryImage } from '../../models/product.model';
 import { Resource, ResourceType, RESOURCE_TYPE_META } from '../../models/resource.model';
 import { ImageUploadComponent } from '../../../../shared/components/image-upload/image-upload.component';
+import { LinkedResourcesEditorComponent } from '../../components/linked-resources-editor/linked-resources-editor.component';
 import { TEXTS } from '../../../../core/i18n/texts';
 
 @Component({
   selector: 'app-admin-product-detail',
-  imports: [RouterLink, MoneyPipe, DecimalPipe, StatusBadgeComponent, ConfirmDialogComponent, ImageUploadComponent],
+  imports: [RouterLink, MoneyPipe, DecimalPipe, StatusBadgeComponent, ConfirmDialogComponent, ImageUploadComponent, LinkedResourcesEditorComponent],
   templateUrl: './admin-product-detail.component.html',
 })
 export class AdminProductDetailComponent implements OnInit {
@@ -90,18 +91,10 @@ export class AdminProductDetailComponent implements OnInit {
     this.product.set(this.service.getById(p.id) ?? null);
   }
 
-  async addResource(resource: Resource): Promise<void> {
+  async onResourcesReorder(orderedIds: string[]): Promise<void> {
     const p = this.product();
     if (!p) return;
-    await this.service.addResourceEntitlement(p.id, resource);
-    this.product.set(this.service.getById(p.id) ?? null);
-    this.isPickerOpen.set(false);
-  }
-
-  async removeResource(resourceId: string): Promise<void> {
-    const p = this.product();
-    if (!p) return;
-    await this.service.removeResourceEntitlement(p.id, resourceId);
+    await this.service.syncEntitlements(p.id, orderedIds);
     this.product.set(this.service.getById(p.id) ?? null);
   }
 
