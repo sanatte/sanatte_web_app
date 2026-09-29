@@ -35,6 +35,14 @@ export const PUBLIC_CHECKOUT_TEXTS = {
       ' para completar el pago de forma segura (tarjeta, PSE, Efecty o saldo en cuenta). Volverás a Sanatte automáticamente al terminar.',
     startError: 'No pudimos iniciar el pago. Intenta de nuevo.',
   },
+  guest: {
+    title: 'Finalizar compra',
+    secure: 'Pago seguro con Mercado Pago',
+    pay: (amount: string) => `Pagar ${amount}`,
+    redirecting: 'Redirigiendo a Mercado Pago…',
+    startError: 'No pudimos iniciar el pago. Intenta de nuevo.',
+    productNotFound: 'Producto no encontrado.',
+  },
   summary: {
     title: 'Tu pedido',
     quantity: (n: number) => `x${n}`,
