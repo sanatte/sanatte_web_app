@@ -55,6 +55,15 @@ export class CheckoutService {
     window.location.href = res.initPoint;
   }
 
+  /** Checkout iniciado desde la app móvil (invitado, por FirebaseUid). */
+  async startGuestPayment(productId: string, firebaseUid: string, discountCode?: string): Promise<void> {
+    const body: Record<string, unknown> = { firebaseUid, items: [{ productId, quantity: 1 }] };
+    if (discountCode) body['discountCode'] = discountCode.trim().toUpperCase();
+    const res = await firstValueFrom(this.http.post<CheckoutResult>(`${this.base}/guest`, body));
+    localStorage.setItem(LAST_ORDER_KEY, res.orderNumber);
+    window.location.href = res.initPoint;
+  }
+
   /** Confirma un pago por su id (lo usa la página de retorno). */
   async confirm(paymentId: string): Promise<boolean> {
     const res = await firstValueFrom(

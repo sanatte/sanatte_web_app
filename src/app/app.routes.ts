@@ -167,6 +167,18 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/public/pages/checkout/checkout.component').then((m) => m.CheckoutComponent),
       },
+      {
+        // Checkout de invitado para la app móvil (userId + productId por query).
+        path: 'checkout/guest',
+        loadComponent: () =>
+          import('./features/public/pages/guest-checkout/guest-checkout.component').then((m) => m.GuestCheckoutComponent),
+      },
+      {
+        // Retorno público de Mercado Pago (sin guard): puede venir de la app móvil.
+        path: 'checkout/result',
+        loadComponent: () =>
+          import('./features/public/pages/checkout-result/checkout-result.component').then((m) => m.CheckoutResultComponent),
+      },
     ],
   },
 

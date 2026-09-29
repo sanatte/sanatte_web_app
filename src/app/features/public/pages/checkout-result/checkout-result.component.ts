@@ -74,7 +74,9 @@ export class CheckoutResultComponent {
   }
 
   private async resolve(outcome: string | null, paymentId: string | null): Promise<void> {
-    if (outcome === 'failure') { this.state.set('failure'); return; }
+    const mobile = this.route.snapshot.queryParamMap.has('mobile');
+
+    if (outcome === 'failure') { this.finish('failure', mobile); return; }
 
     if (paymentId) {
       const paid = await this.checkout.confirm(paymentId).catch(() => false);
@@ -82,12 +84,20 @@ export class CheckoutResultComponent {
         this.cart.clear();
         this.orders.load();
         this.library.load();
-        this.state.set('success');
+        this.finish('success', mobile);
         return;
       }
     }
 
-    if (outcome === 'success') { this.cart.clear(); this.orders.load(); this.library.load(); this.state.set('success'); }
-    else { this.state.set('pending'); }
+    if (outcome === 'success') { this.cart.clear(); this.orders.load(); this.library.load(); this.finish('success', mobile); }
+    else { this.finish('pending', mobile); }
+  }
+
+  /** Fija el estado y, en flujo móvil, devuelve a la app por deep link. */
+  private finish(state: ResultState, mobile: boolean): void {
+    this.state.set(state);
+    if (!mobile) return;
+    const scheme = state === 'success' ? 'payment-success' : state === 'pending' ? 'payment-pending' : 'payment-failure';
+    window.location.href = `sanatte://${scheme}?order=${this.orderNumber() ?? ''}`;
   }
 }
