@@ -87,6 +87,24 @@
             </p>
           </div>
 
+          <!-- Introducción: la insignia se ve siempre; la estrella marca/quita -->
+          @if (introId() === res.id) {
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10
+                         text-primary text-label-sm font-heading font-semibold flex-shrink-0">
+              <span class="material-symbols-outlined text-[14px]">waving_hand</span>
+              {{ t.intro }}
+            </span>
+          }
+          @if (introEnabled()) {
+            <button (click)="toggleIntro(res.id)"
+                    class="p-1 rounded transition-colors flex-shrink-0 hover:bg-primary/5"
+                    [class]="introId() === res.id ? 'text-primary' : 'text-outline-variant hover:text-primary'"
+                    [title]="introId() === res.id ? t.unmarkIntro : t.markIntro">
+              <span class="material-symbols-outlined text-[18px]"
+                    [style.font-variation-settings]="introId() === res.id ? '\'FILL\' 1' : null">star</span>
+            </button>
+          }
+
           <!-- Acciones -->
           <div class="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
             <button (click)="moveUp(i)" [disabled]="i === 0"

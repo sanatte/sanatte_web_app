@@ -5,6 +5,9 @@ export const LINKED_RESOURCES_EDITOR_TEXTS = {
   moveDown:     'Bajar',
   viewResource: 'Ver recurso',
   unlink:       'Quitar',
+  intro:        'Introducción',
+  markIntro:    'Marcar como introducción',
+  unmarkIntro:  'Quitar como introducción',
   empty:        'Sin recursos vinculados',
   addFirst:     'Agregar primer recurso',
   resourceCount: (n: number) =>

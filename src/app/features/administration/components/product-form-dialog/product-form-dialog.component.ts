@@ -69,19 +69,21 @@ export class ProductFormDialogComponent {
     effect(() => {
       const p = this.product();
       if (p) {
-        this.form.patchValue({
-          name: p.name, sku: p.sku, type: p.type, price: p.price, taxRate: p.taxRate ?? 19,
-          billingPeriod: p.billingPeriod ?? 'monthly', stock: p.stock ?? null,
-          requiresActivation: p.requiresActivation, status: p.status,
-          description: p.description, tags: p.tags?.join(', ') ?? '',
-          welcomeResourceId: p.welcomeResourceId ?? '',
-        });
-        this.selectedType.set(p.type);
         const ids = new Set(
           p.entitlements
             .filter((e) => e.type === 'content_item')
             .map((e) => e.referenceId)
         );
+        // La bienvenida solo vale si ese recurso sigue entre los incluidos.
+        const welcomeId = p.welcomeResourceId && ids.has(p.welcomeResourceId) ? p.welcomeResourceId : '';
+        this.form.patchValue({
+          name: p.name, sku: p.sku, type: p.type, price: p.price, taxRate: p.taxRate ?? 19,
+          billingPeriod: p.billingPeriod ?? 'monthly', stock: p.stock ?? null,
+          requiresActivation: p.requiresActivation, status: p.status,
+          description: p.description, tags: p.tags?.join(', ') ?? '',
+          welcomeResourceId: welcomeId,
+        });
+        this.selectedType.set(p.type);
         this.selectedResourceIds.set(ids);
       } else {
         this.form.reset({
@@ -99,11 +101,16 @@ export class ProductFormDialogComponent {
   }
 
   toggleResource(resource: Resource): void {
+    const removing = this.selectedResourceIds().has(resource.id);
     this.selectedResourceIds.update((set) => {
       const next = new Set(set);
       next.has(resource.id) ? next.delete(resource.id) : next.add(resource.id);
       return next;
     });
+    // Si se desmarca el recurso que era la bienvenida, el valor deja de ser válido: sin esto
+    // el selector se veía vacío pero se reenviaba el id viejo al guardar.
+    const welcome = this.form.controls.welcomeResourceId;
+    if (removing && welcome.value === resource.id) welcome.setValue('');
   }
 
   isResourceSelected(id: string): boolean {

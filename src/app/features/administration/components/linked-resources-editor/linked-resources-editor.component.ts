@@ -19,6 +19,13 @@ export class LinkedResourcesEditorComponent {
   /** Emite el array ordenado de IDs cuando el orden o la lista cambia. */
   readonly orderChange = output<string[]>();
 
+  /** Id del recurso marcado como introducción del producto (null = ninguno). */
+  readonly introId = input<string | null>(null);
+  /** Muestra la estrella para marcar/quitar la introducción (solo aplica a productos). */
+  readonly introEnabled = input(false);
+  /** Emite el id elegido como introducción, o null para quitar la marca. */
+  readonly introChange = output<string | null>();
+
   readonly isPickerOpen = signal(false);
 
   // ── Drag state ──────────────────────────────────────────────────────────────
@@ -71,6 +78,10 @@ export class LinkedResourcesEditorComponent {
   remove(resourceId: string): void {
     const list = this.resources().filter(r => r.id !== resourceId);
     this.orderChange.emit(list.map(r => r.id));
+  }
+
+  toggleIntro(resourceId: string): void {
+    this.introChange.emit(this.introId() === resourceId ? null : resourceId);
   }
 
   // ── Helpers ─────────────────────────────────────────────────────────────────
