@@ -120,9 +120,10 @@ export const PRODUCTS_TEXTS = {
     resourcesHint: 'Selecciona los recursos que el usuario recibirá al adquirir este producto.',
     published: '● Publicado',
     draft: '○ Borrador',
-    welcome: 'Recurso de bienvenida',
-    welcomeHint: 'Se muestra al usuario justo después de activar el producto.',
-    welcomeNone: 'Sin página de bienvenida',
+    welcome: 'Recurso de bienvenida / introducción',
+    welcomeHint:
+      'Se muestra al usuario justo después de activar el producto y aparece destacado al inicio de la lista de recursos en la app.',
+    welcomeNone: 'Sin introducción',
     tags: 'Tags',
     tagsHint: '(separados por coma)',
     tagsPlaceholder: 'ej. QR Sync, Cuero vegano, 120gsm',

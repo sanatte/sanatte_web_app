@@ -98,6 +98,14 @@ export class AdminProductDetailComponent implements OnInit {
     this.product.set(this.service.getById(p.id) ?? null);
   }
 
+  /** Marca (o quita con null) el recurso de introducción/bienvenida del producto. */
+  async onIntroChange(resourceId: string | null): Promise<void> {
+    const p = this.product();
+    if (!p) return;
+    await this.service.update(p.id, { welcomeResourceId: resourceId });
+    this.product.set(this.service.getById(p.id) ?? null);
+  }
+
   async onImageFileSelected(file: File, isPrimary = false): Promise<void> {
     const p = this.product();
     if (!p) return;

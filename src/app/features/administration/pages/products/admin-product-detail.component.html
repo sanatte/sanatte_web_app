@@ -193,7 +193,10 @@
       <app-linked-resources-editor
         [resources]="linkedResources()"
         [available]="availableResources()"
-        (orderChange)="onResourcesReorder($event)" />
+        [introId]="p.welcomeResourceId ?? null"
+        [introEnabled]="true"
+        (orderChange)="onResourcesReorder($event)"
+        (introChange)="onIntroChange($event)" />
     </div>
 
     @if (p.specs.length) {
