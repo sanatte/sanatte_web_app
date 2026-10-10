@@ -29,11 +29,14 @@
             {{ t.key }} <span class="text-error">*</span>
           </label>
           <input formControlName="key" type="text" maxlength="80" [placeholder]="t.keyPlaceholder"
+                 (input)="onKeyInput()"
                  class="w-full px-3 py-2.5 rounded-xl border border-outline-variant/30 bg-surface
                         text-body-md text-on-surface placeholder:text-on-surface-variant/40 font-mono
                         focus:outline-none focus:ring-2 focus:ring-primary/40 transition
                         disabled:opacity-50 disabled:cursor-not-allowed" />
-          <p class="text-label-sm text-on-surface-variant mt-1">{{ t.keyHint }}</p>
+          <p class="text-label-sm mt-1"
+             [class.text-error]="form.controls.key.invalid && form.controls.key.dirty"
+             [class.text-on-surface-variant]="!(form.controls.key.invalid && form.controls.key.dirty)">{{ t.keyHint }}</p>
         </div>
 
         <!-- Title -->

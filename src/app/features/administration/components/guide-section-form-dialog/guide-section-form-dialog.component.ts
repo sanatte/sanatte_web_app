@@ -111,6 +111,17 @@ export class GuideSectionFormDialogComponent {
     );
   }
 
+  /** Normaliza el key a slug: minúsculas, sin tildes, espacios/guiones bajos → guion. */
+  onKeyInput(): void {
+    const control = this.form.controls.key;
+    const slug = control.value
+      .normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .toLowerCase()
+      .replace(/[\s_]+/g, '-')
+      .replace(/[^a-z0-9-]/g, '');
+    if (slug !== control.value) control.setValue(slug);
+  }
+
   onSubmit(): void {
     if (this.form.invalid || this.isSaving()) return;
     const v = this.form.getRawValue();
