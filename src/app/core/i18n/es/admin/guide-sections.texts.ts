@@ -1,10 +1,10 @@
 export const GUIDE_SECTIONS_TEXTS = {
   page: {
-    title: 'Contenido Gratuito',
+    title: 'Cortesías',
     description: 'Módulos de bienestar que ofreces gratis (dinero, hábitos, espiritualidad…). Cada módulo tiene un intro y recursos ordenados, visibles en la app sin necesidad de compra.',
     newSection: 'Nuevo módulo',
     emptyTitle: 'Sin módulos configurados',
-    emptyDescription: 'Crea el primer módulo de contenido gratuito.',
+    emptyDescription: 'Crea el primer módulo de cortesías.',
     saveError: 'Error al guardar el módulo.',
     loadError: 'No se pudo cargar los módulos.',
   },
@@ -30,8 +30,8 @@ export const GUIDE_SECTIONS_TEXTS = {
     media: 'Media',
   },
   formDialog: {
-    createTitle: 'Nuevo módulo gratuito',
-    editTitle:   'Editar módulo gratuito',
+    createTitle: 'Nuevo módulo de cortesías',
+    editTitle:   'Editar módulo de cortesías',
     key:         'Key (identificador único)',
     keyPlaceholder: 'ej. money, habits, spirituality',
     keyHint:     'Solo letras minúsculas, números y guiones. No se puede cambiar después de crear.',
