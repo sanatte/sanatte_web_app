@@ -64,6 +64,22 @@ export class GuideSectionService {
     return updated;
   }
 
+  async uploadCover(id: string, file: File): Promise<GuideSection> {
+    const fd = new FormData();
+    fd.append('file', file, file.name);
+    const updated = await firstValueFrom(this.http.post<GuideSection>(`${this.base}/${id}/cover`, fd));
+    // La URL de la portada es estable (mismo path): se fuerza el refresco del caché del navegador.
+    if (updated.coverUrl) updated.coverUrl = `${updated.coverUrl}?t=${Date.now()}`;
+    this._sections.update((list) => list.map((s) => (s.id === id ? updated : s)));
+    return updated;
+  }
+
+  async removeCover(id: string): Promise<GuideSection> {
+    const updated = await firstValueFrom(this.http.delete<GuideSection>(`${this.base}/${id}/cover`));
+    this._sections.update((list) => list.map((s) => (s.id === id ? updated : s)));
+    return updated;
+  }
+
   async deactivate(id: string): Promise<void> {
     await firstValueFrom(this.http.delete(`${this.base}/${id}`));
     this._sections.update((list) =>

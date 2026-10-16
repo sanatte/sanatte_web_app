@@ -75,6 +75,17 @@ export class AdminGuideSectionsComponent {
       if (event.resourceIds !== undefined) {
         await this.svc.syncResources(section.id, event.resourceIds);
       }
+      if (event.coverFile || event.removeCover) {
+        try {
+          if (event.coverFile) await this.svc.uploadCover(section.id, event.coverFile);
+          else await this.svc.removeCover(section.id);
+        } catch {
+          // El módulo ya existe: un reintento debe actualizarlo, no crearlo de nuevo.
+          this.editing.set(this.svc.sections().find((s) => s.id === section.id) ?? section);
+          this.saveError.set(this.t.formDialog.coverUploadFailed);
+          return;
+        }
+      }
       this.isModalOpen.set(false);
     } catch (e: unknown) {
       this.saveError.set(e instanceof Error ? e.message : this.t.page.saveError);
