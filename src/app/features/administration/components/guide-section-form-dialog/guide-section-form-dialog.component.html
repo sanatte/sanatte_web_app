@@ -1,13 +1,11 @@
 @if (isOpen()) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-on-background/40 backdrop-blur-sm"
-       (click)="onClose()">
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-on-background/40 backdrop-blur-sm">
 
-    <div class="bg-surface-bright rounded-2xl shadow-elevation-3 w-full max-w-lg max-h-[90vh] overflow-y-auto"
-         (click)="$event.stopPropagation()">
+    <div class="bg-surface-bright rounded-2xl shadow-elevation-3 w-full max-w-lg max-h-[90vh] overflow-y-auto">
 
       <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-outline-variant/20">
         <h2 class="font-heading text-headline-md font-bold text-on-surface">{{ title() }}</h2>
-        <button (click)="onClose()"
+        <button type="button" (click)="onClose()"
                 class="p-2 rounded-lg hover:bg-surface-container transition-colors"
                 [disabled]="isSaving()">
           <span class="material-symbols-outlined text-on-surface-variant">close</span>
