@@ -18,6 +18,10 @@ export interface GuideSectionFormEvent {
   isActive: boolean;
   introResourceId: string | null;
   resourceIds: string[];
+  /** Nueva portada elegida (null = sin cambios). */
+  coverFile: File | null;
+  /** true = quitar la portada existente. */
+  removeCover: boolean;
 }
 
 @Component({
@@ -43,6 +47,16 @@ export class GuideSectionFormDialogComponent {
 
   readonly uploadProgress = signal<number | null>(null);
   readonly uploadError    = signal<string | null>(null);
+
+  readonly selectedCover = signal<File | null>(null);
+  readonly coverPreview  = signal<string | null>(null);
+  readonly coverRemoved  = signal(false);
+  readonly coverError    = signal<string | null>(null);
+
+  /** Portada a mostrar: la recién elegida, o la guardada si no se quitó. */
+  readonly displayedCover = computed(() =>
+    this.coverPreview() ?? (this.coverRemoved() ? null : this.editingItem()?.coverUrl ?? null)
+  );
   readonly linkedResourceId    = signal<string | null>(null);
   readonly linkedResourceTitle = signal<string | null>(null);
   readonly linkedResourceType  = signal<string | null>(null);
@@ -100,6 +114,10 @@ export class GuideSectionFormDialogComponent {
         this.linkedResourceType.set(null);
         this.linkedModuleResources.set([]);
       }
+      this.selectedCover.set(null);
+      this.coverPreview.set(null);
+      this.coverRemoved.set(false);
+      this.coverError.set(null);
       this.uploadProgress.set(null);
       this.uploadError.set(null);
     });
@@ -135,7 +153,30 @@ export class GuideSectionFormDialogComponent {
       isActive:        v.isActive,
       introResourceId: this.linkedResourceId(),
       resourceIds:     this.linkedModuleResources().map(r => r.id),
+      coverFile:       this.selectedCover(),
+      removeCover:     this.coverRemoved() && !this.selectedCover(),
     });
+  }
+
+  onCoverSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+    input.value = '';
+    if (!file) return;
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      this.coverError.set(this.t.invalidCover);
+      return;
+    }
+    this.coverError.set(null);
+    this.selectedCover.set(file);
+    this.coverPreview.set(URL.createObjectURL(file));
+    this.coverRemoved.set(false);
+  }
+
+  removeCover(): void {
+    this.selectedCover.set(null);
+    this.coverPreview.set(null);
+    this.coverRemoved.set(true);
   }
 
   unlinkResource(): void {

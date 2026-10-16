@@ -20,6 +20,7 @@ export interface GuideSection {
   introResourceId?: string | null;
   introResourceTitle?: string | null;
   introResourceContentType?: string | null;
+  coverUrl?: string | null;
   resources: GuideSectionResource[];
   createdAt: string;
   updatedAt?: string | null;
