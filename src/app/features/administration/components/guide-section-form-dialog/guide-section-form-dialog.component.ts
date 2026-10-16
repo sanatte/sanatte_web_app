@@ -1,5 +1,5 @@
 import {
-  Component, input, output, inject, signal, computed, effect
+  Component, input, output, inject, signal, computed, effect, untracked
 } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -69,6 +69,8 @@ export class GuideSectionFormDialogComponent {
     effect(() => {
       const item = this.editingItem();
       if (!this.isOpen()) return;
+      // Refresca el catálogo para incluir recursos creados después de cargar la página.
+      untracked(() => void this.resourceSvc.loadAll());
       if (item) {
         this.form.patchValue({
           key:       item.key,
@@ -81,8 +83,9 @@ export class GuideSectionFormDialogComponent {
         this.linkedResourceTitle.set(item.introResourceTitle ?? null);
         this.linkedResourceType.set(item.introResourceContentType ?? null);
         // Convertir GuideSectionResource[] → Resource[] para el editor
+        const known = untracked(() => this.resourceSvc.resources());
         this.linkedModuleResources.set(
-          item.resources.map(r => this.resourceSvc.resources().find(res => res.id === r.id) ?? ({
+          item.resources.map(r => known.find(res => res.id === r.id) ?? ({
             id: r.id, title: r.title, slug: r.slug, description: r.description,
             type: r.type as any, status: 'published', tags: [],
             duration: r.duration ?? undefined, thumbnailUrl: r.thumbnailUrl,

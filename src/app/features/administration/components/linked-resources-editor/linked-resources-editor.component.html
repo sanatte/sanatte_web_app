@@ -4,8 +4,7 @@
     <span class="text-label-sm font-heading text-on-surface-variant">
       {{ t.resourceCount(resources().length) }}
     </span>
-    @if (available().length > 0) {
-      <button (click)="isPickerOpen.set(!isPickerOpen())"
+      <button type="button" (click)="isPickerOpen.set(!isPickerOpen())"
               class="flex items-center gap-1 px-2.5 py-1 rounded-full text-label-sm
                      font-heading font-semibold transition-colors"
               [class]="isPickerOpen()
@@ -16,7 +15,6 @@
         </span>
         {{ isPickerOpen() ? c.actions.close : t.add }}
       </button>
-    }
   </div>
 
   <!-- Picker -->
@@ -26,8 +24,16 @@
         <p class="text-label-sm font-heading font-semibold text-primary">{{ t.pickerTitle }}</p>
       </div>
       <div class="max-h-48 overflow-y-auto divide-y divide-outline-variant/20">
+        @if (available().length === 0) {
+          <div class="px-4 py-4 text-center">
+            <p class="text-label-md font-heading text-on-surface-variant mb-1">{{ t.noAvailable }}</p>
+            <a routerLink="/admin/resources" class="text-primary text-label-sm font-heading hover:underline">
+              {{ t.createResource }}
+            </a>
+          </div>
+        }
         @for (resource of available(); track resource.id) {
-          <button (click)="add(resource)"
+          <button type="button" (click)="add(resource)"
                   class="w-full flex items-center gap-3 px-4 py-3 text-left
                          hover:bg-primary-fixed/40 transition-colors group">
             <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center
@@ -96,7 +102,7 @@
             </span>
           }
           @if (introEnabled()) {
-            <button (click)="toggleIntro(res.id)"
+            <button type="button" (click)="toggleIntro(res.id)"
                     class="p-1 rounded transition-colors flex-shrink-0 hover:bg-primary/5"
                     [class]="introId() === res.id ? 'text-primary' : 'text-outline-variant hover:text-primary'"
                     [title]="introId() === res.id ? t.unmarkIntro : t.markIntro">
@@ -107,13 +113,13 @@
 
           <!-- Acciones -->
           <div class="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button (click)="moveUp(i)" [disabled]="i === 0"
+            <button type="button" (click)="moveUp(i)" [disabled]="i === 0"
                     class="p-1 rounded text-outline hover:text-primary hover:bg-primary/5
                            transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                     [title]="t.moveUp">
               <span class="material-symbols-outlined text-[16px]">arrow_upward</span>
             </button>
-            <button (click)="moveDown(i)" [disabled]="last"
+            <button type="button" (click)="moveDown(i)" [disabled]="last"
                     class="p-1 rounded text-outline hover:text-primary hover:bg-primary/5
                            transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                     [title]="t.moveDown">
@@ -124,7 +130,7 @@
                [title]="t.viewResource">
               <span class="material-symbols-outlined text-[16px]">open_in_new</span>
             </a>
-            <button (click)="remove(res.id)"
+            <button type="button" (click)="remove(res.id)"
                     class="p-1 rounded text-outline hover:text-error hover:bg-error-container transition-colors"
                     [title]="t.unlink">
               <span class="material-symbols-outlined text-[16px]">link_off</span>
@@ -137,11 +143,9 @@
     <div class="text-center py-8">
       <span class="material-symbols-outlined text-[40px] text-outline-variant block mb-2">perm_media</span>
       <p class="text-label-md font-heading text-on-surface-variant mb-2">{{ t.empty }}</p>
-      @if (available().length > 0) {
-        <button (click)="isPickerOpen.set(true)" class="text-primary text-label-sm font-heading hover:underline">
-          {{ t.addFirst }}
-        </button>
-      }
+      <button type="button" (click)="isPickerOpen.set(true)" class="text-primary text-label-sm font-heading hover:underline">
+        {{ t.addFirst }}
+      </button>
     </div>
   }
 </div>

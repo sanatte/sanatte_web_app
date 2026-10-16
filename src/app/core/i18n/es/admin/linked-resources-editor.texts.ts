@@ -10,6 +10,8 @@ export const LINKED_RESOURCES_EDITOR_TEXTS = {
   unmarkIntro:  'Quitar como introducción',
   empty:        'Sin recursos vinculados',
   addFirst:     'Agregar primer recurso',
+  noAvailable:  'No hay recursos disponibles para agregar.',
+  createResource: 'Crear recurso',
   resourceCount: (n: number) =>
     n === 0 ? 'Sin recursos' : n === 1 ? '1 recurso' : `${n} recursos`,
 } as const;
