@@ -1,6 +1,6 @@
 export const GUIDE_SECTIONS_TEXTS = {
   page: {
-    title: 'Cortesías',
+    title: 'De cortesía',
     description: 'Módulos de bienestar que ofreces gratis (dinero, hábitos, espiritualidad…). Cada módulo tiene un intro y recursos ordenados, visibles en la app sin necesidad de compra.',
     newSection: 'Nuevo módulo',
     emptyTitle: 'Sin módulos configurados',
