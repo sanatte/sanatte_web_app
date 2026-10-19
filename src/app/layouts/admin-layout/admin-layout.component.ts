@@ -56,6 +56,7 @@ export class AdminLayoutComponent {
     { label: this.t.nav.guideSections, route: '/admin/guide-sections', icon: 'auto_stories' },
     { label: this.t.nav.moodCatalog,  route: '/admin/mood-catalog',   icon: 'sentiment_satisfied' },
     { label: this.t.nav.moodTracking, route: '/admin/mood-tracking', icon: 'monitoring' },
+    { label: this.t.nav.quotes,       route: '/admin/quotes',        icon: 'format_quote' },
     { label: this.t.nav.reports,      route: '/admin/reports',       icon: 'bar_chart' },
   ];
 

@@ -91,5 +91,11 @@ export const administrationRoutes: Routes = [
     loadComponent: () =>
       import('./pages/mood-tracking/admin-mood-tracking.component').then((m) => m.AdminMoodTrackingComponent),
   },
+  {
+    path: 'quotes',
+    data: { title: 'Frases del día' },
+    loadComponent: () =>
+      import('./pages/quotes/admin-quotes.component').then((m) => m.AdminQuotesComponent),
+  },
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
 ];
