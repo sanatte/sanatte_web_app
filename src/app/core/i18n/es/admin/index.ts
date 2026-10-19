@@ -8,6 +8,7 @@ import { GUIDE_SECTIONS_TEXTS } from './guide-sections.texts';
 import { LINKED_RESOURCES_EDITOR_TEXTS } from './linked-resources-editor.texts';
 import { MOOD_CATALOG_TEXTS } from './mood-catalog.texts';
 import { MOOD_TRACKING_TEXTS } from './mood-tracking.texts';
+import { QUOTES_TEXTS } from './quotes.texts';
 import { ORDERS_TEXTS } from './orders.texts';
 import { PRODUCTS_TEXTS } from './products.texts';
 import { REPORTS_TEXTS } from './reports.texts';
@@ -30,6 +31,7 @@ export const ADMIN_TEXTS = {
   linkedResourcesEditor: LINKED_RESOURCES_EDITOR_TEXTS,
   moodCatalog: MOOD_CATALOG_TEXTS,
   moodTracking: MOOD_TRACKING_TEXTS,
+  quotes: QUOTES_TEXTS,
   reports: REPORTS_TEXTS,
   settings: SETTINGS_TEXTS,
 } as const;

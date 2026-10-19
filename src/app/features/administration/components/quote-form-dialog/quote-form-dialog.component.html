@@ -1,0 +1,100 @@
+@if (isOpen()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-on-background/40 backdrop-blur-sm"
+       (click)="onClose()">
+
+    <div class="bg-surface-bright rounded-2xl shadow-elevation-3 w-full max-w-lg max-h-[90vh] overflow-y-auto"
+         (click)="$event.stopPropagation()">
+
+      <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-outline-variant/20">
+        <h2 class="font-heading text-headline-md font-bold text-on-surface">{{ title() }}</h2>
+        <button (click)="onClose()"
+                class="p-2 rounded-lg hover:bg-surface-container transition-colors"
+                [disabled]="isSaving()">
+          <span class="material-symbols-outlined text-on-surface-variant">close</span>
+        </button>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-6 space-y-5">
+
+        @if (errorMessage()) {
+          <div class="rounded-xl bg-error-container p-3 flex items-start gap-2">
+            <span class="material-symbols-outlined text-error text-[18px] mt-0.5">error_outline</span>
+            <p class="text-label-sm text-on-error-container">{{ errorMessage() }}</p>
+          </div>
+        }
+
+        <div>
+          <label class="block text-label-sm font-heading font-semibold text-on-surface-variant mb-1">
+            {{ t.textEs }} <span class="text-error">*</span>
+          </label>
+          <textarea formControlName="textEs" rows="3" maxlength="500" [placeholder]="t.textEsPlaceholder"
+                    class="w-full px-3 py-2.5 rounded-xl border border-outline-variant/30 bg-surface
+                           text-body-md text-on-surface placeholder:text-on-surface-variant/40 resize-none
+                           focus:outline-none focus:ring-2 focus:ring-primary/40 transition"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-label-sm font-heading font-semibold text-on-surface-variant mb-1">
+            {{ t.textEn }}
+          </label>
+          <textarea formControlName="textEn" rows="3" maxlength="500" [placeholder]="t.textEnPlaceholder"
+                    class="w-full px-3 py-2.5 rounded-xl border border-outline-variant/30 bg-surface
+                           text-body-md text-on-surface placeholder:text-on-surface-variant/40 resize-none
+                           focus:outline-none focus:ring-2 focus:ring-primary/40 transition"></textarea>
+          <p class="text-label-sm text-on-surface-variant mt-1">{{ t.textEnHint }}</p>
+        </div>
+
+        <div>
+          <label class="block text-label-sm font-heading font-semibold text-on-surface-variant mb-1">
+            {{ t.author }} <span class="text-error">*</span>
+          </label>
+          <input formControlName="author" type="text" maxlength="120" [placeholder]="t.authorPlaceholder"
+                 class="w-full px-3 py-2.5 rounded-xl border border-outline-variant/30 bg-surface
+                        text-body-md text-on-surface placeholder:text-on-surface-variant/40
+                        focus:outline-none focus:ring-2 focus:ring-primary/40 transition" />
+        </div>
+
+        <div>
+          <label class="block text-label-sm font-heading font-semibold text-on-surface-variant mb-1">
+            {{ t.scheduledFor }}
+          </label>
+          <input formControlName="scheduledFor" type="date"
+                 class="w-full px-3 py-2.5 rounded-xl border border-outline-variant/30 bg-surface
+                        text-body-md text-on-surface
+                        focus:outline-none focus:ring-2 focus:ring-primary/40 transition" />
+          <p class="text-label-sm text-on-surface-variant mt-1">{{ t.scheduledForHint }}</p>
+        </div>
+
+        @if (isEditMode()) {
+          <div class="flex items-center gap-3">
+            <input formControlName="isActive" type="checkbox" id="quoteIsActive"
+                   class="w-5 h-5 rounded border-outline-variant accent-primary cursor-pointer" />
+            <label for="quoteIsActive" class="text-label-md font-heading text-on-surface cursor-pointer">
+              {{ t.isActive }}
+            </label>
+          </div>
+        }
+
+        <div class="flex justify-end gap-3 pt-2">
+          <button type="button" (click)="onClose()"
+                  [disabled]="isSaving()"
+                  class="px-5 py-2.5 rounded-full border border-outline-variant/40 text-label-md font-heading
+                         text-on-surface hover:bg-surface-container transition-colors disabled:opacity-50">
+            {{ c.actions.cancel }}
+          </button>
+          <button type="submit"
+                  [disabled]="form.invalid || isSaving()"
+                  class="px-6 py-2.5 rounded-full gradient-primary text-white text-label-md font-heading font-bold
+                         hover:opacity-90 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed
+                         flex items-center gap-2">
+            @if (isSaving()) {
+              <span class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span>
+            }
+            {{ isEditMode() ? t.saveChanges : t.create }}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+}
