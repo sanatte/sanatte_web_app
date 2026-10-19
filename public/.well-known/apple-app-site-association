@@ -3,10 +3,11 @@
     "apps": [],
     "details": [
       {
-        "appID": "TEAM_ID.com.example.sanatte_app",
+        "appID": "U85M5HX3CU.com.example.sanatteApp",
         "paths": [
           "/activate",
           "/activate/*",
+          "/auth/action",
           "/__/auth/action",
           "/reset-password",
           "/reset-password/*"
