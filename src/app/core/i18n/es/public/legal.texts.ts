@@ -204,6 +204,119 @@ export const PUBLIC_LEGAL_TEXTS = {
       },
     ],
   } satisfies LegalDocument,
+  terms: {
+    title: 'Términos de Servicio',
+    lastUpdated: '22 de octubre de 2026',
+    blocks: [
+      {
+        kind: 'p',
+        content: [{ kind: 'text', text: 'Estos Términos de Servicio regulan el acceso y uso de ' }, { kind: 'strong', text: 'Sanatte' }, { kind: 'text', text: ' ([RAZÓN SOCIAL], NIT [NIT]), incluyendo el sitio web, la aplicación móvil (iOS y Android) y los servicios asociados (en conjunto, la "Plataforma"). Al crear una cuenta o usar la Plataforma aceptas estos términos. Si no estás de acuerdo, no utilices la Plataforma.' }],
+      },
+      { kind: 'h2', text: '1. Qué ofrece Sanatte' },
+      {
+        kind: 'p',
+        content: [{ kind: 'text', text: 'Sanatte es un ecosistema de bienestar que combina productos físicos con código QR, contenido digital (audio, video y documentos) y suscripciones. Mediante tu cuenta puedes activar productos, acceder a tu biblioteca de contenido y acceder a beneficios de aliados y especialistas, según el producto que tengas activo.' }],
+      },
+      { kind: 'h2', text: '2. Tu cuenta' },
+      {
+        kind: 'ul',
+        items: [
+          [{ kind: 'text', text: 'Debes ser mayor de edad o contar con la autorización de tus padres o tutores.' }],
+          [{ kind: 'text', text: 'La información que nos das debe ser veraz y actualizada.' }],
+          [{ kind: 'text', text: 'Puedes registrarte con correo y contraseña, o con tu cuenta de Google o Apple.' }],
+          [{ kind: 'text', text: 'Eres responsable de mantener la confidencialidad de tus credenciales y de la actividad realizada desde tu cuenta. Avísanos de inmediato si detectas un uso no autorizado.' }],
+        ],
+      },
+      { kind: 'h2', text: '3. Activación de productos y acceso al contenido' },
+      {
+        kind: 'p',
+        content: [{ kind: 'text', text: 'Los productos con código QR se activan iniciando sesión y vinculando el producto a tu cuenta. La activación es personal: el acceso queda asociado a la cuenta que activó el producto y no puede cederse ni venderse por separado. Algunos recursos pueden estar compartidos entre varios productos; mientras tengas al menos un producto activo que los incluya, conservarás el acceso a ellos.' }],
+      },
+      { kind: 'h2', text: '4. Compras, precios y pagos' },
+      {
+        kind: 'ul',
+        items: [
+          [{ kind: 'text', text: 'Los precios se muestran en pesos colombianos (COP) e incluyen los impuestos aplicables, salvo que se indique lo contrario.' }],
+          [{ kind: 'text', text: 'Los pagos se procesan a través de Mercado Pago. No almacenamos los datos completos de tu tarjeta.' }],
+          [{ kind: 'text', text: 'Una compra se considera completada cuando el pago es aprobado. Si el pago es rechazado o queda pendiente, el producto no se activará hasta su confirmación.' }],
+        ],
+      },
+      { kind: 'h2', text: '5. Suscripciones' },
+      {
+        kind: 'p',
+        content: [{ kind: 'text', text: 'Cuando ofrezcamos suscripciones, se indicarán de forma clara el precio, la periodicidad y la fecha de renovación. Podrás cancelar la renovación en cualquier momento; conservarás el acceso hasta el final del periodo ya pagado. [Detallar política de reembolsos de suscripciones].' }],
+      },
+      { kind: 'h2', text: '6. Retracto, cambios y devoluciones' },
+      {
+        kind: 'p',
+        content: [{ kind: 'text', text: 'Las compras a distancia se rigen por la Ley 1480 de 2011 (Estatuto del Consumidor). Para productos físicos puedes ejercer el derecho de retracto y solicitar garantía en los términos que establece la ley. Para contenido digital, el acceso comienza al activarse el producto; las condiciones específicas de devolución son: [DETALLAR]. Escríbenos y gestionaremos tu solicitud.' }],
+      },
+      { kind: 'h2', text: '7. Propiedad intelectual y licencia de uso' },
+      {
+        kind: 'p',
+        content: [{ kind: 'text', text: 'Todo el contenido de la Plataforma (audios, videos, documentos, textos, marcas, diseños y software) pertenece a Sanatte o a sus licenciantes. Al activar un producto recibes una licencia personal, limitada, no exclusiva, intransferible y revocable para consultar el contenido con fines de uso personal y no comercial.' }],
+      },
+      { kind: 'h2', text: '8. Uso permitido' },
+      {
+        kind: 'p',
+        content: [{ kind: 'text', text: 'Te comprometes a no:' }],
+      },
+      {
+        kind: 'ul',
+        items: [
+          [{ kind: 'text', text: 'Copiar, descargar de forma masiva, grabar, redistribuir, revender o publicar el contenido.' }],
+          [{ kind: 'text', text: 'Compartir tus credenciales ni usar una misma cuenta para dar acceso a terceros.' }],
+          [{ kind: 'text', text: 'Eludir las medidas técnicas de protección, URLs firmadas o límites de acceso.' }],
+          [{ kind: 'text', text: 'Usar la Plataforma de forma ilícita, fraudulenta o que afecte su seguridad o disponibilidad.' }],
+        ],
+      },
+      { kind: 'h2', text: '9. Aliados y especialistas' },
+      {
+        kind: 'p',
+        content: [{ kind: 'text', text: 'Algunos productos incluyen beneficios ofrecidos por aliados y especialistas independientes. Sanatte facilita el acceso al beneficio, pero los servicios son prestados por esos terceros bajo su propia responsabilidad y condiciones.' }],
+      },
+      { kind: 'h2', text: '10. Aviso sobre salud y bienestar' },
+      {
+        kind: 'p',
+        content: [{ kind: 'text', text: 'El contenido de Sanatte tiene fines de bienestar e información general. ' }, { kind: 'strong', text: 'No sustituye' }, { kind: 'text', text: ' el diagnóstico, tratamiento ni consejo de un profesional de la salud. Si tienes una condición médica o psicológica, consulta a un profesional antes de seguir cualquier práctica. Si estás en una situación de emergencia, contacta a los servicios de emergencia de tu localidad.' }],
+      },
+      { kind: 'h2', text: '11. Disponibilidad y cambios del servicio' },
+      {
+        kind: 'p',
+        content: [{ kind: 'text', text: 'Procuramos que la Plataforma esté disponible de forma continua, pero no garantizamos que funcione sin interrupciones o errores. Podemos modificar, actualizar o retirar funciones o contenidos, con un aviso razonable cuando afecte a productos que ya hayas adquirido.' }],
+      },
+      { kind: 'h2', text: '12. Limitación de responsabilidad' },
+      {
+        kind: 'p',
+        content: [{ kind: 'text', text: 'En la medida permitida por la ley, Sanatte no será responsable por daños indirectos o consecuenciales derivados del uso o la imposibilidad de uso de la Plataforma, ni por el contenido o servicios de terceros. Nada de lo aquí dispuesto limita derechos irrenunciables que la ley te reconozca como consumidor.' }],
+      },
+      { kind: 'h2', text: '13. Suspensión y terminación' },
+      {
+        kind: 'p',
+        content: [{ kind: 'text', text: 'Podemos suspender o cancelar tu cuenta si incumples estos términos o la ley, con aviso previo cuando sea posible. También puedes eliminar tu cuenta en cualquier momento; consulta la ' }, { kind: 'route', text: 'página de eliminación de cuenta', route: '/legal/eliminar-cuenta' }, { kind: 'text', text: '.' }],
+      },
+      { kind: 'h2', text: '14. Datos personales' },
+      {
+        kind: 'p',
+        content: [{ kind: 'text', text: 'El tratamiento de tus datos personales se rige por nuestra ' }, { kind: 'route', text: 'Política de Privacidad', route: '/legal/privacidad' }, { kind: 'text', text: '.' }],
+      },
+      { kind: 'h2', text: '15. Cambios a estos términos' },
+      {
+        kind: 'p',
+        content: [{ kind: 'text', text: 'Podemos actualizar estos términos. Publicaremos la versión vigente en esta página con su fecha de "última actualización". Si el cambio es sustancial, te lo informaremos por la Plataforma o por correo. El uso continuado de la Plataforma implica la aceptación de la versión vigente.' }],
+      },
+      { kind: 'h2', text: '16. Ley aplicable y jurisdicción' },
+      {
+        kind: 'p',
+        content: [{ kind: 'text', text: 'Estos términos se rigen por las leyes de la República de Colombia. Cualquier controversia se someterá a las autoridades competentes de [CIUDAD], Colombia, sin perjuicio de las acciones que puedas ejercer ante la Superintendencia de Industria y Comercio (SIC).' }],
+      },
+      { kind: 'h2', text: '17. Contacto' },
+      {
+        kind: 'p',
+        content: [{ kind: 'text', text: 'Para dudas sobre estos términos, escríbenos a ' }, { kind: 'mail', text: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}` }, { kind: 'text', text: '.' }],
+      },
+    ],
+  } satisfies LegalDocument,
   accountDeletion: {
     title: 'Eliminar tu cuenta y tus datos',
     lastUpdated: '25 de septiembre de 2026',
