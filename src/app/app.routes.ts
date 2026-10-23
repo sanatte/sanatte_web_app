@@ -119,6 +119,11 @@ export const routes: Routes = [
 
   // ── Legal (URLs públicas requeridas por App Store / Play Store) ───────────
   {
+    path: 'legal/terminos',
+    loadComponent: () =>
+      import('./features/legal/pages/terms/terms.component').then((m) => m.TermsComponent),
+  },
+  {
     path: 'legal/privacidad',
     loadComponent: () =>
       import('./features/legal/pages/privacy/privacy.component').then((m) => m.PrivacyComponent),

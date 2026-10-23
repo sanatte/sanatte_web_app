@@ -116,6 +116,7 @@ import { TEXTS } from '../../core/i18n/texts';
           <div>
             <h4 class="font-heading font-bold text-on-surface text-label-md uppercase tracking-wider mb-3">{{ t.footer.legal.title }}</h4>
             <ul class="space-y-2 text-label-md font-heading text-on-surface-variant">
+              <li><a routerLink="/legal/terminos" class="hover:text-primary transition-colors">{{ t.footer.legal.terms }}</a></li>
               <li><a routerLink="/legal/privacidad" class="hover:text-primary transition-colors">{{ t.footer.legal.privacy }}</a></li>
               <li><a routerLink="/legal/eliminar-cuenta" class="hover:text-primary transition-colors">{{ t.footer.legal.deleteAccount }}</a></li>
             </ul>

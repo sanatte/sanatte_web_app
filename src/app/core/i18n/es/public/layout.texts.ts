@@ -34,6 +34,7 @@ export const PUBLIC_LAYOUT_TEXTS = {
     },
     legal: {
       title: 'Legal',
+      terms: 'Términos de servicio',
       privacy: 'Privacidad',
       deleteAccount: 'Eliminar cuenta',
     },
